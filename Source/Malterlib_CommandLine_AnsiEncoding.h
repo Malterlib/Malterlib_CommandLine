@@ -7,6 +7,11 @@
 
 namespace NMib::NCommandLine
 {
+	#define DMibCommandLineAnsiColor_Reset "\x1B[0m"
+	#define DMibCommandLineAnsiColor_Bold "\x1B[1m"
+	#define DMibCommandLineAnsiColor_Reverse "\x1B[7m"
+	#define DMibCommandLineAnsiColor_256(d_Color) "\x1B[38;5;" #d_Color "m"
+
 	struct CAnsiEncoding
 	{
 		struct CDecodedColor
@@ -30,9 +35,29 @@ namespace NMib::NCommandLine
 		;
 
 		NStr::CStr static fs_StripEncoding(NStr::CStr const &_In);
+
+		static NStr::CStr fs_Foreground16(uint8 _Color);
+		static NStr::CStr fs_Background16(uint8 _Color);
+		static NStr::CStr fs_Foreground256(uint8 _Color);
+		static NStr::CStr fs_Background256(uint8 _Color);
+		static NStr::CStr fs_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue);
+		static NStr::CStr fs_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue);
+
+		static ch8 const ms_Default[];
+
+		static ch8 const ms_StatusNormal[];
+		static ch8 const ms_StatusWarning[];
+		static ch8 const ms_StatusError[];
+		static ch8 const ms_Bold[];
+
+		static ch8 const ms_Prompt[];
 	};
 }
 
 #ifndef DMibPNoShortCuts
 	using namespace NMib::NCommandLine;
+	#define DAnsiColor_Reset DMibCommandLineAnsiColor_Reset
+	#define DAnsiColor_Bold DMibCommandLineAnsiColor_Bold
+	#define DAnsiColor_Reverse DMibCommandLineAnsiColor_Reverse
+	#define DAnsiColor_256 DMibCommandLineAnsiColor_256
 #endif

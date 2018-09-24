@@ -8,6 +8,55 @@ namespace NMib::NCommandLine
 	using namespace NStr;
 	using namespace NFunction;
 
+	ch8 const CAnsiEncoding::ms_Default[] = DMibCommandLineAnsiColor_Reset;
+
+	ch8 const CAnsiEncoding::ms_StatusNormal[] = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(118);
+	ch8 const CAnsiEncoding::ms_StatusWarning[] = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(207);
+	ch8 const CAnsiEncoding::ms_StatusError[] = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_Bold DMibCommandLineAnsiColor_256(198);
+	ch8 const CAnsiEncoding::ms_Bold[] = DMibCommandLineAnsiColor_Bold;
+
+	ch8 const CAnsiEncoding::ms_Prompt[] = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(221);
+
+	NStr::CStr CAnsiEncoding::fs_Foreground16(uint8 _Color)
+	{
+		DMibRequire(_Color < 16);
+		if (_Color < 8)
+			_Color = 30 + _Color;
+		else
+			_Color = 90 + _Color;
+		return "\x1B[{}m"_f << _Color;
+	}
+
+	NStr::CStr CAnsiEncoding::fs_Background16(uint8 _Color)
+	{
+		DMibRequire(_Color < 16);
+		if (_Color < 8)
+			_Color = 30 + _Color;
+		else
+			_Color = 90 + _Color;
+		return "\x1B[{}m"_f << _Color;
+	}
+
+	NStr::CStr CAnsiEncoding::fs_Foreground256(uint8 _Color)
+	{
+		return "\x1B[38;5;{}m"_f << _Color;
+	}
+
+	NStr::CStr CAnsiEncoding::fs_Background256(uint8 _Color)
+	{
+		return "\x1B[48;5;{}m"_f << _Color;
+	}
+
+	NStr::CStr CAnsiEncoding::fs_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		return "\x1B[38;5;{};{};{}m"_f << _Red << _Green << _Blue;
+	}
+
+	NStr::CStr CAnsiEncoding::fs_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		return "\x1B[48;5;{};{};{}m"_f << _Red << _Green << _Blue;
+	}
+
 	void CAnsiEncoding::CDecodedColor::f_Set(uint8 _Red, uint8 _Green, uint8 _Blue)
 	{
 		m_Red = _Red;
