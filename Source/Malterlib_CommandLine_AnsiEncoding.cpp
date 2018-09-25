@@ -312,4 +312,45 @@ namespace NMib::NCommandLine
 		;
 		return Ret;
 	}
+
+	mint CAnsiEncoding::fs_RenderedStrLen(CStr const &_String)
+	{
+		mint Len = 0;
+		fs_Parse
+			(
+				_String
+				, [&](CStr const &_String)
+			 	{
+					// Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
+					// Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
+					// Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
+					// Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
+					// Combining Half Marks (FE20–FE2F), versions 1.0, with modifications in subsequent versions down to 8.0
+
+					for (auto iParse = _String.f_GetUnicodeIterator(); iParse; ++iParse)
+					{
+						ch32 Char = *iParse;
+						if
+							(
+								!
+								(
+									(Char >= 0x0300 && Char <= 0x036F)
+									|| (Char >= 0x1AB0 && Char <= 0x1AFF)
+									|| (Char >= 0x1DC0 && Char <= 0x1DFF)
+									|| (Char >= 0x20D0 && Char <= 0x20FF)
+									|| (Char >= 0xFE20 && Char <= 0xFE2F)
+								)
+							)
+						{
+							++Len;
+						}
+					}
+				}
+				, [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor)
+			 	{
+				}
+			)
+		;
+		return Len;
+	}
 }

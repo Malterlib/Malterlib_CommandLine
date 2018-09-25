@@ -34,7 +34,8 @@ namespace NMib::NCommandLine
 			)
 		;
 
-		NStr::CStr static fs_StripEncoding(NStr::CStr const &_In);
+		static NStr::CStr fs_StripEncoding(NStr::CStr const &_In);
+		static mint fs_RenderedStrLen(NStr::CStr const &_String);
 
 		static NStr::CStr fs_Foreground16(uint8 _Color);
 		static NStr::CStr fs_Background16(uint8 _Color);
