@@ -25,7 +25,7 @@ namespace NMib::NCommandLine
 	{
 		mint iColumn = o_RowColumns.f_GetLen();
 		auto &MaxWidth = mp_MaxWidths[iColumn];
-		MaxWidth = fg_Max(MaxWidth, CAnsiEncoding::fs_RenderedStrLen(o_RowColumns.f_Insert(_Value)));
+		MaxWidth = fg_Max(MaxWidth, (int32)CAnsiEncoding::fs_RenderedStrLen(o_RowColumns.f_Insert(_Value)));
 	}
 
 	bool CTableRenderHelper::f_IsRounded() const
