@@ -49,12 +49,12 @@ namespace NMib::NCommandLine
 
 	NStr::CStr CAnsiEncoding::fs_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
 	{
-		return "\x1B[38;5;{};{};{}m"_f << _Red << _Green << _Blue;
+		return "\x1B[38;2;{};{};{}m"_f << _Red << _Green << _Blue;
 	}
 
 	NStr::CStr CAnsiEncoding::fs_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
 	{
-		return "\x1B[48;5;{};{};{}m"_f << _Red << _Green << _Blue;
+		return "\x1B[48;2;{};{};{}m"_f << _Red << _Green << _Blue;
 	}
 
 	void CAnsiEncoding::CDecodedColor::f_Set(uint8 _Red, uint8 _Green, uint8 _Blue)
