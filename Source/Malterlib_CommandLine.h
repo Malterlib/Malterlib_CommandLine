@@ -97,7 +97,7 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_ShortName() const;
 		bint f_HasShortName() const;
 		NStr::CStr const &f_Desc() const;
-		typedef NContainer::TCVariant<NStr::CStr, NContainer::TCVector<NStr::CStr>> CArgValue;
+		typedef NStorage::TCVariant<NStr::CStr, NContainer::TCVector<NStr::CStr>> CArgValue;
 	private:
 		struct CNamedValue
 		{
@@ -170,3 +170,4 @@ namespace NMib::NCommandLine
 	using namespace NMib::NCommandLine;
 #endif
 
+#include "Malterlib_CommandLine_Console.h"
