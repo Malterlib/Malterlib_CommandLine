@@ -21,11 +21,14 @@ namespace NMib::NCommandLine
 		mp_MaxWidths.f_Insert(CAnsiEncoding::fs_RenderedStrLen(mp_Headings.f_Insert(_Heading)));
 	}
 
-	void CTableRenderHelper::fp_AddRowColumn(TCVector<CStr> &o_RowColumns, CStr const &_Value)
+	void CTableRenderHelper::fp_AddRowColumn(NContainer::TCVector<NContainer::TCVector<NStr::CStr>> &o_RowColumns, CStr const &_Value)
 	{
+		CStr Value = _Value.f_Replace("\t", "    ");
 		mint iColumn = o_RowColumns.f_GetLen();
 		auto &MaxWidth = mp_MaxWidths[iColumn];
-		MaxWidth = fg_Max(MaxWidth, (int32)CAnsiEncoding::fs_RenderedStrLen(o_RowColumns.f_Insert(_Value)));
+		auto &ColumnRow = o_RowColumns.f_Insert();
+		for (auto &Line : Value.f_SplitLine())
+			MaxWidth = fg_Max(MaxWidth, (int32)CAnsiEncoding::fs_RenderedStrLen(ColumnRow.f_Insert(Line)));
 	}
 
 	bool CTableRenderHelper::f_IsRounded() const
@@ -91,19 +94,35 @@ namespace NMib::NCommandLine
 
 		for (auto &Row : mp_Rows)
 		{
-			mint iColumn = 0;
-			CUStr Line = LineSeparator;
-			for (auto &ColumnData : Row)
+			mint MaxLines = 0;
+			for (auto &ColumnLines : Row)
+				MaxLines = fg_Max(MaxLines, ColumnLines.f_GetLen());
+
+			if (MaxLines == 0)
+				continue;
+
+			mp_fOutput("{}\n"_f << MiddleLine);
+
+			for (mint iLine = 0; iLine < MaxLines; ++iLine)
 			{
-				auto &MaxWidth = mp_MaxWidths[iColumn];
-				++iColumn;
-				Line += U" {sj*,sf ,a-} {}"_f
-					<< ColumnData
-					<< (MaxWidth + (ColumnData.f_GetLen() - CAnsiEncoding::fs_RenderedStrLen(ColumnData)))
-					<< LineSeparator
-				;
+				CUStr Line = LineSeparator;
+				mint iColumn = 0;
+				for (auto &ColumnLines : Row)
+				{
+					auto &MaxWidth = mp_MaxWidths[iColumn];
+					++iColumn;
+					CStr SourceLine;
+					if (ColumnLines.f_IsPosValid(iLine))
+						SourceLine = ColumnLines[iLine];
+
+					Line += U" {sj*,sf ,a-} {}"_f
+						<< SourceLine
+						<< (MaxWidth + (SourceLine.f_GetLen() - CAnsiEncoding::fs_RenderedStrLen(SourceLine)))
+						<< LineSeparator
+					;
+				}
+				mp_fOutput("{}\n"_f << Line);
 			}
-			mp_fOutput("{}\n{}\n"_f << MiddleLine << Line);
 		}
 
 

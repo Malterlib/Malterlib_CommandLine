@@ -28,12 +28,12 @@ namespace NMib::NCommandLine
 
 	private:
 		void fp_AddHeading(NStr::CStr const &_Heading);
-		void fp_AddRowColumn(NContainer::TCVector<NStr::CStr> &o_RowColumns, NStr::CStr const &_Value);
+		void fp_AddRowColumn(NContainer::TCVector<NContainer::TCVector<NStr::CStr>> &o_RowColumns, NStr::CStr const &_Value);
 
 		NFunction::TCFunction<void (NStr::CStr const &_Output)> mp_fOutput;
 
 		NContainer::TCVector<NStr::CStr> mp_Headings;
-		NContainer::TCVector<NContainer::TCVector<NStr::CStr>> mp_Rows;
+		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
 		NContainer::TCVector<zint32> mp_MaxWidths;
 		EOption mp_Options = EOption_None;
 	};

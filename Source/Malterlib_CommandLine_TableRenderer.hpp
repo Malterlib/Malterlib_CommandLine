@@ -30,7 +30,7 @@ namespace NMib::NCommandLine
 		DMibRequire(!mp_MaxWidths.f_IsEmpty());
 		DMibRequire(sizeof...(p_RowColumns) == mp_Headings.f_GetLen());
 
-		NContainer::TCVector<NStr::CStr> RowColumns;
+		NContainer::TCVector<NContainer::TCVector<NStr::CStr>> RowColumns;
 		TCInitializerList<bool> Dummy =
 			{
 				[&]
