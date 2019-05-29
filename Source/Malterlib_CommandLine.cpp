@@ -79,7 +79,7 @@ namespace NMib::NCommandLine
 		return Ret;
 	}
 
-	bint CValue::f_IsMatch( NStr::CStr const &_Value ) const
+	bool CValue::f_IsMatch( NStr::CStr const &_Value ) const
 	{
 		if (mp_ValidValues.f_IsEmpty())
 			return true;
@@ -164,7 +164,7 @@ namespace NMib::NCommandLine
 		return Ret;
 	}
 
-	bint CParser::f_HasOption( NStr::CStr const &_Name ) const
+	bool CParser::f_HasOption( NStr::CStr const &_Name ) const
 	{
 		if (_Name.f_GetLen()<2)
 			return false;
@@ -230,7 +230,7 @@ namespace NMib::NCommandLine
 	{
 		return mp_ShortName;
 	}
-	bint COption::f_HasShortName() const
+	bool COption::f_HasShortName() const
 	{
 		return !mp_ShortName.f_IsEmpty();
 	}
@@ -246,7 +246,7 @@ namespace NMib::NCommandLine
 		: mp_Values(fg_Move(_Values))
 	{
 	}
-	bint CCommandArguments::f_IsSet(NStr::CStr const &_Name) const
+	bool CCommandArguments::f_IsSet(NStr::CStr const &_Name) const
 	{
 		return mp_Values.f_Exists(_Name);
 	}
@@ -255,7 +255,7 @@ namespace NMib::NCommandLine
 		DMibRequire(f_IsSet(_Name));
 		return mp_Values[_Name];
 	}
-	bint CCommandArguments::f_HasValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const
+	bool CCommandArguments::f_HasValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const
 	{
 		if (!f_IsSet(_Option))
 			return false;
@@ -270,7 +270,7 @@ namespace NMib::NCommandLine
 		auto Ret = mp_Values[_Option][_Value];
 		return Ret.f_GetAsType<NStr::CStr>();
 	}
-	bint CCommandArguments::f_HasList(NStr::CStr const &_Option, NStr::CStr const &_Value) const
+	bool CCommandArguments::f_HasList(NStr::CStr const &_Option, NStr::CStr const &_Value) const
 	{
 		if (!f_IsSet(_Option))
 			return false;
@@ -285,7 +285,7 @@ namespace NMib::NCommandLine
 		auto Ret = mp_Values[_Option][_Value];
 		return Ret.f_GetAsType<NContainer::TCVector<NStr::CStr>>();
 	}
-	bint CCommandArguments::f_HasListItem(NStr::CStr const &_Option, NStr::CStr const &_List, NStr::CStr const &_Item) const
+	bool CCommandArguments::f_HasListItem(NStr::CStr const &_Option, NStr::CStr const &_List, NStr::CStr const &_Item) const
 	{
 		DMibRequire(f_HasList(_Option, _List));
 		auto List = f_GetList(_Option, _List);

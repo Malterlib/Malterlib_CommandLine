@@ -77,7 +77,7 @@ namespace NMib::NCommandLine
 			, mp_Name(_Name)
 		{
 		}
-		bint f_IsMatch(NStr::CStr const &_Value) const;
+		bool f_IsMatch(NStr::CStr const &_Value) const;
 		NStr::CStr const &f_Name() const
 		{
 			return mp_Name;
@@ -95,7 +95,7 @@ namespace NMib::NCommandLine
 		void f_AddList(CValue const &_Value);
 		NStr::CStr const &f_Name() const;
 		NStr::CStr const &f_ShortName() const;
-		bint f_HasShortName() const;
+		bool f_HasShortName() const;
 		NStr::CStr const &f_Desc() const;
 		typedef NStorage::TCVariant<NStr::CStr, NContainer::TCVector<NStr::CStr>> CArgValue;
 	private:
@@ -116,8 +116,8 @@ namespace NMib::NCommandLine
 		struct CArgument
 		{
 			CValue m_Value;
-			bint m_IsList;
-			CArgument(CValue const &_Value, bint _IsList)
+			bool m_IsList;
+			CArgument(CValue const &_Value, bool _IsList)
 				: m_Value(_Value)
 				, m_IsList(_IsList)
 
@@ -136,7 +136,7 @@ namespace NMib::NCommandLine
 		CParser();
 		void f_Add(COption const &_Option);
 		NStr::CStr f_HelpMessage() const;
-		bint f_HasOption(NStr::CStr const &_Name) const;
+		bool f_HasOption(NStr::CStr const &_Name) const;
 		COption const &f_GetOption(NStr::CStr const &_Name) const;
 	private:
 		NContainer::TCLinkedList<COption> mp_Options;
@@ -151,13 +151,13 @@ namespace NMib::NCommandLine
 	public:
 		CCommandArguments();
 		CCommandArguments(COptionMap&& _Values);
-		bint f_IsSet(NStr::CStr const &_Name) const;
+		bool f_IsSet(NStr::CStr const &_Name) const;
 		NContainer::TCMap<NStr::CStr, CValue> const &operator [] (NStr::CStr const &_Name) const;
-		bint f_HasValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
+		bool f_HasValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
 		NStr::CStr f_GetValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		bint f_HasList(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
+		bool f_HasList(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
 		NContainer::TCVector<NStr::CStr> f_GetList(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		bint f_HasListItem(NStr::CStr const &_Option, NStr::CStr const &_List, NStr::CStr const &_Item) const;
+		bool f_HasListItem(NStr::CStr const &_Option, NStr::CStr const &_List, NStr::CStr const &_Item) const;
 	private:
 		COptionMap mp_Values;
 	};

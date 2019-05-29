@@ -139,7 +139,7 @@ namespace NMib::NCommandLine
 		;
 
 		const ch8 *pParse = _In;
-		bint IsBeginning = true;
+		bool IsBeginning = true;
 		while (*pParse)
 		{
 			ch8 Char = *pParse;
