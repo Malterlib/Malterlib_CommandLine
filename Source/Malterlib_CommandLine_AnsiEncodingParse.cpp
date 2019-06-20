@@ -1,0 +1,309 @@
+// Copyright © 2015 Hansoft AB
+// Distributed under the MIT license, see license text in LICENSE.Malterlib
+
+#include "Malterlib_CommandLine_AnsiEncodingParse.h"
+
+namespace NMib::NCommandLine
+{
+	using namespace NStr;
+	using namespace NFunction;
+
+	extern CAnsiEncodingParse::CDecodedColor g_CommandLine_AnsiEncodingColor256Array[256];
+
+	void CAnsiEncodingParse::CDecodedColor::f_Set(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		m_Red = _Red;
+		m_Green = _Green;
+		m_Blue = _Blue;
+		m_bEnabled = true;
+	}
+
+	void CAnsiEncodingParse::CDecodedColor::f_SetAnsi16(uint8 _Value)
+	{
+		*this = g_CommandLine_AnsiEncodingColor256Array[_Value];
+	}
+
+	void CAnsiEncodingParse::CDecodedColor::f_SetAnsi256(uint8 _Value)
+	{
+		*this = g_CommandLine_AnsiEncodingColor256Array[_Value];
+	}
+
+	bool CAnsiEncodingParse::CDecodedColor::operator == (CDecodedColor const &_Right) const
+	{
+		return f_Tuple() == _Right.f_Tuple();
+	}
+
+	void CAnsiEncodingParse::fs_Parse
+		(
+		 	CStr const &_In
+		 	, TCFunction<void (CStr const &_String)> const &_fOnString
+		 	, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
+		)
+	{
+		bool bBold = false;
+		int32 LastForeground = -1;
+		CDecodedColor CurrentColor;
+		CDecodedColor CurrentColorBG;
+
+		CStr StringBuffer;
+
+		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor)
+			{
+				if (!StringBuffer.f_IsEmpty())
+				{
+					_fOnString(StringBuffer);
+					StringBuffer.f_Clear();
+				}
+				if (_Color != CurrentColor)
+				{
+					_fPropertyChange(CForegroundColor{_Color});
+					CurrentColor = _Color;
+				}
+				if (_BGColor != CurrentColorBG)
+				{
+					_fPropertyChange(CBackgroundColor{_BGColor});
+					CurrentColorBG = _BGColor;
+				}
+			}
+		;
+		auto fSetBold = [&](bool _bBold)
+			{
+				if (!StringBuffer.f_IsEmpty())
+				{
+					_fOnString(StringBuffer);
+					StringBuffer.f_Clear();
+				}
+				if (bBold != _bBold)
+				{
+					_fPropertyChange(CBold{_bBold});
+					bBold = _bBold;
+				}
+			}
+		;
+		auto fReset = [&]()
+			{
+				if (!StringBuffer.f_IsEmpty())
+				{
+					_fOnString(StringBuffer);
+					StringBuffer.f_Clear();
+				}
+				fSetBold(false);
+				_fPropertyChange(CReset{});
+			}
+		;
+
+		const ch8 *pParse = _In;
+		bool IsBeginning = true;
+		while (*pParse)
+		{
+			ch8 Char = *pParse;
+			if (Char == '\x1B')
+			{
+				++pParse;
+				if (*pParse == '[')
+				{
+					++pParse;
+					auto pStart = pParse;
+					while (*pStart && *pParse >= 0x30 && *pParse <= 0x3F)
+						++pParse;
+					CStr Params(pStart, pParse - pStart);
+
+					pStart = pParse;
+					while (*pStart && *pParse >= 0x20 && *pParse <= 0x2F)
+						++pParse;
+					CStr Intermediate(pStart, pParse - pStart);
+
+					char Final = *pParse;
+					++pParse;
+
+					switch (Final)
+					{
+					case 'm':
+						{
+							// SGR
+
+							CDecodedColor FgColor = CurrentColor;
+							CDecodedColor BgColor = CurrentColorBG;
+
+							auto ParamsVector = Params.f_Split(";");
+
+							for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
+							{
+								uint32 ParamNumber = iParam->f_ToInt(uint32(0));
+								if (ParamNumber == 38 || ParamNumber == 48)
+								{
+									++iParam;
+									if (iParam && *iParam == "5")
+									{
+										++iParam;
+										if (iParam)
+										{
+											if (ParamNumber == 38)
+												FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+											else
+												BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+											++iParam;
+										}
+									}
+									else if (iParam && *iParam == "2")
+									{
+										++iParam;
+										if (iParam)
+										{
+											uint8 Red = iParam->f_ToInt(uint8(0));
+											++iParam;
+											if (iParam)
+											{
+												uint8 Green = iParam->f_ToInt(uint8(0));
+												++iParam;
+												if (iParam)
+												{
+													uint8 Blue = iParam->f_ToInt(uint8(0));
+													++iParam;
+													if (ParamNumber == 38)
+														FgColor.f_Set(Red, Green, Blue);
+													else
+														BgColor.f_Set(Red, Green, Blue);
+												}
+											}
+										}
+									}
+									continue;
+								}
+
+								if (ParamNumber == 1)
+								{
+									fSetBold(true);
+									if (LastForeground >= 30 && ParamNumber <= 37)
+										ParamNumber = LastForeground + 10;
+								}
+								else if (ParamNumber >= 30 && ParamNumber <= 37)
+								{
+									LastForeground = ParamNumber;
+									if (bBold)
+										ParamNumber += 10;
+								}
+								else
+									LastForeground = -1;
+
+								switch (ParamNumber)
+								{
+								case 0: FgColor = {}; BgColor = {}; fReset(); break;
+								case 39: FgColor = {}; break;
+								case 49: BgColor = {}; break;
+
+								case 30: FgColor.f_SetAnsi16(0); break;
+								case 40: BgColor.f_SetAnsi16(0); break;
+								case 31: FgColor.f_SetAnsi16(1); break;
+								case 41: BgColor.f_SetAnsi16(1); break;
+								case 32: FgColor.f_SetAnsi16(2); break;
+								case 42: BgColor.f_SetAnsi16(2); break;
+								case 33: FgColor.f_SetAnsi16(3); break;
+								case 43: BgColor.f_SetAnsi16(3); break;
+								case 34: FgColor.f_SetAnsi16(4); break;
+								case 44: BgColor.f_SetAnsi16(4); break;
+								case 35: FgColor.f_SetAnsi16(5); break;
+								case 45: BgColor.f_SetAnsi16(5); break;
+								case 36: FgColor.f_SetAnsi16(6); break;
+								case 46: BgColor.f_SetAnsi16(6); break;
+								case 37: FgColor.f_SetAnsi16(7); break;
+								case 47: BgColor.f_SetAnsi16(7); break;
+
+								case 90: FgColor.f_SetAnsi16(8); break;
+								case 100: BgColor.f_SetAnsi16(8); break;
+								case 91: FgColor.f_SetAnsi16(9); break;
+								case 101: BgColor.f_SetAnsi16(9); break;
+								case 92: FgColor.f_SetAnsi16(10); break;
+								case 102: BgColor.f_SetAnsi16(10); break;
+								case 93: FgColor.f_SetAnsi16(11); break;
+								case 103: BgColor.f_SetAnsi16(11); break;
+								case 94: FgColor.f_SetAnsi16(12); break;
+								case 104: BgColor.f_SetAnsi16(12); break;
+								case 95: FgColor.f_SetAnsi16(13); break;
+								case 105: BgColor.f_SetAnsi16(13); break;
+								case 96: FgColor.f_SetAnsi16(14); break;
+								case 106: BgColor.f_SetAnsi16(14); break;
+								case 97: FgColor.f_SetAnsi16(15); break;
+								case 107: BgColor.f_SetAnsi16(15); break;
+								}
+								++iParam;
+							}
+
+							fSetColor(FgColor, BgColor);
+							break;
+						}
+					}
+				}
+				continue;
+			}
+			else
+				StringBuffer.f_AddChar(Char);
+
+			IsBeginning = false;
+
+			++pParse;
+		}
+
+		fSetColor({}, {});
+	}
+
+	CStr CAnsiEncodingParse::fs_StripEncoding(CStr const &_In)
+	{
+		CStr Ret;
+
+		fs_Parse
+			(
+				_In
+				, [&](CStr const &_String)
+			 	{
+					Ret += _String;
+				}
+				, [&](CPropertyChange const &_Change)
+			 	{
+				}
+			)
+		;
+		return Ret;
+	}
+
+	mint CAnsiEncodingParse::fs_RenderedStrLen(CStr const &_String)
+	{
+		mint Len = 0;
+		fs_Parse
+			(
+				_String
+				, [&](CStr const &_String)
+			 	{
+					// Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
+					// Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
+					// Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
+					// Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
+					// Combining Half Marks (FE20–FE2F), versions 1.0, with modifications in subsequent versions down to 8.0
+
+					for (auto iParse = _String.f_GetUnicodeIterator(); iParse; ++iParse)
+					{
+						ch32 Char = *iParse;
+						if
+							(
+								!
+								(
+									(Char >= 0x0300 && Char <= 0x036F)
+									|| (Char >= 0x1AB0 && Char <= 0x1AFF)
+									|| (Char >= 0x1DC0 && Char <= 0x1DFF)
+									|| (Char >= 0x20D0 && Char <= 0x20FF)
+									|| (Char >= 0xFE20 && Char <= 0xFE2F)
+								)
+							)
+						{
+							++Len;
+						}
+					}
+				}
+				, [&](CPropertyChange const &_Change)
+			 	{
+				}
+			)
+		;
+		return Len;
+	}
+}

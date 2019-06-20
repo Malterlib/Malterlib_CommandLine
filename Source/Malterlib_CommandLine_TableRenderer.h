@@ -13,11 +13,12 @@ namespace NMib::NCommandLine
 		{
 			EOption_None = 0
 			, EOption_Rounded = DMibBit(0)
-			, EOption_Color = DMibBit(1)
 		};
 
-		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options);
+		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags);
+		CTableRenderHelper(CTableRenderHelper &&) = default;
 
+		void f_AddDescription(NStr::CStr const &_Description);
 		template <typename ...tfp_CString>
 		void f_AddHeadings(tfp_CString &&...p_Headings);
 		template <typename ...tfp_CString>
@@ -29,13 +30,17 @@ namespace NMib::NCommandLine
 	private:
 		void fp_AddHeading(NStr::CStr const &_Heading);
 		void fp_AddRowColumn(NContainer::TCVector<NContainer::TCVector<NStr::CStr>> &o_RowColumns, NStr::CStr const &_Value);
+		void fp_Output(NStr::CStr const &_String) const;
 
 		NFunction::TCFunction<void (NStr::CStr const &_Output)> mp_fOutput;
 
 		NContainer::TCVector<NStr::CStr> mp_Headings;
 		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
 		NContainer::TCVector<zint32> mp_MaxWidths;
+		NContainer::TCVector<NStr::CStr> mp_Description;
+		int32 mp_DescriptionWidth = 0;
 		EOption mp_Options = EOption_None;
+		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;
 	};
 }
 
