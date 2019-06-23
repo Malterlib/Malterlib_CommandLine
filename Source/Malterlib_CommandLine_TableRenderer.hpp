@@ -27,7 +27,7 @@ namespace NMib::NCommandLine
 	void CTableRenderHelper::f_AddRow(tfp_CString &&...p_RowColumns)
 	{
 		static_assert(sizeof...(p_RowColumns) >= 1);
-		DMibRequire(!mp_MaxWidths.f_IsEmpty());
+		DMibRequire(!mp_Widths.f_IsEmpty());
 		DMibRequire(sizeof...(p_RowColumns) == mp_Headings.f_GetLen());
 
 		NContainer::TCVector<NContainer::TCVector<NStr::CStr>> RowColumns;

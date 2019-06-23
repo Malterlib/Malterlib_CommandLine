@@ -26,6 +26,11 @@ namespace NMib::NCommandLine
 			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line)));
 	}
 
+	void CTableRenderHelper::f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth)
+	{
+		mp_MaxWidths[_iColumn] = _MaxWidth;
+	}
+
 	void CTableRenderHelper::fp_AddHeading(CStr const &_Heading)
 	{
 		mp_Widths.f_Insert(CAnsiEncodingParse::fs_RenderedStrLen(mp_Headings.f_Insert(_Heading)));
@@ -35,10 +40,29 @@ namespace NMib::NCommandLine
 	{
 		CStr Value = _Value.f_Replace("\t", "    ");
 		mint iColumn = o_RowColumns.f_GetLen();
-		auto &MaxWidth = mp_MaxWidths[iColumn];
+		auto pMaxWidth = mp_MaxWidths.f_FindEqual(iColumn);
+		auto &ColumnWidth = mp_Widths[iColumn];
 		auto &ColumnRow = o_RowColumns.f_Insert();
-		for (auto &Line : Value.f_SplitLine())
-			MaxWidth = fg_Max(MaxWidth, (int32)CAnsiEncoding::fs_RenderedStrLen(ColumnRow.f_Insert(Line)));
+
+		auto Lines = _Value.f_SplitLine();
+		if (pMaxWidth)
+		{
+			CAnsiEncoding AnsiColor(mp_AnsiFlags);
+
+			for (auto &LongLine : Lines)
+			{
+				auto NewLines = AnsiColor.f_LineBreak(LongLine, *pMaxWidth);
+				for (auto &Line : NewLines)
+					ColumnWidth = fg_Max(ColumnWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(Line)));
+			}
+		}
+		else
+		{
+			for (auto &LongLine : Lines)
+			{
+				ColumnWidth = fg_Max(ColumnWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
+			}
+		}
 	}
 
 	void CTableRenderHelper::fp_Output(NStr::CStr const &_String) const
@@ -94,12 +118,12 @@ namespace NMib::NCommandLine
 		}
 		{
 			mint TotalWidth = 2;
-			for (auto &MaxWidth : mp_MaxWidths)
+			for (auto &MaxWidth : mp_Widths)
 				TotalWidth += MaxWidth + 2;
 			CUStr TopLine;
 			{
 				TopLine = ((f_IsRounded() && !bHasDescription) ? U"{}/"_f : U"{}|"_f) << LineColor;
-				for (auto &MaxWidth : mp_MaxWidths)
+				for (auto &MaxWidth : mp_Widths)
 					TopLine += U"{sf¯,sj*}|"_f << "" << (MaxWidth + 2);
 				if (f_IsRounded())
 					TopLine[TopLine.f_GetLen() - 1] = '\\';
@@ -108,14 +132,14 @@ namespace NMib::NCommandLine
 			CUStr MiddleLine;
 			{
 				MiddleLine = U"{}|"_f << LineColor;
-				for (auto &MaxWidth : mp_MaxWidths)
+				for (auto &MaxWidth : mp_Widths)
 					MiddleLine += U"{sf-,sj*}|"_f << "" << (MaxWidth + 2);
 				MiddleLine += AnsiColor.f_Default();
 			}
 			CUStr BottomLine;
 			{
 				BottomLine = (f_IsRounded() ? U"{}\\"_f : U"{}|"_f) << LineColor;
-				for (auto &MaxWidth : mp_MaxWidths)
+				for (auto &MaxWidth : mp_Widths)
 					BottomLine += U"{sf_,sj*}|"_f << "" << (MaxWidth + 2);
 				if (f_IsRounded())
 					BottomLine[BottomLine.f_GetLen() - 1] = '/';
@@ -127,7 +151,7 @@ namespace NMib::NCommandLine
 				CUStr Line = LineSeparator;
 				for (auto &Heading : mp_Headings)
 				{
-					auto &MaxWidth = mp_MaxWidths[iColumn];
+					auto &MaxWidth = mp_Widths[iColumn];
 					++iColumn;
 					Line += U" {3}{sj*,sf ,a-}{4} {}"_f
 						<< Heading
@@ -157,7 +181,7 @@ namespace NMib::NCommandLine
 					mint iColumn = 0;
 					for (auto &ColumnLines : Row)
 					{
-						auto &MaxWidth = mp_MaxWidths[iColumn];
+						auto &MaxWidth = mp_Widths[iColumn];
 						++iColumn;
 						CStr SourceLine;
 						if (ColumnLines.f_IsPosValid(iLine))

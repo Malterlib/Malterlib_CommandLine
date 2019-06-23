@@ -23,6 +23,7 @@ namespace NMib::NCommandLine
 		void f_AddHeadings(tfp_CString &&...p_Headings);
 		template <typename ...tfp_CString>
 		void f_AddRow(tfp_CString &&...p_RowColumns);
+		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
 		void f_Output() const;
 		bool f_IsRounded() const;
 		bool f_IsColor() const;
@@ -36,7 +37,8 @@ namespace NMib::NCommandLine
 
 		NContainer::TCVector<NStr::CStr> mp_Headings;
 		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
-		NContainer::TCVector<zint32> mp_MaxWidths;
+		NContainer::TCVector<zint32> mp_Widths;
+		NContainer::TCMap<uint32, uint32> mp_MaxWidths;
 		NContainer::TCVector<NStr::CStr> mp_Description;
 		int32 mp_DescriptionWidth = 0;
 		EOption mp_Options = EOption_None;
