@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Mib/Function/Function>
+#include <Mib/Encoding/EJSON>
 
 namespace NMib::NCommandLine
 {
@@ -13,6 +14,15 @@ namespace NMib::NCommandLine
 		{
 			EOption_None = 0
 			, EOption_Rounded = DMibBit(0)
+			, EOption_AvoidRowSeparators = DMibBit(1)
+		};
+
+		enum EOutputType : uint32
+		{
+			EOutputType_HumanReadable = 0
+			, EOutputType_TabSeparated
+			, EOutputType_JSON
+			, EOutputType_ColoredJSON
 		};
 
 		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags);
@@ -24,9 +34,18 @@ namespace NMib::NCommandLine
 		template <typename ...tfp_CString>
 		void f_AddRow(tfp_CString &&...p_RowColumns);
 		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
-		void f_Output() const;
+		void f_RemoveColumn(uint32 _iColumn);
+		void f_SortColumn(uint32 _iColumn);
+		void f_SetOptions(EOption _Options);
+		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable) const;
+		void f_Output(NStr::CStr const &_OutputType) const;
+		void f_Output(NEncoding::CEJSON const &_Params) const;
 		bool f_IsRounded() const;
 		bool f_IsColor() const;
+
+		static NEncoding::CEJSON::CKeyValue fs_OutputTypeOption(EOutputType _Default = EOutputType_HumanReadable);
+		static EOutputType fs_ParseOutputTypeOption(NStr::CStr const &_String);
+		static EOutputType fs_ParseOutputTypeOption(NEncoding::CEJSON const &_Params);
 
 	private:
 		void fp_AddHeading(NStr::CStr const &_Heading);
