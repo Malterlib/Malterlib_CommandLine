@@ -263,6 +263,31 @@ namespace NMib::NCommandLine
 		return g_Prompt;
 	}
 
+	NStr::CStr CAnsiEncoding::f_StatusNormal(NStr::CStr const &_ToWrap) const
+	{
+		return "{}{}{}"_f << f_StatusNormal() << _ToWrap << f_Default();
+	}
+
+	NStr::CStr CAnsiEncoding::f_StatusWarning(NStr::CStr const &_ToWrap) const
+	{
+		return "{}{}{}"_f << f_StatusWarning() << _ToWrap << f_Default();
+	}
+
+	NStr::CStr CAnsiEncoding::f_StatusError(NStr::CStr const &_ToWrap) const
+	{
+		return "{}{}{}"_f << f_StatusError() << _ToWrap << f_Default();
+	}
+
+	NStr::CStr CAnsiEncoding::f_Bold(NStr::CStr const &_ToWrap) const
+	{
+		return "{}{}{}"_f << f_Bold() << _ToWrap << f_Default();
+	}
+
+	NStr::CStr CAnsiEncoding::f_Prompt(NStr::CStr const &_ToWrap) const
+	{
+		return "{}{}{}"_f << f_Prompt() << _ToWrap << f_Default();
+	}
+
 	bool CAnsiEncoding::f_Color() const
 	{
 		return mp_Flags & EAnsiEncodingFlag_Color;
@@ -413,7 +438,7 @@ namespace NMib::NCommandLine
 							ToOutput += f_Bold();
 							bSetProperties = true;
 						}
-						
+
 						if (Properties.m_BackgroundColor && Properties.m_BackgroundColor->m_bEnabled)
 						{
 							ToOutput += f_BackgroundRGB(Properties.m_BackgroundColor->m_Red, Properties.m_BackgroundColor->m_Green, Properties.m_BackgroundColor->m_Blue);

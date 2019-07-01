@@ -29,10 +29,15 @@ namespace NMib::NCommandLine
 
 		NStr::CStr f_Default() const;
 		NStr::CStr f_StatusNormal() const;
+		NStr::CStr f_StatusNormal(NStr::CStr const &_ToWrap) const;
 		NStr::CStr f_StatusWarning() const;
+		NStr::CStr f_StatusWarning(NStr::CStr const &_ToWrap) const;
 		NStr::CStr f_StatusError() const;
+		NStr::CStr f_StatusError(NStr::CStr const &_ToWrap) const;
 		NStr::CStr f_Bold() const;
+		NStr::CStr f_Bold(NStr::CStr const &_ToWrap) const;
 		NStr::CStr f_Prompt() const;
+		NStr::CStr f_Prompt(NStr::CStr const &_ToWrap) const;
 
 		bool f_Color() const;
 
