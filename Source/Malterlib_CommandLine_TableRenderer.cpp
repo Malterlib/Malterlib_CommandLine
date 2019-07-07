@@ -134,7 +134,7 @@ namespace NMib::NCommandLine
 
 		auto Lines = Value.f_SplitLine();
 		for (auto &LongLine : Lines)
-			ColumnWidth = fg_Max(ColumnWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
+			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
 	}
 
 	void CTableRenderHelper::fp_Output(NStr::CStr const &_String) const
@@ -394,6 +394,8 @@ namespace NMib::NCommandLine
 
 			for (auto &Row : LinebrokenRows)
 			{
+				mint iRow = &Row - LinebrokenRows.f_GetArray();
+
 				mint MaxLines = 0;
 				for (auto &ColumnLines : Row)
 					MaxLines = fg_Max(MaxLines, ColumnLines.f_GetLen());
@@ -401,7 +403,7 @@ namespace NMib::NCommandLine
 				if (MaxLines == 0)
 					continue;
 
-				if (!bAvoidLineSeparators || bWasMultiLine || (bAvoidLineSeparators && !bWasMultiLine && MaxLines > 1) || mp_RowSeparators.f_Exists(&Row - LinebrokenRows.f_GetArray()))
+				if (!bAvoidLineSeparators || bWasMultiLine || (bAvoidLineSeparators && !bWasMultiLine && MaxLines > 1) || mp_RowSeparators.f_Exists(iRow))
 					fp_Output("{}\n"_f << MiddleLine);
 
 				for (mint iLine = 0; iLine < MaxLines; ++iLine)

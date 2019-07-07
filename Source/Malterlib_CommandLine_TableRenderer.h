@@ -58,7 +58,7 @@ namespace NMib::NCommandLine
 
 		NContainer::TCVector<NStr::CStr> mp_Headings;
 		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
-		NContainer::TCVector<zint32> mp_Widths;
+		NContainer::TCVector<zuint32> mp_Widths;
 		NContainer::TCMap<uint32, uint32> mp_MaxWidths;
 		NContainer::TCVector<zbool> mp_AlignRight;
 		NContainer::TCSet<mint> mp_RowSeparators;
