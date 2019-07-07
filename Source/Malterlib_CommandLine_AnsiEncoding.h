@@ -15,6 +15,13 @@ namespace NMib::NCommandLine
 
 	struct CAnsiEncoding
 	{
+		enum ESyntaxColor
+		{
+			ESyntaxColor_Number
+			, ESyntaxColor_String
+			, ESyntaxColor_Constant
+		};
+
 		CAnsiEncoding(EAnsiEncodingFlag _Flags);
 
 		NStr::CStr f_ReEncode(NStr::CStr const &_In) const;
@@ -39,6 +46,10 @@ namespace NMib::NCommandLine
 		NStr::CStr f_Prompt() const;
 		NStr::CStr f_Prompt(NStr::CStr const &_ToWrap) const;
 
+		NStr::CStr f_SyntaxColor(ESyntaxColor _Color) const;
+		template <typename tf_CToWrap>
+		NStr::CStr f_SyntaxColor(ESyntaxColor _Color, tf_CToWrap const &_ToWrap) const;
+
 		bool f_Color() const;
 
 	private:
@@ -49,3 +60,5 @@ namespace NMib::NCommandLine
 #ifndef DMibPNoShortCuts
 	using namespace NMib::NCommandLine;
 #endif
+
+#include "Malterlib_CommandLine_AnsiEncoding.hpp"

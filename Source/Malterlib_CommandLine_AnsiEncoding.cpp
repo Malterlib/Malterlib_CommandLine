@@ -529,4 +529,18 @@ namespace NMib::NCommandLine
 
 		return Output;
 	}
+
+	CStr CAnsiEncoding::f_SyntaxColor(ESyntaxColor _Color) const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return {};
+
+		switch (_Color)
+		{
+		case ESyntaxColor_String: return f_ForegroundRGB(0x00, 0x9e, 0xff);
+		case ESyntaxColor_Number: return f_ForegroundRGB(0xff, 0x00, 0x80);
+		case ESyntaxColor_Constant: return f_ForegroundRGB(0xff, 0x8a, 0xc5);
+		default: return {};
+		}
+	}
 }
