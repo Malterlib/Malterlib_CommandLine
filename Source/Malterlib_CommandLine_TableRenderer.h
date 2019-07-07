@@ -25,7 +25,7 @@ namespace NMib::NCommandLine
 			, EOutputType_ColoredJSON
 		};
 
-		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags);
+		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags, uint32 _AvailableWidth);
 		CTableRenderHelper(CTableRenderHelper &&) = default;
 
 		void f_AddDescription(NStr::CStr const &_Description);
@@ -33,7 +33,9 @@ namespace NMib::NCommandLine
 		void f_AddHeadings(tfp_CString &&...p_Headings);
 		template <typename ...tfp_CString>
 		void f_AddRow(tfp_CString &&...p_RowColumns);
+		void f_ForceRowSeparator();
 		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
+		void f_SetAlignRight(uint32 _iColumn);
 		void f_RemoveColumn(uint32 _iColumn);
 		void f_SortColumn(uint32 _iColumn);
 		void f_SetOptions(EOption _Options);
@@ -58,8 +60,11 @@ namespace NMib::NCommandLine
 		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
 		NContainer::TCVector<zint32> mp_Widths;
 		NContainer::TCMap<uint32, uint32> mp_MaxWidths;
+		NContainer::TCVector<zbool> mp_AlignRight;
+		NContainer::TCSet<mint> mp_RowSeparators;
 		NContainer::TCVector<NStr::CStr> mp_Description;
 		int32 mp_DescriptionWidth = 0;
+		uint32 mp_AvailableWidth = 0;
 		EOption mp_Options = EOption_None;
 		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;
 	};
