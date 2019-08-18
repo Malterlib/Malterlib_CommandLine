@@ -5,6 +5,7 @@
 
 namespace NMib::NCommandLine
 {
+	void fg_MalterlibConOut(ch8 const *_pStr, mint _Len);
 	void fg_MalterlibConOut(const NStr::CStrNonTracked &_Str);
 	void fg_MalterlibConOut(NSys::EColor _Foreground,const NStr::CStrNonTracked &_Str);
 	void fg_MalterlibConErrOut(const NStr::CStrNonTracked &_Str);
