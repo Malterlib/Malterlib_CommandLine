@@ -240,19 +240,39 @@ namespace NMib::NCommandLine
 
 		CAnsiEncoding AnsiColor(mp_AnsiFlags);
 
-		auto LineColor = AnsiColor.f_Foreground256(241);
+		bool bUseBoxDrawing = !!(mp_AnsiFlags & EAnsiEncodingFlag_BoxDrawing);
 
-		CUStr LineSeparator = U"{}|{}"_f << LineColor << (char const *)AnsiColor.f_Default();
+		CUStr LineColor;
+		if (bUseBoxDrawing)
+			LineColor = AnsiColor.f_Foreground256(244);
+		else
+			LineColor = AnsiColor.f_Foreground256(241);
+
+		CUStr LineSeparator;
+		if (bUseBoxDrawing)
+			LineSeparator = U"{}│{}"_f << LineColor << (char const *)AnsiColor.f_Default();
+		else
+			LineSeparator = U"{}|{}"_f << LineColor << (char const *)AnsiColor.f_Default();
 
 		bool bAvoidLineSeparators = !!(mp_Options & CTableRenderHelper::EOption_AvoidRowSeparators);
+		bool bNoExtraLines = !!(mp_Options & CTableRenderHelper::EOption_NoExtraLines);
 
 		CUStr Description;
 		bool bHasDescription = !mp_Description.f_IsEmpty();
 		if (bHasDescription)
 		{
-			Description += (f_IsRounded() ? U"{}/"_f : U"{}|"_f) << LineColor;
-			Description += U"{sf¯,sj*}"_f << "" << (mp_DescriptionWidth + 2);
-			Description += (f_IsRounded() ? U"\\{}\n"_f : U"{}|"_f) << AnsiColor.f_Default();
+			if (bUseBoxDrawing)
+			{
+				Description += (f_IsRounded() ? U"{}╭"_f : U"{}┌"_f) << LineColor;
+				Description += U"{sf─,sj*}"_f << "" << (mp_DescriptionWidth + 2);
+				Description += (f_IsRounded() ? U"╮{}\n"_f : U"┐{}\n"_f) << AnsiColor.f_Default();
+			}
+			else
+			{
+				Description += (f_IsRounded() ? U"{}/"_f : U"{}|"_f) << LineColor;
+				Description += U"{sf¯,sj*}"_f << "" << (mp_DescriptionWidth + 2);
+				Description += (f_IsRounded() ? U"\\{}\n"_f : U"|{}\n"_f) << AnsiColor.f_Default();
+			}
 
 			auto fAddLine = [&](CUStr const &_Line)
 				{
@@ -272,7 +292,8 @@ namespace NMib::NCommandLine
 			for (auto &Line : mp_Description)
 				fAddLine(Line);
 
-			fAddLine("");
+			if (!bUseBoxDrawing)
+				fAddLine("");
 		}
 		{
 			TCVector<uint32> LimitedWidths;
@@ -314,6 +335,29 @@ namespace NMib::NCommandLine
 			}
 
 			CUStr TopLine;
+			if (bUseBoxDrawing)
+			{
+				if (bHasDescription)
+					TopLine = U"├";
+				else
+					TopLine = (f_IsRounded() ? U"{}╭" : U"{}┌");
+
+				for (auto &MaxWidth : LimitedWidths)
+					TopLine += U"{sf─,sj*}┬"_f << "" << (MaxWidth + 2);
+
+				TopLine[TopLine.f_GetLen() - 1] = f_IsRounded() ? U'╮' : U'┐';
+
+				if (bHasDescription && (TopLine.f_GetLen() > mp_DescriptionWidth + 4))
+				{
+					if (TopLine[mp_DescriptionWidth + 3] == U'┬')
+						TopLine[mp_DescriptionWidth + 3] = U'┼';
+					else
+						TopLine[mp_DescriptionWidth + 3] = U'┴';
+				}
+
+				TopLine = LineColor + TopLine + AnsiColor.f_Default();
+			}
+			else
 			{
 				TopLine = ((f_IsRounded() && !bHasDescription) ? U"{}/"_f : U"{}|"_f) << LineColor;
 				for (auto &MaxWidth : LimitedWidths)
@@ -322,14 +366,34 @@ namespace NMib::NCommandLine
 					TopLine[TopLine.f_GetLen() - 1] = '\\';
 				TopLine += AnsiColor.f_Default();
 			}
+
 			CUStr MiddleLine;
+			if (bUseBoxDrawing)
+			{
+				MiddleLine = U"{}├"_f << LineColor;
+				for (auto &MaxWidth : LimitedWidths)
+					MiddleLine += U"{sf─,sj*}┼"_f << "" << (MaxWidth + 2);
+				MiddleLine[MiddleLine.f_GetLen() - 1] = U'┤';
+				MiddleLine += AnsiColor.f_Default();
+			}
+			else
 			{
 				MiddleLine = U"{}|"_f << LineColor;
 				for (auto &MaxWidth : LimitedWidths)
 					MiddleLine += U"{sf-,sj*}|"_f << "" << (MaxWidth + 2);
 				MiddleLine += AnsiColor.f_Default();
 			}
+
 			CUStr BottomLine;
+			if (bUseBoxDrawing)
+			{
+				BottomLine = (f_IsRounded() ? U"{}╰"_f : U"{}└"_f) << LineColor;
+				for (auto &MaxWidth : LimitedWidths)
+					BottomLine += U"{sf─,sj*}┴"_f << "" << (MaxWidth + 2);
+				BottomLine[BottomLine.f_GetLen() - 1] = f_IsRounded() ? U'╯' :U'┘';
+				BottomLine += AnsiColor.f_Default();
+			}
+			else
 			{
 				BottomLine = (f_IsRounded() ? U"{}\\"_f : U"{}|"_f) << LineColor;
 				for (auto &MaxWidth : LimitedWidths)
@@ -360,7 +424,7 @@ namespace NMib::NCommandLine
 
 					++iColumn;
 				}
-				fp_Output("\n{}{}\n{}\n"_f << Description << TopLine << Line);
+				fp_Output("{}{}{}\n{}\n"_f << ((bUseBoxDrawing || bNoExtraLines) ? "" : "\n") << Description << TopLine << Line);
 			}
 
 			bool bWasMultiLine = true;
@@ -435,7 +499,7 @@ namespace NMib::NCommandLine
 				bWasMultiLine = MaxLines > 1;
 			}
 
-			fp_Output("{}\n\n"_f << BottomLine);
+			fp_Output("{}\n{}"_f << BottomLine << (bNoExtraLines ? "" : "\n"));
 		}
 	}
 }

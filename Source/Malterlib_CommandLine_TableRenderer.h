@@ -15,6 +15,7 @@ namespace NMib::NCommandLine
 			EOption_None = 0
 			, EOption_Rounded = DMibBit(0)
 			, EOption_AvoidRowSeparators = DMibBit(1)
+			, EOption_NoExtraLines = DMibBit(2)
 		};
 
 		enum EOutputType : uint32

@@ -11,6 +11,7 @@ namespace NMib::NCommandLine
 		, EAnsiEncodingFlag_Color = DMibBit(1)
 		, EAnsiEncodingFlag_Color24Bit = DMibBit(2)
 		, EAnsiEncodingFlag_ColorLightBackground = DMibBit(3)
+		, EAnsiEncodingFlag_BoxDrawing = DMibBit(4)
 	};
 
 	struct CAnsiEncoding
