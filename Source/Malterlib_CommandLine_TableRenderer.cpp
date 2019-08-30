@@ -340,7 +340,7 @@ namespace NMib::NCommandLine
 				if (bHasDescription)
 					TopLine = U"├";
 				else
-					TopLine = (f_IsRounded() ? U"{}╭" : U"{}┌");
+					TopLine = (f_IsRounded() ? U"╭" : U"┌");
 
 				for (auto &MaxWidth : LimitedWidths)
 					TopLine += U"{sf─,sj*}┬"_f << "" << (MaxWidth + 2);
