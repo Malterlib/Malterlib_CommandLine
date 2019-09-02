@@ -15,7 +15,12 @@ namespace NMib::NCommandLine
 		return m_bEnabled == _Other.m_bEnabled;
 	}
 
-	inline bool CAnsiEncodingParse::CReset::operator == (CBold const &_Other) const
+	inline bool CAnsiEncodingParse::CItalic::operator == (CItalic const &_Other) const
+	{
+		return m_bEnabled == _Other.m_bEnabled;
+	}
+
+	inline bool CAnsiEncodingParse::CReset::operator == (CReset const &_Other) const
 	{
 		return true;
 	}

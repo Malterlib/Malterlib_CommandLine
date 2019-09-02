@@ -42,17 +42,24 @@ namespace NMib::NCommandLine
 			bool operator == (CBold const &_Other) const;
 		};
 
-		struct CReset
+		struct CItalic
 		{
-			bool operator == (CBold const &_Other) const;
+			bool m_bEnabled = false;
+
+			bool operator == (CItalic const &_Other) const;
 		};
 
-		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CReset>;
+		struct CReset
+		{
+			bool operator == (CReset const &_Other) const;
+		};
+
+		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CItalic, CReset>;
 
 		static void fs_Parse
 			(
 				NStr::CStr const &_In
-				, NFunction::TCFunction<void (NStr::CStr const &_String)> const &_fOnString
+				, NFunction::TCFunction<bool (NStr::CStr const &_String)> const &_fOnString
 				, NFunction::TCFunction<void (CPropertyChange const &_Property)> const &_fOnPropertyChange
 			)
 		;

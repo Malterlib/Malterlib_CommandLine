@@ -36,11 +36,13 @@ namespace NMib::NCommandLine
 	void CAnsiEncodingParse::fs_Parse
 		(
 		 	CStr const &_In
-		 	, TCFunction<void (CStr const &_String)> const &_fOnString
+		 	, TCFunction<bool (CStr const &_String)> const &_fOnString
 		 	, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
 		)
 	{
 		bool bBold = false;
+		bool bItalic = false;
+		bool bAborted = false;
 		int32 LastForeground = -1;
 		CDecodedColor CurrentColor;
 		CDecodedColor CurrentColorBG;
@@ -51,7 +53,7 @@ namespace NMib::NCommandLine
 			{
 				if (!StringBuffer.f_IsEmpty())
 				{
-					_fOnString(StringBuffer);
+					bAborted = bAborted || !_fOnString(StringBuffer);
 					StringBuffer.f_Clear();
 				}
 				if (_Color != CurrentColor)
@@ -70,7 +72,7 @@ namespace NMib::NCommandLine
 			{
 				if (!StringBuffer.f_IsEmpty())
 				{
-					_fOnString(StringBuffer);
+					bAborted = bAborted || !_fOnString(StringBuffer);
 					StringBuffer.f_Clear();
 				}
 				if (bBold != _bBold)
@@ -80,21 +82,36 @@ namespace NMib::NCommandLine
 				}
 			}
 		;
+		auto fSetItalic = [&](bool _bItalic)
+			{
+				if (!StringBuffer.f_IsEmpty())
+				{
+					bAborted = bAborted || !_fOnString(StringBuffer);
+					StringBuffer.f_Clear();
+				}
+				if (bItalic != _bItalic)
+				{
+					_fPropertyChange(CItalic{_bItalic});
+					bItalic = _bItalic;
+				}
+			}
+		;
 		auto fReset = [&]()
 			{
 				if (!StringBuffer.f_IsEmpty())
 				{
-					_fOnString(StringBuffer);
+					bAborted = bAborted || !_fOnString(StringBuffer);
 					StringBuffer.f_Clear();
 				}
 				fSetBold(false);
+				fSetItalic(false);
 				_fPropertyChange(CReset{});
 			}
 		;
 
 		const ch8 *pParse = _In;
 		bool IsBeginning = true;
-		while (*pParse)
+		while (*pParse &&!bAborted)
 		{
 			ch8 Char = *pParse;
 			if (Char == '\x1B')
@@ -174,9 +191,19 @@ namespace NMib::NCommandLine
 								if (ParamNumber == 1)
 								{
 									fSetBold(true);
-									if (LastForeground >= 30 && ParamNumber <= 37)
+									if (LastForeground >= 30 && LastForeground <= 37)
 										ParamNumber = LastForeground + 10;
 								}
+								else if (ParamNumber == 22)
+								{
+									fSetBold(false);
+									if (LastForeground >= 40 && LastForeground <= 47)
+										ParamNumber = LastForeground - 10;
+								}
+								else if (ParamNumber == 3)
+									fSetItalic(true);
+								else if (ParamNumber == 23)
+									fSetItalic(false);
 								else if (ParamNumber >= 30 && ParamNumber <= 37)
 								{
 									LastForeground = ParamNumber;
@@ -254,9 +281,10 @@ namespace NMib::NCommandLine
 		fs_Parse
 			(
 				_In
-				, [&](CStr const &_String)
+				, [&](CStr const &_String) -> bool
 			 	{
 					Ret += _String;
+					return true;
 				}
 				, [&](CPropertyChange const &_Change)
 			 	{
@@ -272,32 +300,18 @@ namespace NMib::NCommandLine
 		fs_Parse
 			(
 				_String
-				, [&](CStr const &_String)
+				, [&](CStr const &_String) -> bool
 			 	{
-					// Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
-					// Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
-					// Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
-					// Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
-					// Combining Half Marks (FE20–FE2F), versions 1.0, with modifications in subsequent versions down to 8.0
-
 					for (auto iParse = _String.f_GetUnicodeIterator(); iParse; ++iParse)
 					{
 						ch32 Char = *iParse;
-						if
-							(
-								!
-								(
-									(Char >= 0x0300 && Char <= 0x036F)
-									|| (Char >= 0x1AB0 && Char <= 0x1AFF)
-									|| (Char >= 0x1DC0 && Char <= 0x1DFF)
-									|| (Char >= 0x20D0 && Char <= 0x20FF)
-									|| (Char >= 0xFE20 && Char <= 0xFE2F)
-								)
-							)
+						if (!fg_CharIsCombining(Char))
 						{
 							++Len;
 						}
 					}
+
+					return true;
 				}
 				, [&](CPropertyChange const &_Change)
 			 	{
