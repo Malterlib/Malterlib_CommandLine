@@ -179,43 +179,51 @@ namespace NMib::NCommandLine
 						}
 					}
 
-					auto *pCommand = CommandLineSpec.m_CommandByName.f_FindEqual(ParsedParameter);
-					if (pCommand)
-					{
-						if (bOptionValueSet)
-							DMibError(fg_Format("You cannot specify a command parameter with '=': {}", OptionValue));
-						if (pFoundCommand)
+					auto fCheckCommand = [&](CStr const &_ParsedParameter)
 						{
-							if (pFoundCommand->m_bErrorOnCommandAsParameter)
+							auto *pCommand = CommandLineSpec.m_CommandByName.f_FindEqual(_ParsedParameter);
+							if (pCommand)
 							{
-								DMibError
-									(
-										"Command {} already specified. You cannot specify additional command {}"_f
-										<< fColor(FoundCommandName, CInternal::EColor_Command)
-										<< fColor(ParsedParameter, CInternal::EColor_Command)
-									)
-								;
-							}
-						}
-						else
-						{
-							if (bDefaultCommandUsed)
-							{
-								DMibError
-									(
-										fg_Format
-										(
-											"Options have already been parsed for the default command. You should specify {} first on the command line"
-											, fColor(ParsedParameter, CInternal::EColor_Command)
-										)
-									)
-								;
-							}
+								if (bOptionValueSet)
+									DMibError(fg_Format("You cannot specify a command parameter with '=': {}", OptionValue));
+								if (pFoundCommand)
+								{
+									if (pFoundCommand->m_bErrorOnCommandAsParameter)
+									{
+										DMibError
+											(
+												"Command {} already specified. You cannot specify additional command {}"_f
+												<< fColor(FoundCommandName, CInternal::EColor_Command)
+												<< fColor(_ParsedParameter, CInternal::EColor_Command)
+											)
+										;
+									}
+								}
+								else
+								{
+									if (bDefaultCommandUsed)
+									{
+										DMibError
+											(
+												fg_Format
+												(
+													"Options or parameters have already been parsed for the default command. You should specify {} first on the command line"
+													, fColor(_ParsedParameter, CInternal::EColor_Command)
+												)
+											)
+										;
+									}
 
-							fFoundCommand(*pCommand, ParsedParameter);
-							continue;
+									fFoundCommand(*pCommand, _ParsedParameter);
+									return true;
+								}
+							}
+							return false;
 						}
-					}
+					;
+
+					if (fCheckCommand(ParsedParameter))
+						continue;
 
 					auto fParseOption = [&](typename CInternal::COption const &_Value, CStr const &_OptionName, typename CInternal::EColor _Color)
 						{
@@ -245,76 +253,169 @@ namespace NMib::NCommandLine
 						}
 					;
 
-					if (pCurrentCommand)
-					{
-						if (auto *pOption = pCurrentCommand->m_OptionsByName.f_FindEqual(ParsedParameter))
+					auto fCheckOptions = [&](CStr const &_ParsedParameter, bool _bOnlyShortBooleans)
 						{
-							fUseDefaultCommand();
-							if (fParseOption(**pOption, ParsedParameter, CInternal::EColor_Option))
-								continue;
-							pCurrentOption = *pOption;
-							CurrentOptionName = ParsedParameter;
-							CurrentOptionColor = CInternal::EColor_Option;
-							continue;
-						}
-						if (auto *pOption = pCurrentCommand->m_pSection->m_SectionOptionsByName.f_FindEqual(ParsedParameter))
-						{
-							if (!(*pOption)->f_IsEnabled(pCurrentCommand->m_SectionOptionSet, !!pCurrentCommand->m_pDirectRunCommand))
+							auto fCheckShortBooleans = [&](typename CInternal::COption const &_Option)
+								{
+									if (!_bOnlyShortBooleans)
+										return false;
+
+									if (!_Option.m_TypeTemplate.f_IsBoolean())
+										return true;
+
+									if (_Option.m_Default.f_IsValid() && _Option.m_Default.f_Boolean())
+										return true; // Only options with defaults not set or false can be turned on
+
+									return false;
+								}
+							;
+							if (pCurrentCommand)
 							{
-								DMibError
-									(
-										"Option {} is not allowed for command {}"_f
-										<< fColor((*pOption)->m_Names.f_GetFirst(), CInternal::EColor_SectionOption)
-										<< fColor(pCurrentCommand->m_Names.f_GetFirst(), CInternal::EColor_Command)
-									)
-								;
+								if (auto *pOption = pCurrentCommand->m_OptionsByName.f_FindEqual(_ParsedParameter))
+								{
+									if (fCheckShortBooleans(**pOption))
+										return false;
+
+									fUseDefaultCommand();
+									if (fParseOption(**pOption, _ParsedParameter, CInternal::EColor_Option))
+										return true;
+
+									DMibCheck(!_bOnlyShortBooleans);
+
+									pCurrentOption = *pOption;
+									CurrentOptionName = _ParsedParameter;
+									CurrentOptionColor = CInternal::EColor_Option;
+									return true;
+								}
+								if (auto *pOption = pCurrentCommand->m_pSection->m_SectionOptionsByName.f_FindEqual(_ParsedParameter))
+								{
+									if (fCheckShortBooleans(**pOption))
+										return false;
+
+									if (!(*pOption)->f_IsEnabled(pCurrentCommand->m_SectionOptionSet, !!pCurrentCommand->m_pDirectRunCommand))
+									{
+										DMibError
+											(
+												"Option {} is not allowed for command {}"_f
+												<< fColor((*pOption)->m_Names.f_GetFirst(), CInternal::EColor_SectionOption)
+												<< fColor(pCurrentCommand->m_Names.f_GetFirst(), CInternal::EColor_Command)
+											)
+										;
+									}
+
+									fUseDefaultCommand();
+									if (fParseOption(**pOption, _ParsedParameter, CInternal::EColor_SectionOption))
+										return true;
+
+									DMibCheck(!_bOnlyShortBooleans);
+
+									pCurrentOption = *pOption;
+									CurrentOptionName = _ParsedParameter;
+									CurrentOptionColor = CInternal::EColor_SectionOption;
+									return true;
+								}
 							}
 
-							fUseDefaultCommand();
-							if (fParseOption(**pOption, ParsedParameter, CInternal::EColor_SectionOption))
-								continue;
-							pCurrentOption = *pOption;
-							CurrentOptionName = ParsedParameter;
-							CurrentOptionColor = CInternal::EColor_SectionOption;
-							continue;
-						}
-					}
+							if (auto *pOption = CommandLineSpec.m_GlobalOptionsByName.f_FindEqual(_ParsedParameter))
+							{
+								if (fCheckShortBooleans(**pOption))
+									return false;
 
-					if (auto *pOption = CommandLineSpec.m_GlobalOptionsByName.f_FindEqual(ParsedParameter))
-					{
-						ChecksToPerform.f_Insert
-							(
-								[pOption, &pCurrentCommand, &fColor]
-							 	{
-									if (pCurrentCommand)
-									{
-										if (!(*pOption)->f_IsEnabled(pCurrentCommand->m_GlobalOptionSet, !!pCurrentCommand->m_pDirectRunCommand))
+								ChecksToPerform.f_Insert
+									(
+										[pOption, &pCurrentCommand, &fColor]
 										{
-											DMibError
-												(
-													"Option {} is not allowed for command {}"_f
-													<< fColor((*pOption)->m_Names.f_GetFirst(), CInternal::EColor_GlobalOption)
-													<< fColor(pCurrentCommand->m_Names.f_GetFirst(), CInternal::EColor_Command)
-												)
-											;
+											if (pCurrentCommand)
+											{
+												if (!(*pOption)->f_IsEnabled(pCurrentCommand->m_GlobalOptionSet, !!pCurrentCommand->m_pDirectRunCommand))
+												{
+													DMibError
+														(
+															"Option {} is not allowed for command {}"_f
+															<< fColor((*pOption)->m_Names.f_GetFirst(), CInternal::EColor_GlobalOption)
+															<< fColor(pCurrentCommand->m_Names.f_GetFirst(), CInternal::EColor_Command)
+														)
+													;
+												}
+											}
 										}
-									}
-								}
-							)
-						;
+									)
+								;
 
-						if (fParseOption(**pOption, ParsedParameter, CInternal::EColor_GlobalOption))
-							continue;
-						pCurrentOption = *pOption;
-						CurrentOptionName = ParsedParameter;
-						CurrentOptionColor = CInternal::EColor_GlobalOption;
+								if (fParseOption(**pOption, _ParsedParameter, CInternal::EColor_GlobalOption))
+									return true;
+
+								DMibCheck(!_bOnlyShortBooleans);
+
+								pCurrentOption = *pOption;
+								CurrentOptionName = _ParsedParameter;
+								CurrentOptionColor = CInternal::EColor_GlobalOption;
+								return true;
+							}
+
+							return false;
+						}
+					;
+
+					if (fCheckOptions(ParsedParameter, false))
 						continue;
+
+					bool bForceFail = false;
+					if (ParsedParameter.f_StartsWith("-") && !ParsedParameter.f_StartsWith("--"))
+					{
+						CUStr ToParse = ParsedParameter;
+						auto *pParse = ToParse.f_GetStr() + 1;
+						bool bFoundParam = false;
+
+						while (*pParse)
+						{
+							CUStr ToTest = "-";
+							ToTest.f_AddChar(*pParse);
+
+							if (!fCheckCommand(ToTest))
+							{
+								if (!fCheckOptions(ToTest, true))
+								{
+									if (fCheckOptions(ToTest, false))
+									{
+										// Last param allowed to continue
+										if (pParse[1] == 0)
+											break;
+
+										DMibError
+											(
+												"Option {} needs a value so needs to be last in list of short options"_f
+												<< fColor(ToTest, CurrentOptionColor)
+											)
+										;
+									}
+
+									if (bFoundParam)
+									{
+										bFoundParam = false;
+										bForceFail = true;
+										ParsedParameter = ToTest;
+									}
+									break;
+								}
+
+								OptionValue.f_Clear();
+								bOptionValueSet = false;
+							}
+
+							bFoundParam = true;
+							++pParse;
+						}
+
+						if (bFoundParam)
+							continue;
 					}
 
 					if
 						(
-							(Parameter.f_StartsWith("-") && (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter))
-							|| (!Parameter.f_StartsWith("-") && !pFoundCommand)
+							bForceFail
+							|| (Parameter.f_StartsWith("-") && (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter))
+							|| (!Parameter.f_StartsWith("-") && !pFoundCommand && (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter))
 						)
 					{
 						struct CFuzzyEntry

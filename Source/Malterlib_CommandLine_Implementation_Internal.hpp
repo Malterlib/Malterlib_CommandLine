@@ -668,9 +668,15 @@ namespace NMib::NCommandLine
 						RawValue = _Value;
 					else if (_Value.f_IsString())
 					{
-						RawValue = fp_ParseEJSON(_Value.f_String(), "Error parsing array parameter");
-						if (!RawValue.f_IsArray())
-							DMibError("Expected array");
+						CStr TrimmedValue = _Value.f_String().f_Trim();
+						if (TrimmedValue.f_StartsWith("["))
+						{
+							RawValue = fp_ParseEJSON(_Value.f_String(), "Error parsing array parameter");
+							if (!RawValue.f_IsArray())
+								DMibError("Expected array");
+						}
+						else
+							RawValue = _Value.f_String().f_SplitEscaped(',');
 					}
 					else
 						DMibError("Array can only be converted from string");
