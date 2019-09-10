@@ -1,169 +1,139 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2019 Nonna Holding AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
 
-#include <Mib/Storage/Variant>
-
-/*
-   void main(argv,argc)
-   {
-   NContainer::TCVector<NStr::CStr> CmdArgs;
-
-   CmdParser cp;
-
-   cp.ProgramName("My app");
-   cp.ExeName("My app");
-   cp.ProgramDescription("hfaghföadhs");
-
-   struct Cmd;
-   struct Option;
-   Cmd hlp("help","display help on commands");
-   hlp.AddOptional(Cmd("Topic"));
-   hlp.AddMandatory(Cmd("Topic"));
-   cp.Add(hlp);
-   cp.Add(Option("h","help","display help on commands"));
-
-   cp.AddCmd("h","help","display help on commands", );
-
-   value list(unique or not) set/enum  hierarchical commands
-
-   short summary for help:
-   p4 add [ -c changelist# ] [ -d -f -n ] [ -t filetype ] file
-
-   ;
-   App -e- 
-   App -e+
-   App -e
-
-    App -Tests (Filter1 Filer2 ...)
-	App -Tests "sdf a"
-
-	auto x = parse(CmdArgs, cp);
-
-    if(x.HasOption(bla))
-}
-*/
+#include <Mib/Encoding/EJSON>
 
 namespace NMib::NCommandLine
 {
-	class CInvalidArguments
+	struct COneOf
 	{
-	public:
-		CInvalidArguments(NStr::CStr const &_Arg)
-			: mp_Arg(_Arg)
-		{
-		}
-		NStr::CStr const &f_Arg() const
-		{
-			return mp_Arg;
-		}
-	private:
-		NStr::CStr mp_Arg;
+		inline_always COneOf(NEncoding::CEJSON const &_Config);
+		template <typename ...tfp_CParams>
+		inline_always COneOf(tfp_CParams const &...p_Config);
+
+		inline_always operator NEncoding::CEJSON () &&;
+		inline_always operator NEncoding::CEJSON () const &;
+
+		NEncoding::CEJSON m_Config;
 	};
 
-	class CValue
+	struct COneOfType
 	{
-	public: // types
-		typedef NContainer::TCVector<NStr::CStr> CValidValues;
-	public:
-		CValue(NStr::CStr const &_Name)
-			: mp_ValidValues()
-			, mp_Name(_Name)
-		{
-		}
-		CValue(NStr::CStr const &_Name, CValidValues _ValidValues)
-			: mp_ValidValues(_ValidValues)
-			, mp_Name(_Name)
-		{
-		}
-		bool f_IsMatch(NStr::CStr const &_Value) const;
-		NStr::CStr const &f_Name() const
-		{
-			return mp_Name;
-		}
-	private:
-		CValidValues mp_ValidValues;
-		NStr::CStr mp_Name;
+		inline_always COneOfType(NEncoding::CEJSON const &_Config);
+		template <typename ...tfp_CParams>
+		inline_always COneOfType(tfp_CParams const &...p_Config);
+
+		inline_always operator NEncoding::CEJSON () &&;
+		inline_always operator NEncoding::CEJSON () const &;
+
+		NEncoding::CEJSON m_Config;
 	};
-	class COption
+
+	template <typename t_CCustomization, typename t_CThis = void>
+	struct TCCommandLineClient;
+
+	struct CCommandLineSpecificationNoCustomization
 	{
-	public:
-		COption();;
-		COption(NStr::CStr const &_Name, NStr::CStr const &_Short, NStr::CStr const &_Description);
-		void f_Add(CValue const &_Value);
-		void f_AddList(CValue const &_Value);
-		NStr::CStr const &f_Name() const;
-		NStr::CStr const &f_ShortName() const;
-		bool f_HasShortName() const;
-		NStr::CStr const &f_Desc() const;
-		typedef NStorage::TCVariant<NStr::CStr, NContainer::TCVector<NStr::CStr>> CArgValue;
-	private:
-		struct CNamedValue
+		template <typename t_CCommandLineSpecification>
+		struct TCSection
 		{
-			CNamedValue( NStr::CStr const &_Name, CArgValue const &_Value)
-				: m_Name(_Name)
-				, m_Value(_Value)
-			{
-			}
-			NStr::CStr m_Name;
-			CArgValue m_Value;
+			using CSection = typename t_CCommandLineSpecification::CSectionCommon;
 		};
-	public:
-		NContainer::TCMap<NStr::CStr, CArgValue> f_ReadValues(NContainer::TCVector<NStr::CStr>::CIteratorConst &_Iter) const;
 
-	private:
-		struct CArgument
+		template <typename t_CCommand>
+		struct TCInternalCommand
 		{
-			CValue m_Value;
-			bool m_IsList;
-			CArgument(CValue const &_Value, bool _IsList)
-				: m_Value(_Value)
-				, m_IsList(_IsList)
-
-			{
-			}
+			using CCommand = t_CCommand;
 		};
-		NStr::CStr mp_Name;
-		NStr::CStr mp_ShortName;
-		NStr::CStr mp_Description;
-		NContainer::TCVector<CArgument> mp_Values;
-		//NContainer::TCVector<CEnum> mp_EnumList;
-	};
-	class CParser
-	{
-	public:
-		CParser();
-		void f_Add(COption const &_Option);
-		NStr::CStr f_HelpMessage() const;
-		bool f_HasOption(NStr::CStr const &_Name) const;
-		COption const &f_GetOption(NStr::CStr const &_Name) const;
-	private:
-		NContainer::TCLinkedList<COption> mp_Options;
-		NContainer::TCMap<NStr::CStr, COption const*> mp_LongNames;
-		NContainer::TCMap<NStr::CStr, COption const*> mp_ShortNames;
-	};
-	class CCommandArguments
-	{
-	public:
-		typedef COption::CArgValue CValue;
-		typedef NContainer::TCMap<NStr::CStr, NContainer::TCMap<NStr::CStr, CValue>> COptionMap;
-	public:
-		CCommandArguments();
-		CCommandArguments(COptionMap&& _Values);
-		bool f_IsSet(NStr::CStr const &_Name) const;
-		NContainer::TCMap<NStr::CStr, CValue> const &operator [] (NStr::CStr const &_Name) const;
-		bool f_HasValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		NStr::CStr f_GetValue(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		bool f_HasList(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		NContainer::TCVector<NStr::CStr> f_GetList(NStr::CStr const &_Option, NStr::CStr const &_Value) const;
-		bool f_HasListItem(NStr::CStr const &_Option, NStr::CStr const &_List, NStr::CStr const &_Item) const;
-	private:
-		COptionMap mp_Values;
+
+		using CCommandLineClient = TCCommandLineClient<CCommandLineSpecificationNoCustomization>;
 	};
 
-	CCommandArguments fg_ParseCommandLine(CParser const &_Parser, NContainer::TCVector<NStr::CStr> const &_Argv);
-	CCommandArguments fg_ParseCommandLine(CParser const &_Parser);
+	template <typename t_CCustomization>
+	struct TCCommandLineSpecification
+	{
+		struct CInternal;
+		struct CSectionCommon;
+
+		using CCommandLineClient = typename t_CCustomization::CCommandLineClient;
+		using CSection = typename t_CCustomization::template TCSection<TCCommandLineSpecification>::CSection;
+
+		struct CCommand
+		{
+			friend struct TCCommandLineSpecification;
+			friend struct CSectionCommon;
+			friend CSection;
+
+			void f_RegisterOptions(NEncoding::CEJSON const &_Options);
+		private:
+			CCommand(CInternal *_pInternal, void *_pCommand);
+			void *mp_pCommand;
+			CInternal *mp_pInternal;
+		};
+
+		struct CSectionCommon
+		{
+			friend struct TCCommandLineSpecification;
+			friend struct TCCommandLineSpecification;
+			void f_RegisterSectionOptions(NEncoding::CEJSON const &_Options);
+
+			CCommand f_RegisterDirectCommand
+				(
+					NEncoding::CEJSON const &_CommandDescription
+					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSON const &_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+				)
+			;
+
+		protected:
+			CSectionCommon(CInternal *_pInternal, void *_pSection);
+			void *mp_pSection;
+			CInternal *mp_pInternal;
+		};
+
+		struct CParsedCommandLine
+		{
+			NStr::CStr m_Command;
+			NEncoding::CEJSON m_Params;
+		};
+
+		TCCommandLineSpecification();
+		~TCCommandLineSpecification() noexcept;
+
+		TCCommandLineSpecification(TCCommandLineSpecification const &_Other);
+		TCCommandLineSpecification(TCCommandLineSpecification &&_Other);
+		TCCommandLineSpecification &operator =(TCCommandLineSpecification const &_Other);
+		TCCommandLineSpecification &operator =(TCCommandLineSpecification &&_Other);
+
+		CSection f_GetDefaultSection();
+		CSection f_AddSection(NStr::CStr const &_Heading, NStr::CStr const &_Description, NStr::CStr const &_AfterSection = {});
+		static NContainer::TCVector<NStr::CStr> fs_RelevantHelpGlobalOptions();
+
+		void f_AddHelpCommand();
+		void f_AddTerminalOptions();
+		void f_SetDefaultCommand(CCommand const &_Command);
+		void f_SetProgramDescription(NStr::CStr const &_Heading, NStr::CStr const &_Description);
+		void f_RegisterGlobalOptions(NEncoding::CEJSON const &_Options);
+		CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
+
+		CInternal &f_AccessInternal();
+
+	private:
+		NStorage::TCUniquePointer<CInternal> mp_pInternal;
+	};
+
+	extern template struct TCCommandLineSpecification<CCommandLineSpecificationNoCustomization>;
+	using CCommandLineSpecification = TCCommandLineSpecification<CCommandLineSpecificationNoCustomization>;
+
+	struct CCommandLineDefaults
+	{
+		static NCommandLine::EAnsiEncodingFlag fs_ColorAnsiFlagsDefault();
+		static bool fs_ColorEnabledDefault();
+		static bool fs_Color24BitEnabledDefault();
+		static bool fs_ColorLightBackgroundDefault();
+		static bool fs_BoxDrawingDefault();
+	};
 }
 
 #ifndef DMibPNoShortCuts
@@ -171,3 +141,4 @@ namespace NMib::NCommandLine
 #endif
 
 #include "Malterlib_CommandLine_Console.h"
+#include "Malterlib_CommandLine.hpp"
