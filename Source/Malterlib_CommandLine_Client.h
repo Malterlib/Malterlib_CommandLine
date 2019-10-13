@@ -8,6 +8,8 @@
 
 namespace NMib::NCommandLine
 {
+	struct CTableRenderHelper;
+	
 	template <typename t_CCustomization, typename t_CThis>
 	struct TCCommandLineClient
 	{
@@ -23,10 +25,12 @@ namespace NMib::NCommandLine
 		bool f_Color24BitEnabled() const;
 		bool f_ColorLightBackground() const;
 
-		NCommandLine::EAnsiEncodingFlag f_AnsiEncodingFlags() const;
-		NCommandLine::CAnsiEncoding f_AnsiEncoding() const;
+		EAnsiEncodingFlag f_AnsiEncodingFlags() const;
+		CAnsiEncoding f_AnsiEncoding() const;
 		uint32 f_CommandLineWidth() const;
 		uint32 f_CommandLineHeight() const;
+
+		CTableRenderHelper f_TableRenderer() const;
 
 		TCCommandLineClient(NStorage::TCSharedPointer<CCommandLineSpecification> const &_pCommandLineSpecification);
 		~TCCommandLineClient();
@@ -42,7 +46,7 @@ namespace NMib::NCommandLine
 		uint32 fp_RunCommand(void const *_pCommand, NEncoding::CEJSON const &_Params);
 
 		NStorage::TCSharedPointer<CCommandLineSpecification> mp_pCommandLineSpecification;
-		NCommandLine::EAnsiEncodingFlag mp_AnsiFlags = NCommandLine::EAnsiEncodingFlag_None;
+		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;
 		uint32 mp_CommandLineWidth = 0;
 		uint32 mp_CommandLineHeight = 0;
 	};

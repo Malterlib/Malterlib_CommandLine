@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <Mib/CommandLine/TableRenderer>
+
 namespace NMib::NCommandLine
 {
 	template <typename t_CCustomization, typename t_CThis>
@@ -60,6 +62,22 @@ namespace NMib::NCommandLine
 	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::f_CommandLineHeight() const
 	{
 		return mp_CommandLineHeight;
+	}
+
+	template <typename t_CCustomization, typename t_CThis>
+	CTableRenderHelper TCCommandLineClient<t_CCustomization, t_CThis>::f_TableRenderer() const
+	{
+		return CTableRenderHelper
+			(
+				[](NStr::CStr const &_Output)
+			 	{
+					DMibConOutRaw(_Output);
+				}
+			 	, CTableRenderHelper::EOption_Rounded
+			 	, mp_AnsiFlags
+		 		, mp_CommandLineWidth
+		 	)
+		;
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
