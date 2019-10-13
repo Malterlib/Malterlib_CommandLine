@@ -593,7 +593,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		bool bLastWasNewLine = false;
+		bool bLastWasNewLine = true;
 		bool bOnlyWhitespaceAfterNewLine = true;
 		auto pLastDisplayPoint = pParse;
 		while (*pParse)
@@ -636,8 +636,16 @@ namespace NMib::NCommandLine
 			{
 				if ((_WordWrap == EWordWrap_Word || _WordWrap == EWordWrap_WordEllipsis) && pLastWord)
 				{
-					fOutputLine(pParseStart, pLastWord - pParseStart);
-					pParseStart = pLastWord;
+					if (pLastWord - pParseStart)
+					{
+						fOutputLine(pParseStart, pLastWord - pParseStart);
+						pParseStart = pLastWord;
+					}
+					else
+					{
+						fOutputLine(pParseStart, pParse - pParseStart);
+						pParseStart = pParse;
+					}
 					while (fg_CharIsWhiteSpaceNoLines(*pParseStart))
 						++pParseStart;
 					pParse = pParseStart;
