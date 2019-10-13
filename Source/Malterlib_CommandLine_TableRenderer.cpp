@@ -162,6 +162,22 @@ namespace NMib::NCommandLine
 		f_Output(fs_ParseOutputTypeOption(_Params));
 	}
 
+	void CTableRenderHelper::f_MergeColumnWidths(CTableRenderHelper const &_Other)
+	{
+		if (mp_Widths.f_IsEmpty())
+			mp_Widths = _Other.mp_Widths;
+		else
+		{
+			DMibRequire(mp_Widths.f_GetLen() == _Other.mp_Widths.f_GetLen());
+			mint nColumns = mp_Widths.f_GetLen();
+			for (mint iColumn = 0; iColumn < nColumns; ++iColumn)
+			{
+				auto Max = fg_Max(mp_Widths[iColumn], _Other.mp_Widths[iColumn]);
+				mp_Widths[iColumn] = Max;
+			}
+		}
+	}
+
 	void CTableRenderHelper::f_Output(EOutputType _OutputType) const
 	{
 		if (_OutputType == EOutputType_TabSeparated)
@@ -501,6 +517,26 @@ namespace NMib::NCommandLine
 
 			fp_Output("{}\n{}"_f << BottomLine << (bNoExtraLines ? "" : "\n"));
 		}
+	}
+
+	void CTableRenderHelper::f_AddHeadingsVector(NContainer::TCVector<NStr::CStr> const &_Headings)
+	{
+		DMibRequire(mp_Headings.f_IsEmpty());
+
+		for (auto &Heading : _Headings)
+			fp_AddHeading(Heading);
+	}
+
+	void CTableRenderHelper::f_AddRowVector(NContainer::TCVector<NStr::CStr> const &_RowColumns)
+	{
+		DMibRequire(!mp_Widths.f_IsEmpty());
+		DMibRequire(_RowColumns.f_GetLen() == mp_Headings.f_GetLen());
+
+		NContainer::TCVector<NContainer::TCVector<NStr::CStr>> RowColumns;
+		for (auto &Value : _RowColumns)
+			fp_AddRowColumn(RowColumns, Value);
+
+		mp_Rows.f_Insert(RowColumns);
 	}
 }
 

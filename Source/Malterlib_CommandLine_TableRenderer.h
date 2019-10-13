@@ -32,8 +32,11 @@ namespace NMib::NCommandLine
 		void f_AddDescription(NStr::CStr const &_Description);
 		template <typename ...tfp_CString>
 		void f_AddHeadings(tfp_CString &&...p_Headings);
+		void f_AddHeadingsVector(NContainer::TCVector<NStr::CStr> const &_Headings);
 		template <typename ...tfp_CString>
 		void f_AddRow(tfp_CString &&...p_RowColumns);
+		void f_AddRowVector(NContainer::TCVector<NStr::CStr> const &_RowColumns);
+		void f_MergeColumnWidths(CTableRenderHelper const &_Other);
 		void f_ForceRowSeparator();
 		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
 		void f_SetAlignRight(uint32 _iColumn);
