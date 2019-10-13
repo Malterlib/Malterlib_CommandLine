@@ -142,7 +142,7 @@ namespace NMib::NCommandLine
 							CDecodedColor FgColor = CurrentColor;
 							CDecodedColor BgColor = CurrentColorBG;
 
-							auto ParamsVector = Params.f_Split(";");
+							auto ParamsVector = Params.f_Split<true>(";");
 
 							for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
 							{

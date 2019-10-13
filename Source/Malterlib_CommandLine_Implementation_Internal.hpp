@@ -676,7 +676,12 @@ namespace NMib::NCommandLine
 								DMibError("Expected array");
 						}
 						else
-							RawValue = _Value.f_String().f_SplitEscaped(',');
+						{
+							if (_Value.f_String().f_IsEmpty())
+								RawValue = EEJSONType_Array;
+							else
+								RawValue = _Value.f_String().f_SplitEscaped(',');
+						}
 					}
 					else
 						DMibError("Array can only be converted from string");
