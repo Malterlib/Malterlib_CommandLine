@@ -305,29 +305,10 @@ namespace NMib::NCommandLine
 
 #	define DMibCommandLineConvertException(_Description) DMibImpError(CCommandLineConvertException, _Description)
 
-	static NStr::CStr fg_GetEJSONTypeName(NEncoding::EEJSONType _Type)
-	{
-		using namespace NEncoding;
-		switch (_Type)
-		{
-		case EEJSONType_Null: return "null";
-		case EEJSONType_String: return "string";
-		case EEJSONType_Integer: return "integer";
-		case EEJSONType_Float: return "float";
-		case EEJSONType_Boolean: return "boolean";
-		case EEJSONType_Object: return "object";
-		case EEJSONType_Array: return "array";
-		case EEJSONType_Date: return "date";
-		case EEJSONType_Binary: return "binary";
-		case EEJSONType_UserType: return "user type";
-		default: DMibNeverGetHere; return "unknown";
-		}
-	}
-
 	static void fg_CheckType(NEncoding::CEJSON const &_Value, NEncoding::EEJSONType _Type)
 	{
 		if (_Value.f_EType() != _Type)
-			DMibError(fg_Format("Expected '{}' but got '{}': {}", fg_GetEJSONTypeName(_Type), fg_GetEJSONTypeName(_Value.f_EType()), _Value).f_TrimRight());
+			DMibError(fg_Format("Expected '{}' but got '{}': {}", NEncoding::fg_EJSONTypeToString(_Type), NEncoding::fg_EJSONTypeToString(_Value.f_EType()), _Value).f_TrimRight());
 	}
 
 	template <typename t_CCustomization>
