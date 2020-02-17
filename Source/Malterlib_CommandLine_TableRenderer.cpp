@@ -506,7 +506,7 @@ namespace NMib::NCommandLine
 						if (mp_AlignRight[iColumn])
 							pFormatString = U" {sj*,sf ,a+} {}";
 
-						CStr SourceLine;
+						CUStr SourceLine;
 						if (ColumnLines.f_IsPosValid(iLine))
 							SourceLine = ColumnLines[iLine];
 
