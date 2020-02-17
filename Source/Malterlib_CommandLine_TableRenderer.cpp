@@ -93,6 +93,11 @@ namespace NMib::NCommandLine
 		mp_AlignRight[_iColumn] = true;
 	}
 
+	void CTableRenderHelper::f_SetPrefix(NStr::CStr const &_Prefix)
+	{
+		mp_Prefix = _Prefix;
+	}
+
 	void CTableRenderHelper::f_RemoveColumn(uint32 _iColumn)
 	{
 		mp_Headings.f_Remove(_iColumn);
@@ -139,7 +144,10 @@ namespace NMib::NCommandLine
 
 	void CTableRenderHelper::fp_Output(NStr::CStr const &_String) const
 	{
-		mp_fOutput(_String);
+		if (mp_Prefix)
+			mp_fOutput(_String.f_Indent(mp_Prefix));
+		else
+			mp_fOutput(_String);
 	}
 
 	bool CTableRenderHelper::f_IsRounded() const

@@ -40,6 +40,7 @@ namespace NMib::NCommandLine
 		void f_ForceRowSeparator();
 		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
 		void f_SetAlignRight(uint32 _iColumn);
+		void f_SetPrefix(NStr::CStr const &_Prefix);
 		void f_RemoveColumn(uint32 _iColumn);
 		void f_SortColumn(uint32 _iColumn);
 		void f_SetOptions(EOption _Options);
@@ -67,6 +68,7 @@ namespace NMib::NCommandLine
 		NContainer::TCVector<zbool> mp_AlignRight;
 		NContainer::TCSet<mint> mp_RowSeparators;
 		NContainer::TCVector<NStr::CStr> mp_Description;
+		NStr::CStr mp_Prefix;
 		int32 mp_DescriptionWidth = 0;
 		uint32 mp_AvailableWidth = 0;
 		EOption mp_Options = EOption_None;

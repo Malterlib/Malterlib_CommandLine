@@ -9,7 +9,7 @@
 namespace NMib::NCommandLine
 {
 	struct CTableRenderHelper;
-	
+
 	template <typename t_CCustomization, typename t_CThis>
 	struct TCCommandLineClient
 	{
@@ -30,7 +30,7 @@ namespace NMib::NCommandLine
 		uint32 f_CommandLineWidth() const;
 		uint32 f_CommandLineHeight() const;
 
-		CTableRenderHelper f_TableRenderer() const;
+		CTableRenderHelper f_TableRenderer(NStr::CStr const &_Prefix = {}) const;
 
 		TCCommandLineClient(NStorage::TCSharedPointer<CCommandLineSpecification> const &_pCommandLineSpecification);
 		~TCCommandLineClient();

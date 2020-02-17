@@ -65,9 +65,9 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
-	CTableRenderHelper TCCommandLineClient<t_CCustomization, t_CThis>::f_TableRenderer() const
+	CTableRenderHelper TCCommandLineClient<t_CCustomization, t_CThis>::f_TableRenderer(NStr::CStr const &_Prefix) const
 	{
-		return CTableRenderHelper
+		CTableRenderHelper Renderer
 			(
 				[](NStr::CStr const &_Output)
 			 	{
@@ -78,6 +78,8 @@ namespace NMib::NCommandLine
 		 		, mp_CommandLineWidth
 		 	)
 		;
+		Renderer.f_SetPrefix(_Prefix);
+		return Renderer;
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
