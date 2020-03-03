@@ -79,7 +79,11 @@ namespace NMib::NCommandLine
 
 	void CTableRenderHelper::f_AddDescription(NStr::CStr const &_Description)
 	{
-		for (auto &Line : _Description.f_SplitLine())
+		CAnsiEncoding AnsiColor(mp_AnsiFlags);
+
+		auto Lines = AnsiColor.f_LineBreak(_Description, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+
+		for (auto &Line : Lines)
 			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line)));
 	}
 
@@ -137,7 +141,10 @@ namespace NMib::NCommandLine
 		auto &ColumnWidth = mp_Widths[iColumn];
 		auto &ColumnRow = o_RowColumns.f_Insert();
 
-		auto Lines = Value.f_SplitLine();
+		CAnsiEncoding AnsiColor(mp_AnsiFlags);
+
+		auto Lines = AnsiColor.f_LineBreak(_Value, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+
 		for (auto &LongLine : Lines)
 			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
 	}
