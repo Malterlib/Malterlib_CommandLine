@@ -1,4 +1,4 @@
-// Copyright © 2018 Nonna Holding AB
+ // Copyright © 2018 Nonna Holding AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include <Mib/Core/Core>
@@ -143,7 +143,7 @@ namespace NMib::NCommandLine
 
 		CAnsiEncoding AnsiColor(mp_AnsiFlags);
 
-		auto Lines = AnsiColor.f_LineBreak(_Value, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+		auto Lines = AnsiColor.f_LineBreak(Value, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &LongLine : Lines)
 			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
