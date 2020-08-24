@@ -488,7 +488,7 @@ namespace NMib::NCommandLine
 						CStr m_TextWithOptions;
 						CStr m_Parameters;
 						CStr m_Options;
-						typename CInternal::CCommand const *m_pCommand;
+						typename CInternal::CCommand const *m_pCommand = nullptr;
 					};
 
 					auto fAddOptionUsage = [&](CStr &o_Usage, typename CInternal::COption const &_Option, typename CInternal::EColor _Color)

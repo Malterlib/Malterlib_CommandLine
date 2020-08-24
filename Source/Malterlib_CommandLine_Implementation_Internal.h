@@ -81,7 +81,7 @@ namespace NMib::NCommandLine
 			bool f_IsEnabled(COptionSet const &_OptionSet, bool _bIsDirect) const;
 
 			NContainer::TCVector<NStr::CStr> const m_Names;
-			CCommandCommon * const m_pCommand;
+			CCommandCommon * const m_pCommand = nullptr;
 			bool m_bDefaultEnabled = true;
 			bool m_bHidden = false;
 			bool m_bCanNegate = true;
