@@ -227,7 +227,7 @@ namespace NMib::NCommandLine
 
 			if (!mp_MaxWidths.f_IsEmpty())
 			{
-				auto &OutputMaxWidths = Output["MaxWidths"];
+				auto &OutputMaxWidths = Output["MaxWidths"] = EJSONType_Object;
 
 				for (auto &Width : mp_MaxWidths)
 					OutputMaxWidths[CStr::fs_ToStr(mp_MaxWidths.fs_GetKey(Width))] = Width;
@@ -235,11 +235,12 @@ namespace NMib::NCommandLine
 
 			{
 				auto &OutputAlignRight = Output["AlignRight"] = EJSONType_Array;
+				OutputAlignRight.f_SetLen(mp_AlignRight.f_GetLen());
 
 				for (auto &bAlign : mp_AlignRight)
 				{
 					auto iAlign = &bAlign - mp_AlignRight.f_GetArray();
-					OutputAlignRight[CStr::fs_ToStr(iAlign)] = true;
+					OutputAlignRight[iAlign] = bAlign;
 				}
 			}
 
