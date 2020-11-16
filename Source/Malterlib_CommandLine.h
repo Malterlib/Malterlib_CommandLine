@@ -120,6 +120,8 @@ namespace NMib::NCommandLine
 		CInternal &f_AccessInternal();
 
 	private:
+		uint32 fp_HelpCommand(NEncoding::CEJSON const &_Params, CCommandLineClient &_CommandLineClient);
+
 		NStorage::TCUniquePointer<CInternal> mp_pInternal;
 	};
 

@@ -397,7 +397,7 @@ namespace NMib::NCommandLine
 			pNewSection = &Internal.m_Sections.f_Insert();
 		else
 		{
-			NStr::CStr SectionToFind = _AfterSection == "Default" ? "" : _AfterSection;
+			NStr::CStr SectionToFind = _AfterSection == "Default" ? NStr::CStr() : _AfterSection;
 			typename CInternal::CSection *pPreviousSection = nullptr;
 			for (auto &Section : Internal.m_Sections)
 			{
