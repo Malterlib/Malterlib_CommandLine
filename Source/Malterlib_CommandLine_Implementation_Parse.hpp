@@ -414,7 +414,12 @@ namespace NMib::NCommandLine
 					if
 						(
 							bForceFail
-							|| (Parameter.f_StartsWith("-") && (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter))
+							||
+							(
+								Parameter.f_StartsWith("-")
+								&& (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter)
+								&& (!pCurrentCommand || pCurrentCommand->m_bErrorOnOptionAsParameterWhenDefaultCommand)
+							)
 							|| (!Parameter.f_StartsWith("-") && !pFoundCommand && (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter))
 						)
 					{

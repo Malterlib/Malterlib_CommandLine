@@ -139,6 +139,7 @@ namespace NMib::NCommandLine
 
 			bool m_bErrorOnCommandAsParameter = true;
 			bool m_bErrorOnOptionAsParameter = true;
+			bool m_bErrorOnOptionAsParameterWhenDefaultCommand = true;
 			bool m_bAlwaysVerbose = false;
 			bool m_bGreedyDefaultCommand = false;
 			bool m_bGreedyDefaultCommandParameters = false;

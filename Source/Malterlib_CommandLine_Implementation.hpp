@@ -178,6 +178,7 @@ namespace NMib::NCommandLine
 					, "GreedyDefaultCommand"
 					, "GreedyDefaultCommandParameters"
 					, "ErrorOnOptionAsParameter"
+					, "ErrorOnOptionAsParameterWhenDefaultCommand"
 					, "AlwaysVerbose"
 					, "Parameters"
 					, "Options"
@@ -243,6 +244,8 @@ namespace NMib::NCommandLine
 			NewCommand.m_bGreedyDefaultCommandParameters = pGreedyDefaultCommandParameters->f_Boolean();
 		if (auto *pErrorOnOptionAsParameter = _CommandDescription.f_GetMember("ErrorOnOptionAsParameter"))
 			NewCommand.m_bErrorOnOptionAsParameter = pErrorOnOptionAsParameter->f_Boolean();
+		if (auto *pErrorOnOptionAsParameterWhenDefaultCommand = _CommandDescription.f_GetMember("ErrorOnOptionAsParameterWhenDefaultCommand"))
+			NewCommand.m_bErrorOnOptionAsParameterWhenDefaultCommand = pErrorOnOptionAsParameterWhenDefaultCommand->f_Boolean();
 		if (auto *pAlwaysVerbose = _CommandDescription.f_GetMember("AlwaysVerbose"))
 			NewCommand.m_bAlwaysVerbose = pAlwaysVerbose->f_Boolean();
 		if (auto *pValue = _CommandDescription.f_GetMember("SectionOptions"))
