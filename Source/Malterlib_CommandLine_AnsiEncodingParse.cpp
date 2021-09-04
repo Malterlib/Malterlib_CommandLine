@@ -28,11 +28,6 @@ namespace NMib::NCommandLine
 		*this = g_CommandLine_AnsiEncodingColor256Array[_Value];
 	}
 
-	bool CAnsiEncodingParse::CDecodedColor::operator == (CDecodedColor const &_Right) const
-	{
-		return f_Tuple() == _Right.f_Tuple();
-	}
-
 	void CAnsiEncodingParse::fs_Parse
 		(
 		 	CStr const &_In

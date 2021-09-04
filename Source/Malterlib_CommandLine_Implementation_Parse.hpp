@@ -428,9 +428,10 @@ namespace NMib::NCommandLine
 							CStr m_Name;
 							CStr m_ColoredName;
 							fp64 m_Score;
-							bool operator < (CFuzzyEntry const &_Right) const
+
+							auto operator <=> (CFuzzyEntry const &_Right) const
 							{
-								return NStorage::fg_TupleReferences(m_Score, m_Name) < NStorage::fg_TupleReferences(_Right.m_Score, _Right.m_Name);
+								return NStorage::fg_TupleReferences(m_Score, m_Name) <=> NStorage::fg_TupleReferences(_Right.m_Score, _Right.m_Name);
 							}
 						};
 

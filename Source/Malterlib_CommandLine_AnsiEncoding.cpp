@@ -419,20 +419,12 @@ namespace NMib::NCommandLine
 
 		struct CProperties
 		{
+			auto operator <=> (CProperties const &_Right) const = default;
+
 			TCOptional<CAnsiEncodingParse::CBackgroundColor> m_BackgroundColor;
 			TCOptional<CAnsiEncodingParse::CForegroundColor> m_ForegroundColor;
 			TCOptional<CAnsiEncodingParse::CBold> m_Bold;
 			TCOptional<CAnsiEncodingParse::CItalic> m_Italic;
-
-			auto f_Tuple() const
-			{
-				return fg_TupleReferences(m_BackgroundColor, m_ForegroundColor, m_Bold, m_Italic);
-			}
-
-			bool operator == (CProperties const &_Right) const
-			{
-				return f_Tuple() == _Right.f_Tuple();
-			}
 		};
 
 		TCRegions<mint, CProperties> PropertyRegions;

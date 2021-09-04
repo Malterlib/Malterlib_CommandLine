@@ -17,9 +17,7 @@ namespace NMib::NCommandLine
 			void f_SetAnsi16(uint8 _Value);
 			void f_SetAnsi256(uint8 _Value);
 
-			auto f_Tuple() const;
-
-			bool operator == (CDecodedColor const &_Right) const;
+			auto operator <=> (CDecodedColor const &_Right) const = default;
 
 			uint8 m_Red = 0;
 			uint8 m_Green = 0;
@@ -39,19 +37,19 @@ namespace NMib::NCommandLine
 		{
 			bool m_bEnabled = false;
 
-			bool operator == (CBold const &_Other) const;
+			auto operator <=> (CBold const &_Other) const = default;
 		};
 
 		struct CItalic
 		{
 			bool m_bEnabled = false;
 
-			bool operator == (CItalic const &_Other) const;
+			auto operator <=> (CItalic const &_Other) const = default;
 		};
 
 		struct CReset
 		{
-			bool operator == (CReset const &_Other) const;
+			auto operator <=> (CReset const &_Other) const = default;
 		};
 
 		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CItalic, CReset>;
