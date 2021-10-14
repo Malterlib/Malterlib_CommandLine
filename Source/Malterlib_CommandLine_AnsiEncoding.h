@@ -51,18 +51,18 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_Default() const;
 		NStr::CStr const &f_Reset() const;
 		NStr::CStr const &f_MoveUpperLeft() const;
-		NStr::CStr f_StatusNormal() const;
+		NStr::CStr const &f_StatusNormal() const;
 		NStr::CStr f_StatusNormal(NStr::CStr const &_ToWrap) const;
-		NStr::CStr f_StatusWarning() const;
+		NStr::CStr const &f_StatusWarning() const;
 		NStr::CStr f_StatusWarning(NStr::CStr const &_ToWrap) const;
-		NStr::CStr f_StatusError() const;
+		NStr::CStr const &f_StatusError() const;
 		NStr::CStr f_StatusError(NStr::CStr const &_ToWrap) const;
 		NStr::CStr const &f_Bold() const;
 		NStr::CStr const &f_NotBold() const;
 		NStr::CStr const &f_Italic() const;
 		NStr::CStr const &f_NotItalic() const;
 		NStr::CStr f_Bold(NStr::CStr const &_ToWrap) const;
-		NStr::CStr f_Prompt() const;
+		NStr::CStr const &f_Prompt() const;
 		NStr::CStr f_Prompt(NStr::CStr const &_ToWrap) const;
 
 		NStr::CStr f_SyntaxColor(ESyntaxColor _Color) const;
@@ -75,6 +75,10 @@ namespace NMib::NCommandLine
 
 	private:
 		EAnsiEncodingFlag mp_Flags = EAnsiEncodingFlag_None;
+		NStr::CStr mp_StatusNormal;
+		NStr::CStr mp_StatusWarning;
+		NStr::CStr mp_StatusError;
+		NStr::CStr mp_Prompt;
 	};
 }
 

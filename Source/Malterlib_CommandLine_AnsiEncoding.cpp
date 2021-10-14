@@ -90,6 +90,13 @@ namespace NMib::NCommandLine
 	CAnsiEncoding::CAnsiEncoding(EAnsiEncodingFlag _Flags)
 		: mp_Flags(_Flags)
 	{
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			mp_StatusNormal = DMibCommandLineAnsiColor_Reset + f_Foreground256(118);
+			mp_StatusWarning = DMibCommandLineAnsiColor_Reset + f_Foreground256(207);
+			mp_StatusError = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_Bold + f_Foreground256(198);
+			mp_Prompt = DMibCommandLineAnsiColor_Reset + f_Foreground256(221);
+		}
 	}
 
 	NStr::CStr CAnsiEncoding::f_Foreground16(uint8 _Color) const
@@ -271,30 +278,30 @@ namespace NMib::NCommandLine
 	{
 		return g_UpperLeft;
 	}
-	NStr::CStr CAnsiEncoding::f_StatusNormal() const
+	NStr::CStr const &CAnsiEncoding::f_StatusNormal() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return {};
+			return g_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
-			return DMibCommandLineAnsiColor_Reset + f_Foreground256(118);
+			return mp_StatusNormal;
 		return g_StatusNormal;
 	}
 
-	NStr::CStr CAnsiEncoding::f_StatusWarning() const
+	NStr::CStr const &CAnsiEncoding::f_StatusWarning() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return {};
+			return g_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
-			return DMibCommandLineAnsiColor_Reset + f_Foreground256(207);
+			return mp_StatusWarning;
 		return g_StatusWarning;
 	}
 
-	NStr::CStr CAnsiEncoding::f_StatusError() const
+	NStr::CStr const &CAnsiEncoding::f_StatusError() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return {};
+			return g_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
-			return DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_Bold + f_Foreground256(198);
+			return mp_StatusError;
 		return g_StatusError;
 	}
 
@@ -331,14 +338,12 @@ namespace NMib::NCommandLine
 		return mp_Flags;
 	}
 
-	NStr::CStr CAnsiEncoding::f_Prompt() const
+	NStr::CStr const &CAnsiEncoding::f_Prompt() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return {};
-
+			return g_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
-			return DMibCommandLineAnsiColor_Reset + f_Foreground256(221);
-
+			return mp_Prompt;
 		return g_Prompt;
 	}
 
