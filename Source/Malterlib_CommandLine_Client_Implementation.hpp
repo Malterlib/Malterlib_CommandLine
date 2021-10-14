@@ -89,15 +89,7 @@ namespace NMib::NCommandLine
 
 		auto &CommandLineSpec = mp_pCommandLineSpecification->f_AccessInternal();
 
-		mp_AnsiFlags = EAnsiEncodingFlag_None;
-		if (_Params.f_GetMemberValue("Color", CCommandLineDefaults::fs_ColorEnabledDefault()).f_Boolean())
-			mp_AnsiFlags |= EAnsiEncodingFlag_Color;
-		if (_Params.f_GetMemberValue("Color24Bit", CCommandLineDefaults::fs_Color24BitEnabledDefault()).f_Boolean())
-			mp_AnsiFlags |= EAnsiEncodingFlag_Color24Bit;
-		if (_Params.f_GetMemberValue("ColorLight", CCommandLineDefaults::fs_ColorLightBackgroundDefault()).f_Boolean())
-			mp_AnsiFlags |= EAnsiEncodingFlag_ColorLightBackground;
-		if (_Params.f_GetMemberValue("BoxDrawing", CCommandLineDefaults::fs_BoxDrawingDefault()).f_Boolean())
-			mp_AnsiFlags |= EAnsiEncodingFlag_BoxDrawing;
+		mp_AnsiFlags = CCommandLineDefaults::fs_ParseAnsiEncodingParams(_Params);
 
 		auto ConsoleProperties = NSys::fg_GetConsoleProperties();
 

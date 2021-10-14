@@ -135,6 +135,7 @@ namespace NMib::NCommandLine
 		static bool fs_Color24BitEnabledDefault();
 		static bool fs_ColorLightBackgroundDefault();
 		static bool fs_BoxDrawingDefault();
+		static NCommandLine::EAnsiEncodingFlag fs_ParseAnsiEncodingParams(NEncoding::CEJSON const &_Params);
 	};
 }
 

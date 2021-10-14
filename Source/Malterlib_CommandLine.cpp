@@ -151,4 +151,18 @@ namespace NMib::NCommandLine
 		return bValue;
 	}
 
+	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJSON const &_Params)
+	{
+		NCommandLine::EAnsiEncodingFlag AnsiFlags = EAnsiEncodingFlag_None;
+		if (_Params.f_GetMemberValue("Color", CCommandLineDefaults::fs_ColorEnabledDefault()).f_Boolean())
+			AnsiFlags |= EAnsiEncodingFlag_Color;
+		if (_Params.f_GetMemberValue("Color24Bit", CCommandLineDefaults::fs_Color24BitEnabledDefault()).f_Boolean())
+			AnsiFlags |= EAnsiEncodingFlag_Color24Bit;
+		if (_Params.f_GetMemberValue("ColorLight", CCommandLineDefaults::fs_ColorLightBackgroundDefault()).f_Boolean())
+			AnsiFlags |= EAnsiEncodingFlag_ColorLightBackground;
+		if (_Params.f_GetMemberValue("BoxDrawing", CCommandLineDefaults::fs_BoxDrawingDefault()).f_Boolean())
+			AnsiFlags |= EAnsiEncodingFlag_BoxDrawing;
+
+		return AnsiFlags;
+	}
 }
