@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <Mib/Core/Core>
+
 namespace NMib::NCommandLine
 {
 	[[maybe_unused]] static NStr::CStr fg_ParseIdentifier(NStr::CStr const &_Name, bool &o_bIsOptional, bool &o_bIsVector)
