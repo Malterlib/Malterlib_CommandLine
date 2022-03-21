@@ -7,8 +7,8 @@ namespace NMib::NCommandLine
 {
 	template <typename ...tfp_CString>
 	void CTableRenderHelper::f_AddHeadings(tfp_CString &&...p_Headings)
+		requires (sizeof...(p_Headings) >= 1)
 	{
-		static_assert(sizeof...(p_Headings) >= 1);
 		DMibRequire(mp_Headings.f_IsEmpty());
 
 		TCInitializerList<bool> Dummy =
@@ -25,8 +25,8 @@ namespace NMib::NCommandLine
 
 	template <typename ...tfp_CString>
 	void CTableRenderHelper::f_AddRow(tfp_CString &&...p_RowColumns)
+		requires (sizeof...(p_RowColumns) >= 1)
 	{
-		static_assert(sizeof...(p_RowColumns) >= 1);
 		DMibRequire(!mp_Widths.f_IsEmpty());
 		DMibRequire(sizeof...(p_RowColumns) == mp_Headings.f_GetLen());
 
