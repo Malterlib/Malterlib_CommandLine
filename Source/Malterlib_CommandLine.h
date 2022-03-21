@@ -31,6 +31,8 @@ namespace NMib::NCommandLine
 		NEncoding::CEJSON m_Config;
 	};
 
+	COneOfType fg_AnyType();
+
 	template <typename t_CCustomization, typename t_CThis = void>
 	struct TCCommandLineClient;
 

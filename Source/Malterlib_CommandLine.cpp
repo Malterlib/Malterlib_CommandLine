@@ -12,6 +12,24 @@ namespace NMib::NCommandLine
 
 	DMibImpErrorClassImplement(CCommandLineConvertException);
 
+	COneOfType fg_AnyType()
+	{
+		return COneOfType
+			(
+				EEJSONType_String
+				, EEJSONType_Integer
+				, EEJSONType_Float
+				, EEJSONType_Boolean
+				, EEJSONType_Object
+				, EEJSONType_Array
+				, EEJSONType_Date
+				, EEJSONType_Binary
+				, EEJSONType_UserType
+				, COneOf(EEJSONType_Null)
+			)
+		;
+	}
+
 	EAnsiEncodingFlag CCommandLineDefaults::fs_ColorAnsiFlagsDefault()
 	{
 		EAnsiEncodingFlag Flags = EAnsiEncodingFlag_None;
