@@ -105,7 +105,6 @@ namespace NMib::NCommandLine
 		;
 
 		const ch8 *pParse = _In;
-		bool IsBeginning = true;
 		while (*pParse &&!bAborted)
 		{
 			ch8 Char = *pParse;
@@ -260,8 +259,6 @@ namespace NMib::NCommandLine
 			}
 			else
 				StringBuffer.f_AddChar(Char);
-
-			IsBeginning = false;
 
 			++pParse;
 		}
