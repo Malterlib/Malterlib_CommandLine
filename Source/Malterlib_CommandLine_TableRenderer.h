@@ -51,6 +51,7 @@ namespace NMib::NCommandLine
 		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable) const;
 		void f_Output(NStr::CStr const &_OutputType) const;
 		void f_Output(NEncoding::CEJSON const &_Params) const;
+		void f_ReverseRows();
 		bool f_IsRounded() const;
 		bool f_IsColor() const;
 

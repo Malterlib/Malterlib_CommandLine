@@ -177,6 +177,19 @@ namespace NMib::NCommandLine
 		f_Output(fs_ParseOutputTypeOption(_Params));
 	}
 
+	void CTableRenderHelper::f_ReverseRows()
+	{
+		mp_Rows = mp_Rows.f_Reverse();
+
+		mint LastIndex = mp_Rows.f_GetLen() - 1;
+
+		NContainer::TCSet<mint> NewRowSeparators;
+		for (auto &SeparatorIndex : mp_RowSeparators)
+			NewRowSeparators[LastIndex - SeparatorIndex];
+
+		mp_RowSeparators = fg_Move(NewRowSeparators);
+	}
+
 	void CTableRenderHelper::f_MergeColumnWidths(CTableRenderHelper const &_Other)
 	{
 		if (mp_Widths.f_IsEmpty())
