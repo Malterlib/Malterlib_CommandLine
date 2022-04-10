@@ -715,4 +715,24 @@ namespace NMib::NCommandLine
 		default: return {};
 		}
 	}
+
+	NStr::CStr CAnsiEncoding::f_CreateSemiUniqueColor(NStr::CStr const &_Data) const
+	{
+		NCryptography::CHash_SHA256 Hash;
+		Hash.f_AddData(_Data.f_GetStr(), _Data.f_GetLen());
+		auto Digest = Hash.f_GetDigest();
+
+		auto Red = Digest.f_GetData()[0];
+		auto Green = Digest.f_GetData()[1];
+		auto Blue = Digest.f_GetData()[2];
+
+		if ((Red + Green + Blue) < 50)
+		{
+			Red += 50;
+			Green += 50;
+			Blue += 50;
+		}
+
+		return f_ForegroundRGB(Red, Green, Blue);
+	}
 }

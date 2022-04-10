@@ -69,6 +69,14 @@ namespace NMib::NCommandLine
 		template <typename tf_CToWrap>
 		NStr::CStr f_SyntaxColor(ESyntaxColor _Color, tf_CToWrap const &_ToWrap) const;
 
+		NStr::CStr f_CreateSemiUniqueColor(NStr::CStr const &_Data) const;
+
+		template <typename tf_CType>
+		NStr::CStr f_CreateSemiUniqueColor(tf_CType const &_Data) const;
+
+		template <typename tf_CType>
+		NStr::CStr f_ColorSemiUnique(tf_CType const &_Data) const;
+
 		bool f_Color() const;
 
 		EAnsiEncodingFlag f_Flags() const;
