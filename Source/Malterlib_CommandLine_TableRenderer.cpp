@@ -117,7 +117,7 @@ namespace NMib::NCommandLine
 			(
 				[=](auto const &_Left, auto const &_Right)
 			 	{
-					return _Left[_iColumn].f_CompareLexicographical(_Right[_iColumn]) < 0;
+					return _Left[_iColumn].f_CompareLexicographical(_Right[_iColumn]) <=> 0;
 				}
 			)
 		;
