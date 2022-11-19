@@ -26,12 +26,12 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 Property
 {
-	MalterlibLibrary_CommandLine define bool = MalterlibLibrary_All
+	MalterlibLibrary_CommandLine: bool = MalterlibLibrary_All
 	MalterlibSubLibraries =+ "CommandLine"
 	{
 		!!MalterlibLibrary_CommandLine true
 	}
-//	MalterlibSubLibrarySeparate_Lib_Malterlib_CommandLine define bool = true
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_CommandLine: bool = true
 	MalterlibIncludeRoots =+ "Include"->MakeAbsolute()
 	{
 		!!MalterlibLibrary_CommandLine true
@@ -43,6 +43,6 @@ Property
 	!!MalterlibEnableInternalTests true
 	
 	MalterlibTests =+ "Malterlib_CommandLine"
-	MalterlibTestFiles_Malterlib_CommandLine define [type(CEntity)] = ["Test/*"->MakeAbsolute()]
+	MalterlibTestFiles_Malterlib_CommandLine: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
 }
 
