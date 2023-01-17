@@ -23,20 +23,20 @@ namespace NMib::NCommandLine
 
 	namespace
 	{
-		NStr::CStr g_Empty;
-		NStr::CStr g_Default = DMibCommandLineAnsiColor_Reset;
-		NStr::CStr g_Reset = "\x1B""c";
-		NStr::CStr g_UpperLeft = "\x1B[H";
+		constexpr NStr::CStr gc_Empty;
+		constexpr NStr::CStr gc_Default = gc_Str<DMibCommandLineAnsiColor_Reset>;
+		constexpr NStr::CStr gc_Reset = gc_Str<"\x1B""c">;
+		constexpr NStr::CStr gc_UpperLeft = gc_Str<"\x1B[H">;
 
-		NStr::CStr g_StatusNormal = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(118);
-		NStr::CStr g_StatusWarning = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(207);
-		NStr::CStr g_StatusError = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_Bold DMibCommandLineAnsiColor_256(198);
-		NStr::CStr g_Bold = DMibCommandLineAnsiColor_Bold;
-		NStr::CStr g_Italic = "\x1B[3m";
-		NStr::CStr g_NotBold = "\x1B[22m";
-		NStr::CStr g_NotItalic = "\x1B[23m";
+		constexpr NStr::CStr gc_StatusNormal = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(118)>;
+		constexpr NStr::CStr gc_StatusWarning = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(207)>;
+		constexpr NStr::CStr gc_StatusError = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_Bold DMibCommandLineAnsiColor_256(198)>;
+		constexpr NStr::CStr gc_Bold = gc_Str<DMibCommandLineAnsiColor_Bold>;
+		constexpr NStr::CStr gc_Italic = gc_Str<"\x1B[3m">;
+		constexpr NStr::CStr gc_NotBold = gc_Str<"\x1B[22m">;
+		constexpr NStr::CStr gc_NotItalic = gc_Str<"\x1B[23m">;
 
-		NStr::CStr g_Prompt = DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(221);
+		constexpr NStr::CStr gc_Prompt = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(221)>;
 
 		uint8 fg_FindColor256(uint8 _Red, uint8 _Green, uint8 _Blue)
 		{
@@ -264,73 +264,73 @@ namespace NMib::NCommandLine
 	NStr::CStr const &CAnsiEncoding::f_Default() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
+			return gc_Empty;
 
-		return g_Default;
+		return gc_Default;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_Reset() const
 	{
-		return g_Reset;
+		return gc_Reset;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_MoveUpperLeft() const
 	{
-		return g_UpperLeft;
+		return gc_UpperLeft;
 	}
 	NStr::CStr const &CAnsiEncoding::f_StatusNormal() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
+			return gc_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 			return mp_StatusNormal;
-		return g_StatusNormal;
+		return gc_StatusNormal;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_StatusWarning() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
+			return gc_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 			return mp_StatusWarning;
-		return g_StatusWarning;
+		return gc_StatusWarning;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_StatusError() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
+			return gc_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 			return mp_StatusError;
-		return g_StatusError;
+		return gc_StatusError;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_Bold() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
-		return g_Bold;
+			return gc_Empty;
+		return gc_Bold;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_NotBold() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
-		return g_NotBold;
+			return gc_Empty;
+		return gc_NotBold;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_Italic() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
-		return g_Italic;
+			return gc_Empty;
+		return gc_Italic;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_NotItalic() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
-		return g_NotItalic;
+			return gc_Empty;
+		return gc_NotItalic;
 	}
 
 	EAnsiEncodingFlag CAnsiEncoding::f_Flags() const
@@ -341,10 +341,10 @@ namespace NMib::NCommandLine
 	NStr::CStr const &CAnsiEncoding::f_Prompt() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
-			return g_Empty;
+			return gc_Empty;
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 			return mp_Prompt;
-		return g_Prompt;
+		return gc_Prompt;
 	}
 
 	NStr::CStr CAnsiEncoding::f_StatusNormal(NStr::CStr const &_ToWrap) const
