@@ -16,7 +16,7 @@ namespace NMib::NCommandLine
 		using CThis = typename TCChooseType<NTraits::TCIsVoid<t_CThis>::mc_Value, TCCommandLineClient, t_CThis>::CType;
 		using CCommandLineSpecification = TCCommandLineSpecification<t_CCustomization>;
 
-		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params);
+		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params = fg_GetSys()->f_GetCommandLineArgs());
 		aint f_RunCommandLine(NContainer::TCVector<NStr::CStr> const &_CommandLine = fg_GetSys()->f_GetCommandLineArgs());
 		aint f_RunCommand(NStr::CStr const &_Command, NEncoding::CEJSON const &_Params);
 		void f_MutateCommandLineSpecification(NFunction::TCFunction<void (CCommandLineSpecification &o_CommandLine)> const &_fMutate);

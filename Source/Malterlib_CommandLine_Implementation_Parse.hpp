@@ -127,7 +127,7 @@ namespace NMib::NCommandLine
 		bool bUsedVectorParam = false;
 		bool bFatalError = false;
 
-		TCVector<NException::CException> Exceptions;
+		TCVector<NException::CExceptionPointer> Exceptions;
 		TCVector<NFunction::TCFunctionMovable<void ()>> ChecksToPerform;
 
 		for (auto &Parameter : Params)
@@ -514,7 +514,7 @@ namespace NMib::NCommandLine
 			}
 			catch (NException::CException const &_Exception)
 			{
-				Exceptions.f_Insert(_Exception);
+				Exceptions.f_Insert(_Exception.f_ExceptionPointer());
 				if (!bParametersOnly)
 				{
 					pCurrentOption = nullptr;
@@ -537,15 +537,15 @@ namespace NMib::NCommandLine
 			pFoundCommand = CommandLineSpec.m_pDefaultCommand;
 
 		if (!pFoundCommand)
-			Exceptions.f_Insert(DMibErrorInstance("No command specified"));
+			Exceptions.f_Insert(fg_MakeException(DMibErrorInstance("No command specified")));
 
 		if (pCurrentOption)
-			Exceptions.f_Insert(DMibErrorInstance("Missing parameter for option: {}"_f << fColor(CurrentOptionName, CurrentOptionColor)));
+			Exceptions.f_Insert(fg_MakeException(DMibErrorInstance("Missing parameter for option: {}"_f << fColor(CurrentOptionName, CurrentOptionColor))));
 
 		auto fCheckOption = [&](typename CInternal::COption const &_Option, typename CInternal::EColor _Color)
 			{
 				if (!_Option.m_bOptional && !CommandParams.f_GetMember(_Option.m_Identifier))
-					Exceptions.f_Insert(DMibErrorInstance("Missing required option: {}"_f << fColor(_Option.m_Names.f_GetFirst(), _Color)));
+					Exceptions.f_Insert(fg_MakeException(DMibErrorInstance("Missing required option: {}"_f << fColor(_Option.m_Names.f_GetFirst(), _Color))));
 			}
 		;
 		for (auto &Option : CommandLineSpec.m_GlobalOptions)
@@ -566,7 +566,7 @@ namespace NMib::NCommandLine
 		}
 
 		if (!MissingParameters.f_IsEmpty())
-			Exceptions.f_Insert(DMibErrorInstance("Missing required command parameters: {}"_f << MissingParameters));
+			Exceptions.f_Insert(fg_MakeException(DMibErrorInstance("Missing required command parameters: {}"_f << MissingParameters)));
 
 		for (; iCommandParameter; ++iCommandParameter)
 		{
@@ -578,26 +578,15 @@ namespace NMib::NCommandLine
 
 		if (!Exceptions.f_IsEmpty() && (!pFoundCommand || !bDisableAllErrors))
 		{
-			NStr::CStr CombinedException;
-			bool bWasMultiLine = false;
+			NException::CExceptionExceptionVectorData::CErrorCollector ErrorCollector;
 
 			for (auto &Exception : Exceptions)
-			{
-				auto ExceptionStr = Exception.f_GetErrorStr();
-				bool bMultiLine = ExceptionStr.f_SplitLine().f_GetLen() > 1;
-
-				if (bMultiLine || bWasMultiLine)
-					fg_AddStrSep(CombinedException, Exception.f_GetErrorStr(), "\n\n");
-				else
-					fg_AddStrSep(CombinedException, Exception.f_GetErrorStr(), "\n");
-
-				bWasMultiLine = bMultiLine;
-			}
+				ErrorCollector.f_AddError(fg_Move(Exception));
 
 			if (bFoundCommand)
-				CombinedException += "\n\nTo see command syntax, run command with {}\n"_f << fColor("-?", CInternal::EColor_GlobalOption);
+				ErrorCollector.f_AddError(fg_MakeException(DMibErrorInstance("\n\nTo see command syntax, run command with {}\n"_f << fColor("-?", CInternal::EColor_GlobalOption))));
 
-			DMibError(CombinedException);
+			std::rethrow_exception(fg_Move(ErrorCollector).f_GetException());
 		}
 
 		if (pFoundCommand)
