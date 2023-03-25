@@ -164,10 +164,10 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
 		(
-		 	NEncoding::CEJSON const &_Value
-		 	, NStr::CStr const &_Identifier
-		 	, EColor _Color
-		 	, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+			NEncoding::CEJSON const &_Value
+			, NStr::CStr const &_Identifier
+			, EColor _Color
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		return fp_ConvertValue(m_TypeTemplate, _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
@@ -182,10 +182,10 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-		 	NEncoding::CEJSON &o_Value
-		 	, NEncoding::CEJSON const &_Value
-		 	, EColor _Color
-		 	, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+			NEncoding::CEJSON &o_Value
+			, NEncoding::CEJSON const &_Value
+			, EColor _Color
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		NEncoding::CEJSON NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
@@ -195,11 +195,11 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-		 	NEncoding::CEJSON &o_Value
-		 	, NEncoding::CEJSON const &_Value
-		 	, NStr::CStr const &_Identifier
-		 	, EColor _Color
-		 	, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+			NEncoding::CEJSON &o_Value
+			, NEncoding::CEJSON const &_Value
+			, NStr::CStr const &_Identifier
+			, EColor _Color
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		NEncoding::CEJSON NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
@@ -736,10 +736,10 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
 		(
-		 	NEncoding::CEJSON const &_Template
-		 	, NEncoding::CEJSON const &_Value
-		 	, NStr::CStr const &_Identifier
-		 	, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+			NEncoding::CEJSON const &_Template
+			, NEncoding::CEJSON const &_Value
+			, NStr::CStr const &_Identifier
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		using namespace NEncoding;

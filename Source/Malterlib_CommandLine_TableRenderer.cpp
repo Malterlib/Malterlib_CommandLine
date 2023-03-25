@@ -116,7 +116,7 @@ namespace NMib::NCommandLine
 		mp_Rows.f_Sort
 			(
 				[=](auto const &_Left, auto const &_Right)
-			 	{
+				{
 					return _Left[_iColumn].f_CompareLexicographical(_Right[_iColumn]) <=> 0;
 				}
 			)

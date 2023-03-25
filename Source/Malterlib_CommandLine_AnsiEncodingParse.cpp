@@ -30,9 +30,9 @@ namespace NMib::NCommandLine
 
 	void CAnsiEncodingParse::fs_Parse
 		(
-		 	CStr const &_In
-		 	, TCFunction<bool (CStr const &_String)> const &_fOnString
-		 	, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
+			CStr const &_In
+			, TCFunction<bool (CStr const &_String)> const &_fOnString
+			, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
 		)
 	{
 		bool bBold = false;
@@ -274,12 +274,12 @@ namespace NMib::NCommandLine
 			(
 				_In
 				, [&](CStr const &_String) -> bool
-			 	{
+				{
 					Ret += _String;
 					return true;
 				}
 				, [&](CPropertyChange const &_Change)
-			 	{
+				{
 				}
 			)
 		;
@@ -293,7 +293,7 @@ namespace NMib::NCommandLine
 			(
 				_String
 				, [&](CStr const &_String) -> bool
-			 	{
+				{
 					for (auto iParse = _String.f_GetUnicodeIterator(); iParse; ++iParse)
 					{
 						ch32 Char = *iParse;
@@ -306,7 +306,7 @@ namespace NMib::NCommandLine
 					return true;
 				}
 				, [&](CPropertyChange const &_Change)
-			 	{
+				{
 				}
 			)
 		;

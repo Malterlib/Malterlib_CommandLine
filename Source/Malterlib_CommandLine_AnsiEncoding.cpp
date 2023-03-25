@@ -385,13 +385,13 @@ namespace NMib::NCommandLine
 			(
 				_In
 				, [&](CStr const &_String) -> bool
-			 	{
+				{
 					Ret += _String;
 
 					return true;
 				}
 				, [&](CAnsiEncodingParse::CPropertyChange const &_Change)
-			 	{
+				{
 					if (!f_Color())
 						return;
 
@@ -442,15 +442,15 @@ namespace NMib::NCommandLine
 			(
 				_String
 				, [&](CUStr _String) -> bool
-			 	{
+				{
 					auto Start = String.f_GetLen();
 					String += _String;
 					PropertyRegions.f_MakeRegion
 						(
-						 	Start
-						 	, String.f_GetLen()
-						 	, [&](CProperties &o_Properties)
-						 	{
+							Start
+							, String.f_GetLen()
+							, [&](CProperties &o_Properties)
+							{
 								o_Properties = CurrentProperties;
 							}
 						)
@@ -459,7 +459,7 @@ namespace NMib::NCommandLine
 					return true;
 				}
 				, [&](CAnsiEncodingParse::CPropertyChange const &_Change)
-			 	{
+				{
 					if (_Change.f_IsOfType<CAnsiEncodingParse::CReset>())
 					{
 						CurrentProperties.m_BackgroundColor.f_Clear();

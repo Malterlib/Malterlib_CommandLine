@@ -70,13 +70,13 @@ namespace NMib::NCommandLine
 		CTableRenderHelper Renderer
 			(
 				[](NStr::CStr const &_Output)
-			 	{
+				{
 					DMibConOutRaw(_Output);
 				}
-			 	, CTableRenderHelper::EOption_Rounded
-			 	, mp_AnsiFlags
-		 		, mp_CommandLineWidth
-		 	)
+				, CTableRenderHelper::EOption_Rounded
+				, mp_AnsiFlags
+				, mp_CommandLineWidth
+			)
 		;
 		Renderer.f_SetPrefix(_Prefix);
 		return Renderer;
