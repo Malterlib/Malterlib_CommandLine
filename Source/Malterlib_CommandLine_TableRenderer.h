@@ -26,6 +26,22 @@ namespace NMib::NCommandLine
 			, EOutputType_ColoredJSON
 		};
 
+		struct CColumnHelper
+		{
+			CColumnHelper(uint32 _Verbosity);
+
+			void f_AddHeading(NStr::CStr const &_Name, uint32 _Verbosity);
+			void f_SetVerbose(NStr::CStr const &_Heading, uint32 _Verbosity = 1);
+
+		private:
+			friend struct CTableRenderHelper;
+
+			uint32 mp_Verbosity = 0;
+			NContainer::TCVector<NStr::CStr> mp_Headings;
+			NContainer::TCMap<mint, uint32> mp_VerboseHeadings;
+			NContainer::TCMap<NStr::CStr, mint> mp_HeadingIndices;
+		};
+
 		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags, uint32 _AvailableWidth);
 		CTableRenderHelper(CTableRenderHelper &&) = default;
 
@@ -35,6 +51,8 @@ namespace NMib::NCommandLine
 			requires (sizeof...(p_Headings) >= 1)
 		;
 		void f_AddHeadingsVector(NContainer::TCVector<NStr::CStr> const &_Headings);
+		void f_AddHeadings(CColumnHelper *_pHelper);
+
 		template <typename ...tfp_CString>
 		void f_AddRow(tfp_CString &&...p_RowColumns)
 			requires (sizeof...(p_RowColumns) >= 1)
@@ -48,9 +66,9 @@ namespace NMib::NCommandLine
 		void f_RemoveColumn(uint32 _iColumn);
 		void f_SortColumn(uint32 _iColumn);
 		void f_SetOptions(EOption _Options);
-		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable) const;
-		void f_Output(NStr::CStr const &_OutputType) const;
-		void f_Output(NEncoding::CEJSON const &_Params) const;
+		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable);
+		void f_Output(NStr::CStr const &_OutputType);
+		void f_Output(NEncoding::CEJSON const &_Params);
 		void f_ReverseRows();
 		bool f_IsRounded() const;
 		bool f_IsColor() const;
@@ -73,6 +91,7 @@ namespace NMib::NCommandLine
 		NContainer::TCVector<zbool> mp_AlignRight;
 		NContainer::TCSet<mint> mp_RowSeparators;
 		NContainer::TCVector<NStr::CStr> mp_Description;
+		CColumnHelper *mp_pColumnsHelper = nullptr;
 		NStr::CStr mp_Prefix;
 		int32 mp_DescriptionWidth = 0;
 		uint32 mp_AvailableWidth = 0;

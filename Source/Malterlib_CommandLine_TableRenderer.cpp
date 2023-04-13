@@ -167,12 +167,12 @@ namespace NMib::NCommandLine
 		return (mp_AnsiFlags & EAnsiEncodingFlag_Color) != 0;
 	}
 
-	void CTableRenderHelper::f_Output(NStr::CStr const &_OutputType) const
+	void CTableRenderHelper::f_Output(NStr::CStr const &_OutputType)
 	{
 		f_Output(fs_ParseOutputTypeOption(_OutputType));
 	}
 
-	void CTableRenderHelper::f_Output(NEncoding::CEJSON const &_Params) const
+	void CTableRenderHelper::f_Output(NEncoding::CEJSON const &_Params)
 	{
 		f_Output(fs_ParseOutputTypeOption(_Params));
 	}
@@ -206,8 +206,18 @@ namespace NMib::NCommandLine
 		}
 	}
 
-	void CTableRenderHelper::f_Output(EOutputType _OutputType) const
+	void CTableRenderHelper::f_Output(EOutputType _OutputType)
 	{
+		if (mp_pColumnsHelper)
+		{
+			while (auto pVerbosityLevel = mp_pColumnsHelper->mp_VerboseHeadings.f_FindLargest())
+			{
+				if (*pVerbosityLevel > mp_pColumnsHelper->mp_Verbosity)
+					f_RemoveColumn(mp_pColumnsHelper->mp_VerboseHeadings.fs_GetKey(*pVerbosityLevel));
+				mp_pColumnsHelper->mp_VerboseHeadings.f_Remove(pVerbosityLevel);
+			}
+		}
+
 		if (_OutputType == EOutputType_TabSeparated)
 		{
 			for (auto &Row : mp_Rows)
@@ -554,6 +564,37 @@ namespace NMib::NCommandLine
 
 		for (auto &Heading : _Headings)
 			fp_AddHeading(Heading);
+	}
+
+	CTableRenderHelper::CColumnHelper::CColumnHelper(uint32 _Verbosity)
+		: mp_Verbosity(_Verbosity)
+	{
+	}
+
+	void CTableRenderHelper::CColumnHelper::f_AddHeading(NStr::CStr const &_Name, uint32 _Verbosity)
+	{
+		auto HeadingIndex = mp_Headings.f_GetLen();
+		mp_HeadingIndices[_Name] = HeadingIndex;
+		if (_Verbosity)
+			mp_VerboseHeadings[HeadingIndex] = _Verbosity;
+
+		mp_Headings.f_Insert(_Name);
+	}
+
+	void CTableRenderHelper::CColumnHelper::f_SetVerbose(NStr::CStr const &_Heading, uint32 _Verbosity)
+	{
+		DMibRequire(mp_HeadingIndices.f_FindEqual(_Heading));
+		auto &Index = fg_Const(mp_HeadingIndices)[_Heading];
+		if (_Verbosity)
+			mp_VerboseHeadings[Index] = _Verbosity;
+		else
+			mp_VerboseHeadings.f_Remove(Index);
+	}
+
+	void CTableRenderHelper::f_AddHeadings(CColumnHelper *_pHelper)
+	{
+		mp_pColumnsHelper = _pHelper;
+		f_AddHeadingsVector(mp_pColumnsHelper->mp_Headings);
 	}
 
 	void CTableRenderHelper::f_AddRowVector(NContainer::TCVector<NStr::CStr> const &_RowColumns)
