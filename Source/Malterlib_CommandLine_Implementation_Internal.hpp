@@ -238,7 +238,7 @@ namespace NMib::NCommandLine
 				if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
 				{
 					bool bIsType = TemplateUserType.m_Type == "$OneOfType";
-					NEncoding::CEJSON TemplateSet = NEncoding::CEJSON::fs_FromJSON(TemplateUserType.m_Value);
+					NEncoding::CEJSON TemplateSet = NEncoding::CEJSON::fs_FromJson(TemplateUserType.m_Value);
 
 					auto &Set = TemplateSet.f_Array();
 
@@ -516,7 +516,7 @@ namespace NMib::NCommandLine
 					if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
 					{
 						bool bIsType = TemplateUserType.m_Type == "$OneOfType";
-						CEJSON TemplateSet = CEJSON::fs_FromJSON(TemplateUserType.m_Value);
+						CEJSON TemplateSet = CEJSON::fs_FromJson(TemplateUserType.m_Value);
 
 						auto &Set = TemplateSet.f_Array();
 

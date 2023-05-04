@@ -30,12 +30,12 @@ namespace NMib::NCommandLine
 
 	COneOf::operator NEncoding::CEJSON () &&
 	{
-		return NEncoding::fg_UserType("$OneOf", m_Config.f_ToJSON());
+		return NEncoding::fg_UserType("$OneOf", m_Config.f_ToJson());
 	}
 
 	COneOf::operator NEncoding::CEJSON () const &
 	{
-		return NEncoding::fg_UserType("$OneOf", m_Config.f_ToJSON());
+		return NEncoding::fg_UserType("$OneOf", m_Config.f_ToJson());
 	}
 
 	COneOfType::COneOfType(NEncoding::CEJSON const &_Config)
@@ -63,11 +63,11 @@ namespace NMib::NCommandLine
 
 	COneOfType::operator NEncoding::CEJSON () &&
 	{
-		return NEncoding::fg_UserType("$OneOfType", m_Config.f_ToJSON());
+		return NEncoding::fg_UserType("$OneOfType", m_Config.f_ToJson());
 	}
 
 	COneOfType::operator NEncoding::CEJSON () const &
 	{
-		return NEncoding::fg_UserType("$OneOfType", m_Config.f_ToJSON());
+		return NEncoding::fg_UserType("$OneOfType", m_Config.f_ToJson());
 	}
 }
