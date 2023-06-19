@@ -24,13 +24,13 @@ namespace NMib::NCommandLine
 	{
 	}
 
-	NEncoding::CEJSON::CKeyValue CTableRenderHelper::fs_OutputTypeOption(EOutputType _Default)
+	NEncoding::CEJSONOrdered::CKeyValue CTableRenderHelper::fs_OutputTypeOption(EOutputType _Default)
 	{
-		return "TableType?"_=
+		return "TableType?"_o=
 			{
-				"Names"_= {"--table-type"}
-				, "Type"_= NEncoding::fg_UserType("$OneOf", CJSON{"human-readable", "tab-separated", "json", "colored-json"})
-				, "Default"_= [&]
+				"Names"_o= {"--table-type"}
+				, "Type"_o= NEncoding::fg_UserTypeSorted("$OneOf", CJSONSorted{"human-readable", "tab-separated", "json", "colored-json"})
+				, "Default"_o= [&]
 				{
 					switch (_Default)
 					{
@@ -42,7 +42,7 @@ namespace NMib::NCommandLine
 					}
 				}
 				()
-				, "Description"_= "How to output the table.\n"
+				, "Description"_o= "How to output the table.\n"
 					"human-readable    - Display the table rendered with borders.\n"
 					"tab-separated     - Output the table as tab separated output suitable for scripting.\n"
 					"json              - Output the table as JSON.\n"
@@ -51,7 +51,7 @@ namespace NMib::NCommandLine
 		;
 	}
 
-	auto CTableRenderHelper::fs_ParseOutputTypeOption(NEncoding::CEJSON const &_Params) -> EOutputType
+	auto CTableRenderHelper::fs_ParseOutputTypeOption(NEncoding::CEJSONSorted const &_Params) -> EOutputType
 	{
 		return fs_ParseOutputTypeOption(_Params["TableType"].f_String());
 	}
@@ -172,7 +172,7 @@ namespace NMib::NCommandLine
 		f_Output(fs_ParseOutputTypeOption(_OutputType));
 	}
 
-	void CTableRenderHelper::f_Output(NEncoding::CEJSON const &_Params)
+	void CTableRenderHelper::f_Output(NEncoding::CEJSONSorted const &_Params)
 	{
 		f_Output(fs_ParseOutputTypeOption(_Params));
 	}
@@ -238,7 +238,7 @@ namespace NMib::NCommandLine
 		}
 		else if (_OutputType == EOutputType_JSON || _OutputType == EOutputType_ColoredJSON)
 		{
-			CJSON Output;
+			CJSONSorted Output;
 
 			if (!mp_Description.f_IsEmpty())
 			{

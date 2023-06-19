@@ -41,22 +41,22 @@ namespace NMib::NCommandLine
 				, m_bOptional(_bOptional)
 			{
 			}
-			void f_Parse(NEncoding::CEJSON const &_Option);
-			NEncoding::CEJSON fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
-			NEncoding::CEJSON fp_ConvertValue(NEncoding::CEJSON const &_Template, NEncoding::CEJSON const &_Value, NStr::CStr const &_Identifier, bool _bStrict, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			NStr::CStr fp_FormatValue(NEncoding::CEJSON const &_Template, NEncoding::CEJSON const &_Value, NStr::CStr const &_Identifier, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			void fp_ValidateTemplate(NEncoding::CEJSON const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
-			NEncoding::CEJSON f_ConvertValue(NEncoding::CEJSON const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			NEncoding::CEJSON f_ConvertValue(NEncoding::CEJSON const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			void f_AppendConvertValue(NEncoding::CEJSON &o_Value, NEncoding::CEJSON const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			void f_AppendConvertValue(NEncoding::CEJSON &o_Value, NEncoding::CEJSON const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			NStr::CStr f_FormatValue(NEncoding::CEJSON const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void f_Parse(NEncoding::CEJSONOrdered &&_Option);
+			NEncoding::CEJSONSorted fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
+			NEncoding::CEJSONSorted fp_ConvertValue(NEncoding::CEJSONSorted const &_Template, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, bool _bStrict, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr fp_FormatValue(NEncoding::CEJSONSorted const &_Template, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void fp_ValidateTemplate(NEncoding::CEJSONSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
+			NEncoding::CEJSONSorted f_ConvertValue(NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NEncoding::CEJSONSorted f_ConvertValue(NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void f_AppendConvertValue(NEncoding::CEJSONSorted &o_Value, NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void f_AppendConvertValue(NEncoding::CEJSONSorted &o_Value, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr f_FormatValue(NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 
 			NStr::CStr const m_Identifier;
 			bool const m_bOptional;
 
-			NEncoding::CEJSON m_TypeTemplate;
-			NEncoding::CEJSON m_Default;
+			NEncoding::CEJSONSorted m_TypeTemplate;
+			NEncoding::CEJSONSorted m_Default;
 
 			NStr::CStr m_ShortDescription;
 			NStr::CStr m_LongDescription;
@@ -77,7 +77,7 @@ namespace NMib::NCommandLine
 				, m_Names(_Names)
 			{
 			}
-			void f_ParseOption(NEncoding::CEJSON const &_Option);
+			void f_ParseOption(NEncoding::CEJSONOrdered &&_Option);
 			bool f_IsEnabled(COptionSet const &_OptionSet, bool _bIsDirect) const;
 
 			NContainer::TCVector<NStr::CStr> const m_Names;
@@ -96,7 +96,7 @@ namespace NMib::NCommandLine
 				, m_bVector(_bVector)
 			{
 			}
-			void f_ParseParameter(NEncoding::CEJSON const &_Parameter);
+			void f_ParseParameter(NEncoding::CEJSONOrdered &&_Parameter);
 
 			bool m_bVector;
 		};
@@ -108,7 +108,7 @@ namespace NMib::NCommandLine
 				, m_Names(_Names)
 			{
 			}
-			void f_RegisterOptions(CInternal &_Internal, NEncoding::CEJSON const &_Options);
+			void f_RegisterOptions(CInternal &_Internal, NEncoding::CEJSONOrdered &&_Options);
 
 			CSection * const m_pSection;
 			NContainer::TCVector<NStr::CStr> const m_Names;
@@ -132,7 +132,7 @@ namespace NMib::NCommandLine
 
 			NStorage::TCSharedPointer
 				<
-					NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSON const &_Parameters, CCommandLineClient &_CommandLineClient)>
+					NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted const &_Parameters, CCommandLineClient &_CommandLineClient)>
 				>
 				m_pDirectRunCommand
 			;
@@ -164,10 +164,10 @@ namespace NMib::NCommandLine
 			NContainer::TCMap<NStr::CStr, COption *> m_SectionOptionsByName;
 		};
 
-		CCommand *f_RegisterCommand(CSection &_Section, NEncoding::CEJSON const &_CommandDescription);
-		NEncoding::CEJSON f_ValidateParams(CCommand const &_Command, NEncoding::CEJSON const &_Params) const;
+		CCommand *f_RegisterCommand(CSection &_Section, NEncoding::CEJSONOrdered &&_CommandDescription);
+		NEncoding::CEJSONSorted f_ValidateParams(CCommand const &_Command, NEncoding::CEJSONSorted const &_Params) const;
 		void f_CheckName(NStr::CStr const &_Name);
-		static void fs_CheckValidObject(NEncoding::CEJSON const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys);
+		static void fs_CheckValidObject(NEncoding::CEJSONOrdered const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys);
 		static NStr::CStr fs_Color(NStr::CStr const &_String, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
 
 		NContainer::TCLinkedList<CSection> m_Sections;

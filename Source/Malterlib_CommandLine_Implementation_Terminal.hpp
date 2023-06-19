@@ -18,11 +18,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"Color?"_=
+					"Color?"_o=
 					{
-						"Names"_= {"--color"}
-						, "Default"_= CCommandLineDefaults::fs_ColorEnabledDefault()
-						, "Description"_= "Display text output with ansi colors where supported.\n"\
+						"Names"_o= {"--color"}
+						, "Default"_o= CCommandLineDefaults::fs_ColorEnabledDefault()
+						, "Description"_o= "Display text output with ansi colors where supported.\n"\
 						"You can override behaviour with MalterlibColor env var. Set it to true or false. "\
 					}
 				}
@@ -31,11 +31,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"Color24Bit?"_=
+					"Color24Bit?"_o=
 					{
-						"Names"_= {"--color-24bit"}
-						, "Default"_= CCommandLineDefaults::fs_Color24BitEnabledDefault()
-						, "Description"_= "Display text output with 24 bit ansi colors.\n"\
+						"Names"_o= {"--color-24bit"}
+						, "Default"_o= CCommandLineDefaults::fs_Color24BitEnabledDefault()
+						, "Description"_o= "Display text output with 24 bit ansi colors.\n"\
 						"By default detected through COLORTERM. "\
 						"You can override behaviour with MalterlibColor24Bit env var. Set it to true or false. "\
 					}
@@ -45,11 +45,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"ColorLight?"_=
+					"ColorLight?"_o=
 					{
-						"Names"_= {"--color-light"}
-						, "Default"_= CCommandLineDefaults::fs_ColorLightBackgroundDefault()
-						, "Description"_= "Force light background.\n"\
+						"Names"_o= {"--color-light"}
+						, "Default"_o= CCommandLineDefaults::fs_ColorLightBackgroundDefault()
+						, "Description"_o= "Force light background.\n"\
 						"You can override behaviour with MalterlibColorLight env var. Set it to true, false or auto. "\
 						"With auto a xterm secquence will be used to determine background color. "\
 						"Can interfere with commands that use std input processing."
@@ -60,11 +60,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"BoxDrawing?"_=
+					"BoxDrawing?"_o=
 					{
-						"Names"_= {"--box-drawing"}
-						, "Default"_= CCommandLineDefaults::fs_BoxDrawingDefault()
-						, "Description"_= "Enable box drawing characters.\n"\
+						"Names"_o= {"--box-drawing"}
+						, "Default"_o= CCommandLineDefaults::fs_BoxDrawingDefault()
+						, "Description"_o= "Enable box drawing characters.\n"\
 					}
 				}
 			)
@@ -72,11 +72,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"TerminalWidth?"_=
+					"TerminalWidth?"_o=
 					{
-						"Names"_= {"--terminal-width"}
-						, "Default"_= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalWidth", "-1").f_ToInt(int64(-1))
-						, "Description"_= "Override detected terminal width.\n"\
+						"Names"_o= {"--terminal-width"}
+						, "Default"_o= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalWidth", "-1").f_ToInt(int64(-1))
+						, "Description"_o= "Override detected terminal width.\n"\
 						"Useful for when for whatever reason tty is not accessible. "\
 					}
 				}
@@ -85,11 +85,11 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"TerminalHeight?"_=
+					"TerminalHeight?"_o=
 					{
-						"Names"_= {"--terminal-height"}
-						, "Default"_= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalHeight", "-1").f_ToInt(int64(-1))
-						, "Description"_= "Override detected terminal height.\n"\
+						"Names"_o= {"--terminal-height"}
+						, "Default"_o= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalHeight", "-1").f_ToInt(int64(-1))
+						, "Description"_o= "Override detected terminal height.\n"\
 						"Useful for when for whatever reason tty is not accessible. "\
 					}
 				}

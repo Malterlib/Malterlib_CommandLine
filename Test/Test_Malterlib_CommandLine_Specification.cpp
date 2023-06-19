@@ -27,7 +27,7 @@ namespace
 			{
 				DMibTestSuite("General")
 				{
-					CEJSON RunParams;
+					CEJSONSorted RunParams;
 
 					TCSharedPointer<CCommandLineSpecification> pSpecification = fg_Construct();
 
@@ -38,87 +38,87 @@ namespace
 					[[maybe_unused]] auto Command = Section.f_RegisterDirectCommand
 						(
 							{
-								"Names"_= {"--test", "-t"}
-								, "Description"_= "Test 3."
-								, "Parameters"_=
+								"Names"_o= {"--test", "-t"}
+								, "Description"_o= "Test 3."
+								, "Parameters"_o=
 								{
-									"ArgString?"_=
+									"ArgString?"_o=
 									{
-										"Default"_= ""
-										, "Description"_= "Test 5"
+										"Default"_o= ""
+										, "Description"_o= "Test 5"
 									}
 								}
-								, "Options"_=
+								, "Options"_o=
 								{
-									"Boolean?"_=
+									"Boolean?"_o=
 									{
-										"Names"_= {"--boolean"}
-										, "Default"_= false
-										, "Description"_= "Test 1"
+										"Names"_o= {"--boolean"}
+										, "Default"_o= false
+										, "Description"_o= "Test 1"
 									}
-									, "Integer?"_=
+									, "Integer?"_o=
 									{
-										"Names"_= {"--integer"}
-										, "Default"_= 5
-										, "Description"_= "Test 2"
+										"Names"_o= {"--integer"}
+										, "Default"_o= 5
+										, "Description"_o= "Test 2"
 									}
-									, "Float?"_=
+									, "Float?"_o=
 									{
-										"Names"_= {"--float"}
-										, "Default"_= 5.5
-										, "Description"_= "Test 3"
+										"Names"_o= {"--float"}
+										, "Default"_o= 5.5
+										, "Description"_o= "Test 3"
 									}
-									, "String?"_=
+									, "String?"_o=
 									{
-										"Names"_= {"--string"}
-										, "Default"_= "TestStr"
-										, "Description"_= "Test 4"
+										"Names"_o= {"--string"}
+										, "Default"_o= "TestStr"
+										, "Description"_o= "Test 4"
 									}
-									, "Binary?"_=
+									, "Binary?"_o=
 									{
-										"Names"_= {"--binary"}
-										, "Default"_= fg_CreateVector<uint8>(5, 6, 7)
-										, "Description"_= "Test 4"
+										"Names"_o= {"--binary"}
+										, "Default"_o= fg_CreateVector<uint8>(5, 6, 7)
+										, "Description"_o= "Test 4"
 									}
-									, "StringChoice?"_=
+									, "StringChoice?"_o=
 									{
-										"Names"_= {"--string-choice"}
-										, "Type"_= COneOf{"TestStr", "TestStr2"}
-										, "Default"_= "TestStr"
-										, "Description"_= "Test 4"
+										"Names"_o= {"--string-choice"}
+										, "Type"_o= COneOf{"TestStr", "TestStr2"}
+										, "Default"_o= "TestStr"
+										, "Description"_o= "Test 4"
 									}
-									, "Array?"_=
+									, "Array?"_o=
 									{
-										"Names"_= {"--array"}
-										, "Type"_= _[_]
-										, "Default"_= {"Test1", "Test2", {"Test"_= 5}}
-										, "Description"_= "Test 5"
+										"Names"_o= {"--array"}
+										, "Type"_o= _[_]
+										, "Default"_o= {"Test1", "Test2", {"Test"_o= 5}}
+										, "Description"_o= "Test 5"
 									}
-									, "ArrayChoice?"_=
+									, "ArrayChoice?"_o=
 									{
-										"Names"_= {"--array-choice"}
-										, "Type"_= {COneOf{"", "Test1", "Test2"}}
-										, "Default"_= {"Test1", "Test2"}
-										, "Description"_= "Test 5"
+										"Names"_o= {"--array-choice"}
+										, "Type"_o= {COneOf{"", "Test1", "Test2"}}
+										, "Default"_o= {"Test1", "Test2"}
+										, "Description"_o= "Test 5"
 									}
-									, "ComplexObject?"_=
+									, "ComplexObject?"_o=
 									{
-										"Names"_= {"--complex-object"}
-										, "Type"_=
+										"Names"_o= {"--complex-object"}
+										, "Type"_o=
 										{
-											"Key1?"_= ""
-											, "Key2?"_= {""}
-											, "Key3?"_= {COneOf{"Test1", "Test2"}}
+											"Key1?"_o= ""
+											, "Key2?"_o= {""}
+											, "Key3?"_o= {COneOf{"Test1", "Test2"}}
 										}
-										, "Default"_=
+										, "Default"_o=
 										{
-											"Key2"_= {"Test2"}
+											"Key2"_o= {"Test2"}
 										}
-										, "Description"_= "Test 4"
+										, "Description"_o= "Test 4"
 									}
 								}
 							}
-							, [&](CEJSON const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
+							, [&](CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 66;
@@ -135,7 +135,7 @@ namespace
 						(
 							RunParams
 							, ==
-							, CEJSON
+							, CEJSONSorted
 							(
 								{
 									"Boolean"_= false

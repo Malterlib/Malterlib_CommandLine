@@ -83,7 +83,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
-	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommand(NStr::CStr const &_Command, NEncoding::CEJSON const &_Params)
+	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommand(NStr::CStr const &_Command, NEncoding::CEJSONSorted const &_Params)
 	{
 		using namespace NStr;
 
@@ -159,7 +159,7 @@ namespace NMib::NCommandLine
 	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::fp_RunCommand
 		(
 			void const *_pCommand
-			, NEncoding::CEJSON const &_Params
+			, NEncoding::CEJSONSorted const &_Params
 		)
 	{
 		if constexpr (NTraits::TCIsSame<CThis, TCCommandLineClient>::mc_Value)

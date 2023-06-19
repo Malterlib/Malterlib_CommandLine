@@ -37,7 +37,7 @@ namespace NMib::NCommandLine
 		return Identifier;
 	}
 
-	[[maybe_unused]] static void fg_ParseDescription(NEncoding::CEJSON const &_Object, NStr::CStr &o_Short, NStr::CStr &o_Long)
+	[[maybe_unused]] static void fg_ParseDescription(NEncoding::CEJSONOrdered const &_Object, NStr::CStr &o_Short, NStr::CStr &o_Long)
 	{
 		NStr::CStr Description = _Object["Description"].f_String();
 		o_Short = fg_GetStrLineSep(Description).f_Trim();
@@ -77,12 +77,12 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_Parse(NEncoding::CEJSON const &_Value)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_Parse(NEncoding::CEJSONOrdered &&_Value)
 	{
 		if (auto *pDefault = _Value.f_GetMember("Default"))
-			m_Default = *pDefault;
+			m_Default = NEncoding::CEJSONSorted::fs_FromCompatible(fg_Move(*pDefault));
 		if (auto *pType = _Value.f_GetMember("Type"))
-			m_TypeTemplate = *pType;
+			m_TypeTemplate = NEncoding::CEJSONSorted::fs_FromCompatible(fg_Move(*pType));
 
 		if (!m_Default.f_IsValid() && !m_TypeTemplate.f_IsValid())
 			DMibError("An option needs to specify at least 'Default' or 'Type'");
@@ -98,9 +98,9 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::f_ValidateParams(CCommand const &_Command, NEncoding::CEJSON const &_Params) const
+	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::f_ValidateParams(CCommand const &_Command, NEncoding::CEJSONSorted const &_Params) const
 	{
-		NEncoding::CEJSON Params;
+		NEncoding::CEJSONSorted Params;
 
 		auto fCheckValue = [&](CValue const &_Value)
 			{
@@ -156,15 +156,15 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue(NEncoding::CEJSON const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue(NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
 	{
 		return fp_ConvertValue(m_TypeTemplate, _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
+	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
 		(
-			NEncoding::CEJSON const &_Value
+			NEncoding::CEJSONSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
@@ -174,7 +174,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatValue(NEncoding::CEJSON const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatValue(NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
 	{
 		return fp_FormatValue(m_TypeTemplate, _Value, m_Identifier, _AnsiFlags);
 	}
@@ -182,36 +182,36 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-			NEncoding::CEJSON &o_Value
-			, NEncoding::CEJSON const &_Value
+			NEncoding::CEJSONSorted &o_Value
+			, NEncoding::CEJSONSorted const &_Value
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
-		NEncoding::CEJSON NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
+		NEncoding::CEJSONSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
 	}
 
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-			NEncoding::CEJSON &o_Value
-			, NEncoding::CEJSON const &_Value
+			NEncoding::CEJSONSorted &o_Value
+			, NEncoding::CEJSONSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
-		NEncoding::CEJSON NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
+		NEncoding::CEJSONSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const
+	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const
 	{
 		try
 		{
-			return NEncoding::CEJSON::fs_FromString(_Value);
+			return NEncoding::CEJSONSorted::fs_FromString(_Value);
 		}
 		catch (NException::CException const &_Exception)
 		{
@@ -220,7 +220,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate(NEncoding::CEJSON const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate(NEncoding::CEJSONSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const
 	{
 		using namespace NEncoding;
 		switch (_Template.f_EType())
@@ -238,7 +238,7 @@ namespace NMib::NCommandLine
 				if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
 				{
 					bool bIsType = TemplateUserType.m_Type == "$OneOfType";
-					NEncoding::CEJSON TemplateSet = NEncoding::CEJSON::fs_FromJson(TemplateUserType.m_Value);
+					NEncoding::CEJSONSorted TemplateSet = NEncoding::CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
 
 					auto &Set = TemplateSet.f_Array();
 
@@ -307,17 +307,17 @@ namespace NMib::NCommandLine
 
 #	define DMibCommandLineConvertException(_Description) DMibImpError(CCommandLineConvertException, _Description)
 
-	static void fg_CheckType(NEncoding::CEJSON const &_Value, NEncoding::EEJSONType _Type)
+	static void fg_CheckType(NEncoding::CEJSONSorted const &_Value, NEncoding::EEJSONType _Type)
 	{
 		if (_Value.f_EType() != _Type)
 			DMibError(fg_Format("Expected '{}' but got '{}': {}", NEncoding::fg_EJSONTypeToString(_Type), NEncoding::fg_EJSONTypeToString(_Value.f_EType()), _Value).f_TrimRight());
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSON TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ConvertValue
+	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ConvertValue
 		(
-			NEncoding::CEJSON const &_Template
-			, NEncoding::CEJSON const &_Value
+			NEncoding::CEJSONSorted const &_Template
+			, NEncoding::CEJSONSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, bool _bStrict
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
@@ -325,7 +325,7 @@ namespace NMib::NCommandLine
 	{
 		using namespace NEncoding;
 		using namespace NStr;
-		CEJSON Return;
+		CEJSONSorted Return;
 		try
 		{
 			switch (_Template.f_EType())
@@ -516,7 +516,7 @@ namespace NMib::NCommandLine
 					if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
 					{
 						bool bIsType = TemplateUserType.m_Type == "$OneOfType";
-						CEJSON TemplateSet = CEJSON::fs_FromJson(TemplateUserType.m_Value);
+						CEJSONSorted TemplateSet = CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
 
 						auto &Set = TemplateSet.f_Array();
 
@@ -533,7 +533,7 @@ namespace NMib::NCommandLine
 							{
 								try
 								{
-									CEJSON Value = fp_ConvertValue(PossibleMatch, _Value, FormatIdentifier, _bStrict, _AnsiFlags);
+									CEJSONSorted Value = fp_ConvertValue(PossibleMatch, _Value, FormatIdentifier, _bStrict, _AnsiFlags);
 									if (bIsType)
 										return Value;
 									else if (Value == PossibleMatch)
@@ -563,7 +563,7 @@ namespace NMib::NCommandLine
 				break;
 			case EEJSONType_Object:
 				{
-					CEJSON RawValue;
+					CEJSONSorted RawValue;
 					if (_bStrict)
 					{
 						fg_CheckType(_Value, _Template.f_EType());
@@ -593,7 +593,7 @@ namespace NMib::NCommandLine
 						auto &OutputObject = Return.f_Object();
 						NContainer::TCSet<CStr> TemplateMemberNames;
 
-						CEJSON const *pWildcard = nullptr;
+						CEJSONSorted const *pWildcard = nullptr;
 
 						for (auto &TemplateMember : TemplateObject)
 						{
@@ -641,7 +641,7 @@ namespace NMib::NCommandLine
 				break;
 			case EEJSONType_Array:
 				{
-					CEJSON RawValue;
+					CEJSONSorted RawValue;
 					if (_bStrict)
 					{
 						fg_CheckType(_Value, _Template.f_EType());
@@ -736,8 +736,8 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
 		(
-			NEncoding::CEJSON const &_Template
-			, NEncoding::CEJSON const &_Value
+			NEncoding::CEJSONSorted const &_Template
+			, NEncoding::CEJSONSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
@@ -747,7 +747,7 @@ namespace NMib::NCommandLine
 
 		CStr Return;
 
-		auto fToString = [&](CEJSON const &_Value)
+		auto fToString = [&](CEJSONSorted const &_Value)
 			{
 				return _Value.f_ToStringColored(_AnsiFlags, "    ");
 			}
@@ -834,11 +834,9 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::COption::f_ParseOption(NEncoding::CEJSON const &_Option)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::COption::f_ParseOption(NEncoding::CEJSONOrdered &&_Option)
 	{
 		fs_CheckValidObject(_Option, {"Type", "Default", "Names", "Description", "DefaultEnabled", "Hidden", "CanNegate", "DisablesAllErrors", "ValidForDirectCommand"});
-
-		CValue::f_Parse(_Option);
 
 		if (auto *pValue = _Option.f_GetMember("DefaultEnabled"))
 			m_bDefaultEnabled = pValue->f_Boolean();
@@ -850,13 +848,15 @@ namespace NMib::NCommandLine
 			m_bDisablesAllErrors = pValue->f_Boolean();
 		if (auto *pValue = _Option.f_GetMember("ValidForDirectCommand"))
 			m_bValidForDirectCommand = pValue->f_Boolean();
+
+		CValue::f_Parse(fg_Move(_Option));
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CParameter::f_ParseParameter(NEncoding::CEJSON const &_Parameter)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CParameter::f_ParseParameter(NEncoding::CEJSONOrdered &&_Parameter)
 	{
 		fs_CheckValidObject(_Parameter, {"Type", "Default", "Description"});
-		CValue::f_Parse(_Parameter);
+		CValue::f_Parse(fg_Move(_Parameter));
 
 		if (m_bVector)
 		{
@@ -869,7 +869,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::fs_CheckValidObject(NEncoding::CEJSON const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::fs_CheckValidObject(NEncoding::CEJSONOrdered const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys)
 	{
 		if (!_ToCheck.f_IsObject())
 			DMibError("Command line description is not an object");
@@ -898,12 +898,14 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CCommandCommon::f_RegisterOptions(CInternal &_Internal, NEncoding::CEJSON const &_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CCommandCommon::f_RegisterOptions(CInternal &_Internal, NEncoding::CEJSONOrdered &&_Options)
 	{
 		auto &Internal = _Internal;
 
-		for (auto &Option : _Options.f_Object())
+		for (auto &OptionMutable : _Options.f_Object())
 		{
+			auto &Option = fg_Const(OptionMutable);
+
 			bool bOptional = false;
 			bool bVector = false;
 			NStr::CStr Identifier = fg_ParseIdentifier(Option.f_Name(), bOptional, bVector);
@@ -951,7 +953,7 @@ namespace NMib::NCommandLine
 				m_OptionsByName[Name] = &NewOption;
 			}
 
-			NewOption.f_ParseOption(Option.f_Value());
+			NewOption.f_ParseOption(fg_Move(OptionMutable.f_Value()));
 
 			if (NameArray.f_IsEmpty() && !NewOption.m_bHidden)
 				DMibError("You need to specify at least one name for option");

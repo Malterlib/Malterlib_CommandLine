@@ -68,14 +68,14 @@ namespace NMib::NCommandLine
 		void f_SetOptions(EOption _Options);
 		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable);
 		void f_Output(NStr::CStr const &_OutputType);
-		void f_Output(NEncoding::CEJSON const &_Params);
+		void f_Output(NEncoding::CEJSONSorted const &_Params);
 		void f_ReverseRows();
 		bool f_IsRounded() const;
 		bool f_IsColor() const;
 
-		static NEncoding::CEJSON::CKeyValue fs_OutputTypeOption(EOutputType _Default = EOutputType_HumanReadable);
+		static NEncoding::CEJSONOrdered::CKeyValue fs_OutputTypeOption(EOutputType _Default = EOutputType_HumanReadable);
 		static EOutputType fs_ParseOutputTypeOption(NStr::CStr const &_String);
-		static EOutputType fs_ParseOutputTypeOption(NEncoding::CEJSON const &_Params);
+		static EOutputType fs_ParseOutputTypeOption(NEncoding::CEJSONSorted const &_Params);
 
 	private:
 		void fp_AddHeading(NStr::CStr const &_Heading);

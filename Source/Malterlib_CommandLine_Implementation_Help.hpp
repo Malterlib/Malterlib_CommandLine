@@ -14,7 +14,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	uint32 TCCommandLineSpecification<t_CCustomization>::fp_HelpCommand(NEncoding::CEJSON const &_Params, CCommandLineClient &_CommandLineClient)
+	uint32 TCCommandLineSpecification<t_CCustomization>::fp_HelpCommand(NEncoding::CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient)
 	{
 		using namespace NStr;
 		using namespace NFile;
@@ -939,19 +939,19 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"HelpCurrentCommand?"_=
+					"HelpCurrentCommand?"_o=
 					{
-						"Names"_= {"-?"}
-						, "Default"_= false
-						, "Description"_= "Display help for the current command."
-						, "DisablesAllErrors"_= true
+						"Names"_o= {"-?"}
+						, "Default"_o= false
+						, "Description"_o= "Display help for the current command."
+						, "DisablesAllErrors"_o= true
 					}
-					, "HelpCurrentCommandVerbose?"_=
+					, "HelpCurrentCommandVerbose?"_o=
 					{
-						"Names"_= {"-??"}
-						, "Default"_= false
-						, "Description"_= "Display verbose help for the current command."
-						, "DisablesAllErrors"_= true
+						"Names"_o= {"-??"}
+						, "Default"_o= false
+						, "Description"_o= "Display verbose help for the current command."
+						, "DisablesAllErrors"_o= true
 					}
 				}
 			)
@@ -959,38 +959,38 @@ namespace NMib::NCommandLine
 		auto Command = DefaultSection.f_RegisterDirectCommand
 			(
 				{
-					"Names"_= {"--help", "-h"}
-					, "Description"_= "Display help."
-					, "AlwaysVerbose"_= true
-					, "ErrorOnCommandAsParameter"_= false
-					, "ErrorOnOptionAsParameter"_= false
-					, "DisableGlobalOptions"_= {"ConcurrentLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"}
-					, "Parameters"_=
+					"Names"_o= {"--help", "-h"}
+					, "Description"_o= "Display help."
+					, "AlwaysVerbose"_o= true
+					, "ErrorOnCommandAsParameter"_o= false
+					, "ErrorOnOptionAsParameter"_o= false
+					, "DisableGlobalOptions"_o= {"ConcurrentLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"}
+					, "Parameters"_o=
 					{
-						"Commands...?"_=
+						"Commands...?"_o=
 						{
-							"Type"_= {""}
-							, "Default"_= _[_]
-							, "Description"_= "Specify the command(s) to display help for."
+							"Type"_o= {""}
+							, "Default"_o= _[_]
+							, "Description"_o= "Specify the command(s) to display help for."
 						}
 					}
-					, "Options"_=
+					, "Options"_o=
 					{
-						"Verbose?"_=
+						"Verbose?"_o=
 						{
-							"Names"_= {"--verbose", "-v"}
-							, "Default"_= false
-							, "Description"_= "Display the full documentation."
+							"Names"_o= {"--verbose", "-v"}
+							, "Default"_o= false
+							, "Description"_o= "Display the full documentation."
 						}
-						, "OnlyCommands?"_=
+						, "OnlyCommands?"_o=
 						{
-							"Names"_= {"--only-commands", "-c"}
-							, "Default"_= false
-							, "Description"_= "Display commands only."
+							"Names"_o= {"--only-commands", "-c"}
+							, "Default"_o= false
+							, "Description"_o= "Display commands only."
 						}
 					}
 				}
-				, [this](CEJSON const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
+				, [this](CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 				{
 					return fp_HelpCommand(_Params, _CommandLineClient);
 				}

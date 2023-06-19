@@ -169,7 +169,7 @@ namespace NMib::NCommandLine
 		return bValue;
 	}
 
-	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJSON const &_Params)
+	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJSONSorted const &_Params)
 	{
 		NCommandLine::EAnsiEncodingFlag AnsiFlags = EAnsiEncodingFlag_None;
 		if (_Params.f_GetMemberValue("Color", CCommandLineDefaults::fs_ColorEnabledDefault()).f_Boolean())

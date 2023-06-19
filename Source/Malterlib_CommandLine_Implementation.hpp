@@ -22,11 +22,11 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CCommand::f_RegisterOptions(NEncoding::CEJSON const &_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CCommand::f_RegisterOptions(NEncoding::CEJSONOrdered &&_Options)
 	{
 		auto &Internal = *mp_pInternal;
 		typename CInternal::CCommand *pCommand = fg_AutoStaticCast(mp_pCommand);
-		pCommand->f_RegisterOptions(Internal, _Options);
+		pCommand->f_RegisterOptions(Internal, fg_Move(_Options));
 	}
 
 	template <typename tf_CIdentifiers>
@@ -39,7 +39,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterSectionOptions(NEncoding::CEJSON const &_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterSectionOptions(NEncoding::CEJSONOrdered &&_Options)
 	{
 		using namespace NStr;
 		
@@ -47,8 +47,10 @@ namespace NMib::NCommandLine
 		auto &Section = *pSection;
 		auto &Internal = *mp_pInternal;
 
-		for (auto &Option : _Options.f_Object())
+		for (auto &OptionMutable : _Options.f_Object())
 		{
+			auto &Option = fg_Const(OptionMutable);
+
 			bool bOptional = false;
 			bool bVector = false;
 			CStr Identifier = fg_ParseIdentifier(Option.f_Name(), bOptional, bVector);
@@ -97,19 +99,20 @@ namespace NMib::NCommandLine
 				Internal.m_SectionOptionsNames[Name].f_Insert(Section.m_Heading);
 			}
 
-			NewOption.f_ParseOption(Option.f_Value());
+			NewOption.f_ParseOption(fg_Move(OptionMutable.f_Value()));
 		}
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::f_RegisterGlobalOptions(NEncoding::CEJSON const &_Options)
+	void TCCommandLineSpecification<t_CCustomization>::f_RegisterGlobalOptions(NEncoding::CEJSONOrdered &&_Options)
 	{
 		using namespace NStr;
 		
 		auto &Internal = *mp_pInternal;
 
-		for (auto &Option : _Options.f_Object())
+		for (auto &OptionMutable : _Options.f_Object())
 		{
+			auto &Option = fg_Const(OptionMutable);
 			bool bOptional = false;
 			bool bVector = false;
 			CStr Identifier = fg_ParseIdentifier(Option.f_Name(), bOptional, bVector);
@@ -153,7 +156,7 @@ namespace NMib::NCommandLine
 			for (auto &NameJSON : NameArray)
 				Internal.m_GlobalOptionsByName[NameJSON.f_String()] = &NewOption;
 
-			NewOption.f_ParseOption(Option.f_Value());
+			NewOption.f_ParseOption(fg_Move(OptionMutable.f_Value()));
 
 			if (!NewOption.m_bDefaultEnabled)
 				DMibError("Default enabled can only be disabled on section options");
@@ -161,13 +164,15 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	auto TCCommandLineSpecification<t_CCustomization>::CInternal::f_RegisterCommand(CSection &_Section, NEncoding::CEJSON const &_CommandDescription) -> CCommand *
+	auto TCCommandLineSpecification<t_CCustomization>::CInternal::f_RegisterCommand(CSection &_Section, NEncoding::CEJSONOrdered &&_CommandDescription) -> CCommand *
 	{
 		using namespace NStr;
 
+		auto CommandDescription = fg_Const(_CommandDescription);
+
 		fs_CheckValidObject
 			(
-				_CommandDescription
+				CommandDescription
 				,
 				{
 					"Names"
@@ -193,7 +198,7 @@ namespace NMib::NCommandLine
 			)
 		;
 
-		auto &NameArray = _CommandDescription["Names"].f_Array();
+		auto &NameArray = CommandDescription["Names"].f_Array();
 		if (NameArray.f_IsEmpty())
 			DMibError("You need to specify at least one name for command");
 
@@ -221,51 +226,51 @@ namespace NMib::NCommandLine
 			m_CommandByName[Name] = &NewCommand;
 		}
 
-		fg_ParseDescription(_CommandDescription, NewCommand.m_ShortDescription, NewCommand.m_LongDescription);
+		fg_ParseDescription(CommandDescription, NewCommand.m_ShortDescription, NewCommand.m_LongDescription);
 
-		if (auto *pStatus = _CommandDescription.f_GetMember("Status"))
+		if (auto *pStatus = CommandDescription.f_GetMember("Status"))
 		{
 			for (auto &Status : pStatus->f_Object())
 				NewCommand.m_StatusDescription[Status.f_Name()] = Status.f_Value().f_String();
 		}
-		if (auto *pOutput = _CommandDescription.f_GetMember("Output"))
+		if (auto *pOutput = CommandDescription.f_GetMember("Output"))
 			NewCommand.m_OutputDescription = pOutput->f_String();
-		if (auto *pCategory = _CommandDescription.f_GetMember("Category"))
+		if (auto *pCategory = CommandDescription.f_GetMember("Category"))
 			NewCommand.m_Category = pCategory->f_String();
-		if (auto *pErrorOnCommandAsParameter = _CommandDescription.f_GetMember("ErrorOnCommandAsParameter"))
+		if (auto *pErrorOnCommandAsParameter = CommandDescription.f_GetMember("ErrorOnCommandAsParameter"))
 			NewCommand.m_bErrorOnCommandAsParameter = pErrorOnCommandAsParameter->f_Boolean();
-		if (auto *pShowOptionsInCommandEntry = _CommandDescription.f_GetMember("ShowOptionsInCommandEntry"))
+		if (auto *pShowOptionsInCommandEntry = CommandDescription.f_GetMember("ShowOptionsInCommandEntry"))
 			NewCommand.m_bShowOptionsInCommandEntry = pShowOptionsInCommandEntry->f_Boolean();
-		if (auto *pShowParametersStart = _CommandDescription.f_GetMember("ShowParametersStart"))
+		if (auto *pShowParametersStart = CommandDescription.f_GetMember("ShowParametersStart"))
 			NewCommand.m_bShowParametersStart = pShowParametersStart->f_Boolean();
-		if (auto *pGreedyDefaultCommand = _CommandDescription.f_GetMember("GreedyDefaultCommand"))
+		if (auto *pGreedyDefaultCommand = CommandDescription.f_GetMember("GreedyDefaultCommand"))
 			NewCommand.m_bGreedyDefaultCommand = pGreedyDefaultCommand->f_Boolean();
-		if (auto *pGreedyDefaultCommandParameters = _CommandDescription.f_GetMember("GreedyDefaultCommandParameters"))
+		if (auto *pGreedyDefaultCommandParameters = CommandDescription.f_GetMember("GreedyDefaultCommandParameters"))
 			NewCommand.m_bGreedyDefaultCommandParameters = pGreedyDefaultCommandParameters->f_Boolean();
-		if (auto *pErrorOnOptionAsParameter = _CommandDescription.f_GetMember("ErrorOnOptionAsParameter"))
+		if (auto *pErrorOnOptionAsParameter = CommandDescription.f_GetMember("ErrorOnOptionAsParameter"))
 			NewCommand.m_bErrorOnOptionAsParameter = pErrorOnOptionAsParameter->f_Boolean();
-		if (auto *pErrorOnOptionAsParameterWhenDefaultCommand = _CommandDescription.f_GetMember("ErrorOnOptionAsParameterWhenDefaultCommand"))
+		if (auto *pErrorOnOptionAsParameterWhenDefaultCommand = CommandDescription.f_GetMember("ErrorOnOptionAsParameterWhenDefaultCommand"))
 			NewCommand.m_bErrorOnOptionAsParameterWhenDefaultCommand = pErrorOnOptionAsParameterWhenDefaultCommand->f_Boolean();
-		if (auto *pAlwaysVerbose = _CommandDescription.f_GetMember("AlwaysVerbose"))
+		if (auto *pAlwaysVerbose = CommandDescription.f_GetMember("AlwaysVerbose"))
 			NewCommand.m_bAlwaysVerbose = pAlwaysVerbose->f_Boolean();
-		if (auto *pValue = _CommandDescription.f_GetMember("SectionOptions"))
+		if (auto *pValue = CommandDescription.f_GetMember("SectionOptions"))
 		{
 			NewCommand.m_SectionOptionSet.m_bAllowedSpecified = true;
 			for (auto &Option : pValue->f_Array())
 				NewCommand.m_SectionOptionSet.m_Allowed[Option.f_String()];
 		}
-		if (auto *pValue = _CommandDescription.f_GetMember("DisableSectionOptions"))
+		if (auto *pValue = CommandDescription.f_GetMember("DisableSectionOptions"))
 		{
 			for (auto &Option : pValue->f_Array())
 				NewCommand.m_SectionOptionSet.m_Disallowed[Option.f_String()];
 		}
-		if (auto *pValue = _CommandDescription.f_GetMember("GlobalOptions"))
+		if (auto *pValue = CommandDescription.f_GetMember("GlobalOptions"))
 		{
 			NewCommand.m_GlobalOptionSet.m_bAllowedSpecified = true;
 			for (auto &Option : pValue->f_Array())
 				NewCommand.m_GlobalOptionSet.m_Allowed[Option.f_String()];
 		}
-		if (auto *pValue = _CommandDescription.f_GetMember("DisableGlobalOptions"))
+		if (auto *pValue = CommandDescription.f_GetMember("DisableGlobalOptions"))
 		{
 			for (auto &Option : pValue->f_Array())
 				NewCommand.m_GlobalOptionSet.m_Disallowed[Option.f_String()];
@@ -275,8 +280,9 @@ namespace NMib::NCommandLine
 		{
 			bool bWasOptional = false;
 			bool bWasVector = false;
-			for (auto &Parameter : pParameters->f_Object())
+			for (auto &ParameterMutable : pParameters->f_Object())
 			{
+				auto &Parameter = fg_Const(ParameterMutable);
 				bool bOptional = false;
 				bool bVector = false;
 				CStr Identifier = fg_ParseIdentifier(Parameter.f_Name(), bOptional, bVector);
@@ -302,13 +308,12 @@ namespace NMib::NCommandLine
 				m_CommandParameterIdentifiers[Identifier].f_Insert(NewCommand.m_Names.f_GetFirst());
 				_Section.m_CommandParameterIdentifiers[Identifier].f_Insert(NewCommand.m_Names.f_GetFirst());
 
-				NewParameter.f_ParseParameter(Parameter.f_Value());
+				NewParameter.f_ParseParameter(fg_Move(ParameterMutable.f_Value()));
 			}
-
 		}
 
 		if (auto *pOptions = _CommandDescription.f_GetMember("Options"))
-			NewCommand.f_RegisterOptions(*this, *pOptions);
+			NewCommand.f_RegisterOptions(*this, fg_Move(*pOptions));
 
 		return &NewCommand;
 	}
@@ -316,15 +321,15 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	auto TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterDirectCommand
 		(
-			NEncoding::CEJSON const &_CommandDescription
-			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSON const &_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+			NEncoding::CEJSONOrdered &&_CommandDescription
+			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted const &_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 		)
 		-> CCommand
 	{
 		typename CInternal::CSection *pSection = fg_AutoStaticCast(mp_pSection);
 		auto &Section = *pSection;
 		auto &Internal = *mp_pInternal;
-		auto *pCommand = Internal.f_RegisterCommand(Section, _CommandDescription);
+		auto *pCommand = Internal.f_RegisterCommand(Section, fg_Move(_CommandDescription));
 		pCommand->m_pDirectRunCommand = fg_Construct(fg_Move(_fRunCommand));
 		return CCommand(mp_pInternal, pCommand);
 	}
@@ -339,12 +344,12 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
-					"MalterlibCommand?"_=
+					"MalterlibCommand?"_o=
 					{
-						"Names"_= {"--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89"}
-						, "Type"_= ""
-						, "Description"_= "Override the command to run anywhere on the command line."
-						, "Hidden"_= true
+						"Names"_o= {"--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89"}
+						, "Type"_o= ""
+						, "Description"_o= "Override the command to run anywhere on the command line."
+						, "Hidden"_o= true
 					}
 				}
 			)
