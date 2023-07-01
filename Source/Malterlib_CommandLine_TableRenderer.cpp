@@ -152,7 +152,7 @@ namespace NMib::NCommandLine
 	void CTableRenderHelper::fp_Output(NStr::CStr const &_String) const
 	{
 		if (mp_Prefix)
-			mp_fOutput(_String.f_Indent(mp_Prefix));
+			mp_fOutput(_String.f_Indent(mp_Prefix, true, false));
 		else
 			mp_fOutput(_String);
 	}
