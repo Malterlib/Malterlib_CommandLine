@@ -42,22 +42,57 @@ namespace NMib::NCommandLine
 		{
 			uint8 BestColor = 0;
 			uint32 SmallestError = TCLimitsInt<uint32>::mc_Max;
-			for (mint i = 16; i < 256; ++i)
+
+			constexpr static uint8 c_CubeColors[6] = {0, 95, 135, 175, 215, 255};
+
+			auto fBestComponent = [](uint8 _Value)
+				{
+					uint8 BestColor = 0;
+					uint32 SmallestError = TCLimitsInt<uint32>::mc_Max;
+					for (mint i = 0; i < 6; ++i)
+					{
+						uint32 Error = fg_Abs(int32(_Value) - int32(c_CubeColors[i]));
+						Error = Error * Error;
+						if (Error < SmallestError)
+						{
+							SmallestError = Error;
+							BestColor = i;
+						}
+					}
+					return BestColor;
+				}
+			;
+
+			auto fError = [&](CAnsiEncodingParse::CDecodedColor const &_Color)
+				{
+					uint32 ErrorRed = fg_Abs(int32(_Red) - int32(_Color.m_Red));
+					uint32 ErrorGreen = fg_Abs(int32(_Green) - int32(_Color.m_Green));
+					uint32 ErrorBlue = fg_Abs(int32(_Blue) - int32(_Color.m_Blue));
+					return ErrorRed * ErrorRed + ErrorGreen * ErrorGreen + ErrorBlue * ErrorBlue;
+				}
+			;
+
+			{
+				auto BestRed = fBestComponent(_Red);
+				auto BestGreen = fBestComponent(_Green);
+				auto BestBlue = fBestComponent(_Blue);
+				BestColor = 16 + BestRed * 36 + BestGreen * 6 + BestBlue;
+				SmallestError = fError(g_CommandLine_AnsiEncodingColor256Array[BestColor]);
+			}
+
+			for (mint i = 232; i < 256; ++i)
 			{
 				auto &Color = g_CommandLine_AnsiEncodingColor256Array[i];
 
-				uint32 ErrorRed = fg_Abs(int32(_Red) - int32(Color.m_Red));
-				uint32 ErrorGreen = fg_Abs(int32(_Green) - int32(Color.m_Green));
-				uint32 ErrorBlue = fg_Abs(int32(_Blue) - int32(Color.m_Blue));
-				uint32 Error = ErrorRed * ErrorRed + ErrorGreen * ErrorGreen + ErrorBlue * ErrorBlue;
+				uint32 Error = fError(Color);
 				if (Error < SmallestError)
 				{
 					SmallestError = Error;
 					BestColor = i;
 				}
 			}
-			return BestColor;
 
+			return BestColor;
 		}
 
 		uint32 fg_InvertBrightness(uint8 _Red, uint8 _Green, uint8 _Blue)
