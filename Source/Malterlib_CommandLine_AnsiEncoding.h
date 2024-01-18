@@ -64,6 +64,11 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_Default() const;
 		NStr::CStr const &f_Reset() const;
 		NStr::CStr const &f_MoveUpperLeft() const;
+		NStr::CStr::CFormat f_Move(uint32 _Row, uint32 _Column) const;
+		NStr::CStr::CFormat f_MoveNextLine(uint32 _nLines = 1) const;
+		NStr::CStr::CFormat f_ShowCursor(bool _bShow) const;
+		NStr::CStr::CFormat f_EnableAlternativeScreenBuffer(bool _bEnable) const;
+
 		NStr::CStr const &f_StatusNormal() const;
 		NStr::CStr f_StatusNormal(NStr::CStr const &_ToWrap) const;
 		NStr::CStr const &f_StatusWarning() const;

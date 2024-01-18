@@ -309,10 +309,34 @@ namespace NMib::NCommandLine
 		return gc_Reset;
 	}
 
+	NStr::CStr::CFormat CAnsiEncoding::f_ShowCursor(bool _bShow) const
+	{
+		return "\x1B[?25{}"_f << fg_ByValue(_bShow ? "h" : "l");
+	}
+
+	NStr::CStr::CFormat CAnsiEncoding::f_EnableAlternativeScreenBuffer(bool _bEnable) const
+	{
+		return "\x1B[?1049{}"_f << fg_ByValue(_bEnable ? "h" : "l");
+	}
+
 	NStr::CStr const &CAnsiEncoding::f_MoveUpperLeft() const
 	{
 		return gc_UpperLeft;
 	}
+
+	NStr::CStr::CFormat CAnsiEncoding::f_Move(uint32 _Row, uint32 _Column) const
+	{
+		return "\x1B[{};{}H"_f << fg_ByValue(_Row + 1) << fg_ByValue(_Column + 1);
+	}
+
+	NStr::CStr::CFormat CAnsiEncoding::f_MoveNextLine(uint32 _nLines) const
+	{
+		if (_nLines == 1)
+			return "\x1B[E"_f;
+		else
+			return "\x1B[{}E"_f << fg_ByValue(_nLines);
+	}
+
 	NStr::CStr const &CAnsiEncoding::f_StatusNormal() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
