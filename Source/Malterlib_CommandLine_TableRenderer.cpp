@@ -84,7 +84,7 @@ namespace NMib::NCommandLine
 		auto Lines = AnsiColor.f_LineBreak(_Description, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &Line : Lines)
-			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line)));
+			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line.m_String)));
 	}
 
 	void CTableRenderHelper::f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth)
@@ -146,7 +146,7 @@ namespace NMib::NCommandLine
 		auto Lines = AnsiColor.f_LineBreak(Value, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &LongLine : Lines)
-			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine)));
+			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine.m_String)));
 	}
 
 	void CTableRenderHelper::fp_Output(NStr::CStr const &_String) const
@@ -506,7 +506,7 @@ namespace NMib::NCommandLine
 					{
 						auto NewLines = AnsiColor.f_LineBreak(LongLine, MaxWidth);
 						for (auto &Line : NewLines)
-							OutColumnLines.f_Insert(Line);
+							OutColumnLines.f_Insert(Line.m_String);
 					}
 				}
 			}

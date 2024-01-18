@@ -417,7 +417,7 @@ namespace NMib::NCommandLine
 		return Ret;
 	}
 
-	TCVector<CStr> CAnsiEncoding::f_LineBreak(CStr const &_String, mint _Length, EWordWrap _WordWrap) const
+	TCVector<CAnsiEncoding::CLine> CAnsiEncoding::f_LineBreak(CStr const &_String, mint _Length, EWordWrap _WordWrap) const
 	{
 		DMibRequire(_Length > 0);
 		DMibRequire((_WordWrap != EWordWrap_WordEllipsis && _WordWrap != EWordWrap_CharacterEllipsis) || _Length > 2);
@@ -498,10 +498,10 @@ namespace NMib::NCommandLine
 		mint Len = 0;
 		mint MaxLen = _Length;
 
-		TCVector<CStr> Output;
+		TCVector<CLine> Output;
 
 		bool bWasEllipsis = false;
-		auto fOutputLine = [&](ch32 const *_pStart, mint _Len)
+		auto fOutputLine = [&](ch32 const *_pStart, mint _Len, mint _DisplayLen)
 			{
 				mint Position = _pStart - String.f_GetStr();
 				mint EndPos = Position + _Len;
@@ -569,21 +569,22 @@ namespace NMib::NCommandLine
 					if (bSetProperties)
 						ToOutput += f_Default();
 
-					Output.f_Insert(fg_StrTrimRight(ToOutput));
+					mint OriginalLen = ToOutput.f_GetLen();
+					fg_StrTrimRight(ToOutput);
+					mint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
+					Output.f_Insert({ToOutput, DisplayLen});
 				}
 				else
 				{
+					CUStr ToOutput;
 					if (bWasEllipsis)
-					{
-						CUStr ToOutput = "…";
-						ToOutput.f_AddStr(_pStart, _Len);
-						Output.f_Insert(fg_StrTrimRight(ToOutput));
-					}
-					else
-					{
-						CUStr ToOutput{_pStart, _Len};
-						Output.f_Insert(fg_StrTrimRight(ToOutput));
-					}
+						ToOutput = "…";
+
+					ToOutput.f_AddStr(_pStart, _Len);
+					mint OriginalLen = ToOutput.f_GetLen();
+					fg_StrTrimRight(ToOutput);
+					mint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
+					Output.f_Insert({ToOutput, DisplayLen});
 				}
 
 				bWasEllipsis = false;
@@ -593,15 +594,16 @@ namespace NMib::NCommandLine
 		bool bLastWasNewLine = true;
 		bool bOnlyWhitespaceAfterNewLine = true;
 		auto pLastDisplayPoint = pParse;
+		mint LastWordLen = 0;
+		mint LastDisplayPointLen = 0;
+		
 		while (*pParse)
 		{
 			ch32 Char = *pParse;
 			++pParse;
 			if (Char == '\r' || Char == '\n')
 			{
-				fOutputLine(pParseStart, (pParse - pParseStart) - 1);
-				if (_WordWrap == EWordWrap_Ellipsis || _WordWrap == EWordWrap_None)
-					return Output;
+				fOutputLine(pParseStart, (pParse - pParseStart) - 1, Len);
 
 				if (Char == '\r' && *pParse == '\n')
 					++pParse;
@@ -635,12 +637,12 @@ namespace NMib::NCommandLine
 				{
 					if (pLastWord - pParseStart)
 					{
-						fOutputLine(pParseStart, pLastWord - pParseStart);
+						fOutputLine(pParseStart, pLastWord - pParseStart, LastWordLen);
 						pParseStart = pLastWord;
 					}
 					else
 					{
-						fOutputLine(pParseStart, pParse - pParseStart);
+						fOutputLine(pParseStart, pParse - pParseStart, Len);
 						pParseStart = pParse;
 					}
 					while (fg_CharIsWhiteSpaceNoLines(*pParseStart))
@@ -651,10 +653,12 @@ namespace NMib::NCommandLine
 				{
 					if (_WordWrap == EWordWrap_WordEllipsis || _WordWrap == EWordWrap_CharacterEllipsis)
 					{
-						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart);
+						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen);
 						if (!fg_CharIsWhiteSpaceNoLines(*pLastDisplayPoint))
 						{
-							Output.f_GetLast() += "…";
+							auto &LastOutput = Output.f_GetLast();
+							LastOutput.m_String += "…";
+							LastOutput.m_Width += 1;
 							bWasEllipsis = true;
 							pParse = pParseStart = pLastDisplayPoint;
 						}
@@ -667,19 +671,27 @@ namespace NMib::NCommandLine
 						}
 					}
 					else if (_WordWrap == EWordWrap_None)
-					{
-						fOutputLine(pParseStart, pParse - pParseStart);
-						return Output;
-					}
+						fOutputLine(pParseStart, pParse - pParseStart, Len);
 					else if (_WordWrap == EWordWrap_Ellipsis)
 					{
-						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart);
-						Output.f_GetLast() += "…";
-						return Output;
+						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen + 1);
+						Output.f_GetLast().m_String += "…";
 					}
 					else
 					{
-						fOutputLine(pParseStart, pParse - pParseStart);
+						fOutputLine(pParseStart, pParse - pParseStart, Len);
+						pParseStart = pParse;
+					}
+
+					if (_WordWrap == EWordWrap_None || _WordWrap == EWordWrap_Ellipsis)
+					{
+						fg_ParseToEndOfLine(pParse);
+						if (fg_CharIsNewLine(*pParse))
+						{
+							bLastWasNewLine = true;
+							bOnlyWhitespaceAfterNewLine = true;
+						}
+						fg_ParseEndOfLine(pParse);
 						pParseStart = pParse;
 					}
 				}
@@ -692,12 +704,16 @@ namespace NMib::NCommandLine
 			}
 
 			if (fg_CharIsWhiteSpaceNoLines(Char) && !bOnlyWhitespaceAfterNewLine)
+			{
 				pLastWord = pParse;
+				LastWordLen = Len;
+			}
 			pLastDisplayPoint = pParse;
+			LastDisplayPointLen = Len;
 		}
 
 		if (pParseStart != pParse || bLastWasNewLine)
-			fOutputLine(pParseStart, pParse - pParseStart);
+			fOutputLine(pParseStart, pParse - pParseStart, Len);
 
 		return Output;
 	}
