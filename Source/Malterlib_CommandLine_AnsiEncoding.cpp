@@ -1649,6 +1649,45 @@ namespace NMib::NCommandLine
 	}
 
 	
+	uint32 CAnsiEncoding::CSgrSequence::f_ForegroundDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "39";
+		return mc_DefaultColor;
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_BackgroundDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "49";
+		return mc_DefaultColor;
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_UnderlineDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "59";
+		return mc_DefaultColor;
+	}
+
 	void CAnsiEncoding::CSgrSequence::f_Weight(EWeight _Weight)
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))

@@ -91,6 +91,13 @@ namespace NMib::NCommandLine
 			uint32 f_BackgroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
 			uint32 f_UnderlineRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
 
+			// The terminal's own default for a channel (SGR 39, 49, 59), tracked against the
+			// previous value the way the RGB forms are; the value stands apart from every RGB one
+			static constexpr uint32 mc_DefaultColor = 0xFFFFFFFE;
+			uint32 f_ForegroundDefaultDiff(uint32 _Previous);
+			uint32 f_BackgroundDefaultDiff(uint32 _Previous);
+			uint32 f_UnderlineDefaultDiff(uint32 _Previous);
+
 			void f_Weight(EWeight _Weight);
 			void f_Underline(EUnderline _Underline);
 			void f_Italic();
