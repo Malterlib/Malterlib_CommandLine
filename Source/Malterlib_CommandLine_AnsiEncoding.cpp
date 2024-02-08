@@ -1374,7 +1374,7 @@ namespace NMib::NCommandLine
 		}
 
 		fp_StartSequence();
-		
+
 		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
 		{
 			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
@@ -1417,7 +1417,7 @@ namespace NMib::NCommandLine
 		}
 
 		fp_StartSequence();
-		
+
 		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
 		{
 			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
@@ -1648,20 +1648,60 @@ namespace NMib::NCommandLine
 		}
 	}
 
-	
+
+	uint32 CAnsiEncoding::CSgrSequence::f_ForegroundDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "39";
+		return mc_DefaultColor;
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_BackgroundDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "49";
+		return mc_DefaultColor;
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_UnderlineDefaultDiff(uint32 _Previous)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (_Previous == mc_DefaultColor)
+			return _Previous;
+
+		fp_StartSequence();
+		*mp_pAppender += "59";
+		return mc_DefaultColor;
+	}
+
 	void CAnsiEncoding::CSgrSequence::f_Weight(EWeight _Weight)
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
 			return;
 
 		fp_StartSequence();
+		*mp_pAppender += gc_Str<"22">.m_Str; // Bold and dim are independent attributes and only 22 clears them
 
 		switch (_Weight)
 		{
-		case EWeight::mc_Normal: *mp_pAppender += gc_Str<"22">.m_Str; break;
-		case EWeight::mc_Bold: *mp_pAppender += gc_Str<"1">.m_Str; break;
-		case EWeight::mc_Dim: *mp_pAppender += gc_Str<"2">.m_Str; break;
-		case EWeight::mc_Shadowed: *mp_pAppender += gc_Str<"1:2">.m_Str; break;
+		case EWeight::mc_Normal: break;
+		case EWeight::mc_Bold: fp_StartSequence(); *mp_pAppender += gc_Str<"1">.m_Str; break;
+		case EWeight::mc_Dim: fp_StartSequence(); *mp_pAppender += gc_Str<"2">.m_Str; break;
+		case EWeight::mc_Shadowed: fp_StartSequence(); *mp_pAppender += gc_Str<"1:2">.m_Str; break;
 		}
 	}
 

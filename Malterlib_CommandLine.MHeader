@@ -15,6 +15,10 @@ Import "../Core/Lib_Malterlib.MTarget"
 			}
 			%File "Include/Mib/CommandLine/^*"
 		}
+		%Group "BoxMerges"
+		{
+			%File "Source/BoxMerges/*"
+		}
 		%File "Source/*"
 		%Group "Platform"
 		{
