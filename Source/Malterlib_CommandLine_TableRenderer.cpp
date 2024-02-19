@@ -111,6 +111,28 @@ namespace NMib::NCommandLine
 			Row.f_Remove(_iColumn);
 	}
 
+	void CTableRenderHelper::f_SortColumns(TCVector<uint32> const &_Columns)
+	{
+		if (_Columns.f_IsEmpty())
+			return;
+
+		mp_Rows.f_Sort
+			(
+				[&](auto const &_Left, auto const &_Right) -> COrdering_Strong
+				{
+					for (auto &iColumn : _Columns)
+					{
+						auto Compare = _Left[iColumn].f_CompareLexicographical(_Right[iColumn]) <=> 0;
+						if (Compare != 0)
+							return Compare;
+					}
+
+					return COrdering_Strong::equal;
+				}
+			)
+		;
+	}
+
 	void CTableRenderHelper::f_SortColumn(uint32 _iColumn)
 	{
 		mp_Rows.f_Sort
@@ -210,6 +232,17 @@ namespace NMib::NCommandLine
 	{
 		if (mp_pColumnsHelper)
 		{
+			TCVector<uint32> SortByColumnIds;
+			for (auto &ColumnName : mp_pColumnsHelper->mp_SortByColumns)
+			{
+				auto *pColumnIndex = mp_pColumnsHelper->mp_HeadingIndices.f_FindEqual(ColumnName);
+				if (!pColumnIndex)
+					continue;
+				SortByColumnIds.f_Insert(*pColumnIndex);
+			}
+
+			f_SortColumns(SortByColumnIds);
+
 			while (auto pVerbosityLevel = mp_pColumnsHelper->mp_VerboseHeadings.f_FindLargest())
 			{
 				if (*pVerbosityLevel > mp_pColumnsHelper->mp_Verbosity)
@@ -579,6 +612,11 @@ namespace NMib::NCommandLine
 			mp_VerboseHeadings[HeadingIndex] = _Verbosity;
 
 		mp_Headings.f_Insert(_Name);
+	}
+
+	void CTableRenderHelper::CColumnHelper::f_SetSortByColumns(NContainer::TCVector<NStr::CStr> const &_SortByColumns)
+	{
+		mp_SortByColumns = _SortByColumns;
 	}
 
 	void CTableRenderHelper::CColumnHelper::f_SetVerbose(NStr::CStr const &_Heading, uint32 _Verbosity)

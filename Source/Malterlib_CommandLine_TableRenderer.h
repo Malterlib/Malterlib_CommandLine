@@ -32,6 +32,7 @@ namespace NMib::NCommandLine
 
 			void f_AddHeading(NStr::CStr const &_Name, uint32 _Verbosity);
 			void f_SetVerbose(NStr::CStr const &_Heading, uint32 _Verbosity = 1);
+			void f_SetSortByColumns(NContainer::TCVector<NStr::CStr> const &_SortByColumns);
 
 		private:
 			friend struct CTableRenderHelper;
@@ -40,6 +41,7 @@ namespace NMib::NCommandLine
 			NContainer::TCVector<NStr::CStr> mp_Headings;
 			NContainer::TCMap<mint, uint32> mp_VerboseHeadings;
 			NContainer::TCMap<NStr::CStr, mint> mp_HeadingIndices;
+			NContainer::TCVector<NStr::CStr> mp_SortByColumns;
 		};
 
 		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags, uint32 _AvailableWidth);
@@ -65,6 +67,7 @@ namespace NMib::NCommandLine
 		void f_SetPrefix(NStr::CStr const &_Prefix);
 		void f_RemoveColumn(uint32 _iColumn);
 		void f_SortColumn(uint32 _iColumn);
+		void f_SortColumns(NContainer::TCVector<uint32> const &_Columns);
 		void f_SetOptions(EOption _Options);
 		void f_Output(EOutputType _OutputType = EOutputType_HumanReadable);
 		void f_Output(NStr::CStr const &_OutputType);
