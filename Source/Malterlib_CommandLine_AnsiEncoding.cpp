@@ -309,6 +309,16 @@ namespace NMib::NCommandLine
 		return gc_Reset;
 	}
 
+	NStr::CStr CAnsiEncoding::f_SyncronizeOutputStart() const
+	{
+		return gc_Str<"\x1B[?2026h">;
+	}
+
+	NStr::CStr CAnsiEncoding::f_SyncronizeOutputFinish() const
+	{
+		return gc_Str<"\x1B[?2026l">;
+	}
+
 	NStr::CStr::CFormat CAnsiEncoding::f_ShowCursor(bool _bShow) const
 	{
 		return "\x1B[?25{}"_f << fg_ByValue(_bShow ? "h" : "l");
