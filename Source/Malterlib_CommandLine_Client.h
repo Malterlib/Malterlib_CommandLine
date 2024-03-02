@@ -37,6 +37,8 @@ namespace NMib::NCommandLine
 		CAnsiEncoding f_AnsiEncoding() const;
 		uint32 f_CommandLineWidth() const;
 		uint32 f_CommandLineHeight() const;
+		uint32 f_CommandLineGlyphWidth() const;
+		uint32 f_CommandLineGlyphHeight() const;
 
 		CTableRenderHelper f_TableRenderer(NStr::CStr const &_Prefix = {}) const;
 
@@ -49,6 +51,8 @@ namespace NMib::NCommandLine
 		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;
 		uint32 mp_CommandLineWidth = 0;
 		uint32 mp_CommandLineHeight = 0;
+		uint32 mp_CommandLineGlyphWidth = 0;
+		uint32 mp_CommandLineGlyphHeight = 0;
 	};
 
 	using CCommandLineClient = TCCommandLineClient<CCommandLineSpecificationNoCustomization>;

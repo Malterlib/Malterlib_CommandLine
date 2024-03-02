@@ -16,6 +16,16 @@ Import "../Core/Lib_Malterlib.MTarget"
 			%File "Include/Mib/CommandLine/^*"
 		}
 		%File "Source/*"
+		%Group "Platform"
+		{
+			%File "Source/Platform/*"
+			{
+				Compile.Disabled true
+				{
+					!PlatformFamily PlatformFamilyFromFile
+				}
+			}
+		}
 		%Group "Documentation"
 		{
 			%File "Documentation/*"

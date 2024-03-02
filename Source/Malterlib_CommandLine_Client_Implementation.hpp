@@ -65,6 +65,18 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
+	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::f_CommandLineGlyphWidth() const
+	{
+		return mp_CommandLineGlyphWidth;
+	}
+
+	template <typename t_CCustomization, typename t_CThis>
+	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::f_CommandLineGlyphHeight() const
+	{
+		return mp_CommandLineGlyphHeight;
+	}
+
+	template <typename t_CCustomization, typename t_CThis>
 	CTableRenderHelper TCCommandLineClient<t_CCustomization, t_CThis>::f_TableRenderer(NStr::CStr const &_Prefix) const
 	{
 		CTableRenderHelper Renderer
@@ -95,6 +107,8 @@ namespace NMib::NCommandLine
 
 		mp_CommandLineWidth = ConsoleProperties.m_Width;
 		mp_CommandLineHeight = ConsoleProperties.m_Height;
+		mp_CommandLineGlyphWidth = ConsoleProperties.m_GlyphWidth;
+		mp_CommandLineGlyphHeight = ConsoleProperties.m_GlyphHeight;
 
 		if (auto Value = _Params.f_GetMemberValue("TerminalWidth", -1).f_Integer(); Value > 0)
 			mp_CommandLineWidth = Value;

@@ -103,7 +103,7 @@ namespace NMib::NCommandLine
 		;
 
 		const ch8 *pParse = _In;
-		while (*pParse &&!bAborted)
+		while (*pParse && !bAborted)
 		{
 			ch8 Char = *pParse;
 			if (Char == '\x1B')
