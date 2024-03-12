@@ -355,6 +355,16 @@ namespace NMib::NCommandLine
 		return "\x1B[?1049{}"_f << fg_ByValue(_bEnable ? "h" : "l");
 	}
 
+	NStr::CFStr24 CAnsiEncoding::f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const
+	{
+		return NStr::CFStr24::CFormat("\x1B[>{}u") << uint8(_KeyHandlingFlags);
+	}
+
+	NStr::CStr const &CAnsiEncoding::f_PopComprehensiveKeyHandling() const
+	{
+		return gc_Str<"\x1B[<u">;
+	}
+
 	NStr::CStr const &CAnsiEncoding::f_MoveUpperLeft() const
 	{
 		return gc_UpperLeft;

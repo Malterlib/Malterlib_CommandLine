@@ -37,6 +37,16 @@ namespace NMib::NCommandLine
 			, EWordWrap_Ellipsis
 		};
 
+		enum class EComprehensiveKeyFlags : uint8
+		{
+			mc_None = 0
+			, mc_DisambiguateEscapeCodes = fg_Bit(0)
+			, mc_ReportEventTypes = fg_Bit(1)
+			, mc_ReportAlternateKeys = fg_Bit(2)
+			, mc_ReportAllKeysAsEscapeCodes = fg_Bit(3)
+			, mc_ReportAssociatedText = fg_Bit(4)
+		};
+
 		struct CLine
 		{
 			bool operator == (CLine const &_Right) const noexcept = default;
@@ -82,6 +92,8 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_ClearToEndOfScreen() const;
 		NStr::CStr::CFormat f_ShowCursor(bool _bShow) const;
 		NStr::CStr::CFormat f_EnableAlternativeScreenBuffer(bool _bEnable) const;
+		NStr::CFStr24 f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const;
+		NStr::CStr const &f_PopComprehensiveKeyHandling() const;
 
 		NStr::CStr const &f_StatusNormal() const;
 		NStr::CStr f_StatusNormal(NStr::CStr const &_ToWrap) const;
