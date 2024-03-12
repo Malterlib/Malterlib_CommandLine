@@ -1,0 +1,628 @@
+// Copyright © Unbroken AB
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+#include "Malterlib_CommandLine_AnsiEncodingParseInput.h"
+
+namespace NMib::NCommandLine
+{
+	using namespace NMib::NStr;
+
+	// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+	// https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+
+	namespace
+	{
+		EKeyModifier fg_DecodeModifiers(int32 _Param)
+		{
+			if (_Param < 1)
+				return EKeyModifier::mc_None;
+
+			return EKeyModifier(uint8(_Param - 1));
+		}
+
+		ch32 fg_TildeKeyCode(int32 _Number)
+		{
+			switch (_Number)
+			{
+				case 1: return ch32(EKey::mc_Home); // Linux console and vt220 style Home
+				case 2: return ch32(EKey::mc_Insert);
+				case 3: return ch32(EKey::mc_Delete);
+				case 4: return ch32(EKey::mc_End); // Linux console and vt220 style End
+				case 5: return ch32(EKey::mc_PageUp);
+				case 6: return ch32(EKey::mc_PageDown);
+				case 7: return ch32(EKey::mc_Home);
+				case 8: return ch32(EKey::mc_End);
+				case 11: return ch32(EKey::mc_F1);
+				case 12: return ch32(EKey::mc_F2);
+				case 13: return ch32(EKey::mc_F3);
+				case 14: return ch32(EKey::mc_F4);
+				case 15: return ch32(EKey::mc_F5);
+				case 17: return ch32(EKey::mc_F6);
+				case 18: return ch32(EKey::mc_F7);
+				case 19: return ch32(EKey::mc_F8);
+				case 20: return ch32(EKey::mc_F9);
+				case 21: return ch32(EKey::mc_F10);
+				case 23: return ch32(EKey::mc_F11);
+				case 24: return ch32(EKey::mc_F12);
+				default: return 0;
+			}
+		}
+
+		ch32 fg_LetterKeyCode(char _Final)
+		{
+			switch (_Final)
+			{
+				case 'A': return ch32(EKey::mc_Up);
+				case 'B': return ch32(EKey::mc_Down);
+				case 'C': return ch32(EKey::mc_Right);
+				case 'D': return ch32(EKey::mc_Left);
+				case 'H': return ch32(EKey::mc_Home);
+				case 'F': return ch32(EKey::mc_End);
+				case 'P': return ch32(EKey::mc_F1);
+				case 'Q': return ch32(EKey::mc_F2);
+				case 'R': return ch32(EKey::mc_F3);
+				case 'S': return ch32(EKey::mc_F4);
+				default: return 0;
+			}
+		}
+
+		int32 fg_FirstSubParam(CStr const &_Param, int32 _Default)
+		{
+			auto SubParams = _Param.f_Split(":");
+			if (!SubParams.f_GetLen())
+				return _Default;
+
+			return SubParams[0].f_ToInt(_Default);
+		}
+	}
+
+	CAnsiEncodingParseInput::CAnsiEncodingParseInput(CAnsiEncodingParseInputOptions &&_Options)
+		: mp_Options(fg_Move(_Options))
+	{
+	}
+
+	void CAnsiEncodingParseInput::fp_EmitKey(CKeyEvent &&_KeyEvent)
+	{
+		if (mp_Options.m_fOnKeyEvent)
+			mp_Options.m_fOnKeyEvent(fg_Move(_KeyEvent));
+	}
+
+	void CAnsiEncodingParseInput::fp_EmitControl(ch8 _Char)
+	{
+		CKeyEvent Event;
+
+		switch (_Char)
+		{
+			case 0x00:
+				Event.m_ScanCode = ch32(EKey::mc_Space);
+				Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+				break;
+
+			case 0x08:
+				Event.m_ScanCode = ch32(EKey::mc_Backspace);
+				Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+				break;
+
+			case 0x09:
+				Event.m_ScanCode = ch32(EKey::mc_Tab);
+				break;
+
+			case 0x0A:
+			case 0x0D:
+				Event.m_ScanCode = ch32(EKey::mc_Enter);
+				break;
+
+			case 0x7F:
+				Event.m_ScanCode = ch32(EKey::mc_Backspace);
+				break;
+
+			default:
+				if (_Char >= 0x01 && _Char <= 0x1A)
+				{
+					Event.m_ScanCode = ch32('a' + _Char - 1);
+					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+				}
+				else if (_Char >= 0x1C && _Char <= 0x1F)
+				{
+					// Traditional C0 controls for Ctrl with the printable characters \ ] ^ _
+					Event.m_ScanCode = ch32('\\' + _Char - 0x1C);
+					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+				}
+				else
+				{
+					Event.m_ScanCode = ch32(uch8(_Char));
+					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+				}
+				break;
+		}
+
+		fp_EmitKey(fg_Move(Event));
+	}
+
+	void CAnsiEncodingParseInput::fp_DispatchCsiMouse(CStr const &_Params, char _Final)
+	{
+		// SGR mouse report: CSI < Btn ; X ; Y M (press/move) or m (release)
+		auto Params = CStr(_Params.f_GetStr() + 1, _Params.f_GetLen() - 1).f_Split(";");
+		if (Params.f_GetLen() < 3)
+			return;
+
+		int32 ButtonBits = Params[0].f_ToInt(0);
+		int32 CellX = Params[1].f_ToInt(1) - 1;
+		int32 CellY = Params[2].f_ToInt(1) - 1;
+
+		CTerminalMouseEvent Event;
+		Event.m_CoordX = CellX;
+		Event.m_CoordY = CellY;
+
+		if (ButtonBits & 0x04)
+			Event.m_Modifiers |= EKeyModifier::mc_Shift;
+		if (ButtonBits & 0x08)
+			Event.m_Modifiers |= EKeyModifier::mc_Alt;
+		if (ButtonBits & 0x10)
+			Event.m_Modifiers |= EKeyModifier::mc_Ctrl;
+
+		if (ButtonBits & 0x40)
+		{
+			Event.m_EventType = EMouseEventType::mc_Wheel;
+			Event.m_WheelDelta = (ButtonBits & 0x01) ? -1.0 : 1.0;
+		}
+		else
+		{
+			switch (ButtonBits & 0x03)
+			{
+				case 0:
+					Event.m_Button = EMouseButton::mc_Left;
+					break;
+
+				case 1:
+					Event.m_Button = EMouseButton::mc_Middle;
+					break;
+
+				case 2:
+					Event.m_Button = EMouseButton::mc_Right;
+					break;
+
+				default:
+					Event.m_Button = EMouseButton::mc_None;
+					break;
+			}
+
+			if (ButtonBits & 0x20)
+				Event.m_EventType = EMouseEventType::mc_Move;
+			else if (_Final == 'm')
+				Event.m_EventType = EMouseEventType::mc_Up;
+			else
+				Event.m_EventType = EMouseEventType::mc_Down;
+		}
+
+		if (mp_Options.m_fOnMouseEvent)
+			mp_Options.m_fOnMouseEvent(fg_Move(Event));
+	}
+
+	void CAnsiEncodingParseInput::fp_DispatchCsi(CStr const &_Params, char _Final)
+	{
+		if (_Params.f_StartsWith("<"))
+		{
+			if (_Final == 'M' || _Final == 'm')
+				fp_DispatchCsiMouse(_Params, _Final);
+
+			return;
+		}
+
+		auto Params = _Params.f_Split(";");
+		auto fGetParam = [&Params](umint _iParam, int32 _Default) -> int32
+			{
+				if (_iParam >= Params.f_GetLen())
+					return _Default;
+
+				return fg_FirstSubParam(Params[_iParam], _Default);
+			}
+		;
+
+		switch (_Final)
+		{
+			case 'u':
+			{
+				// kitty comprehensive key: CSI unicode[:shifted[:base]] ; modifiers[:event] ; text u
+				CKeyEvent Event;
+				Event.m_ScanCode = ch32(fGetParam(0, 0));
+				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+
+				if (Params.f_GetLen() >= 2)
+				{
+					auto ModifierParts = Params[1].f_Split(":");
+					if (ModifierParts.f_GetLen() >= 2)
+					{
+						switch (ModifierParts[1].f_ToInt(1))
+						{
+							case 2:
+								Event.m_EventType = EKeyEventType::mc_Repeat;
+								break;
+
+							case 3:
+								Event.m_EventType = EKeyEventType::mc_Release;
+								break;
+
+							default:
+								break;
+						}
+					}
+				}
+
+				if (Params.f_GetLen() >= 3)
+				{
+					for (auto &Codepoint : Params[2].f_Split(":"))
+						Event.m_Text += fg_CharToString(ch32(Codepoint.f_ToInt(0)));
+				}
+				else if
+				(
+					Event.m_ScanCode >= 0x20
+					&& Event.m_ScanCode != ch32(EKey::mc_Backspace)
+					&& (Event.m_ScanCode < 57344 || Event.m_ScanCode > 63743) // Kitty functional key range
+				)
+				{
+					// Without the optional associated text parameter the codepoint itself is the text
+					Event.m_Text = fg_CharToString(Event.m_ScanCode);
+				}
+
+				fp_EmitKey(fg_Move(Event));
+
+				break;
+			}
+
+			case '~':
+			{
+				ch32 ScanCode = fg_TildeKeyCode(fGetParam(0, 0));
+				if (!ScanCode)
+					break;
+
+				CKeyEvent Event;
+				Event.m_ScanCode = ScanCode;
+				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+
+				fp_EmitKey(fg_Move(Event));
+
+				break;
+			}
+
+			case 'Z':
+			{
+				CKeyEvent Event;
+				Event.m_ScanCode = ch32(EKey::mc_Tab);
+				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1)) | EKeyModifier::mc_Shift;
+
+				fp_EmitKey(fg_Move(Event));
+
+				break;
+			}
+
+			default:
+			{
+				ch32 ScanCode = fg_LetterKeyCode(_Final);
+				if (!ScanCode)
+				{
+					DMibLog(Debug, "Unknown CSI sequence: {} '{}'", _Params, fg_CharToString(_Final));
+
+					break;
+				}
+
+				CKeyEvent Event;
+				Event.m_ScanCode = ScanCode;
+				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+
+				fp_EmitKey(fg_Move(Event));
+
+				break;
+			}
+		}
+	}
+
+	bool CAnsiEncodingParseInput::fp_ParseCsi(ch8 const *&_pParse, ch8 const *_pEnd)
+	{
+		// _pParse points after "ESC ["; returns false if the sequence is incomplete
+		ch8 const *pParse = _pParse;
+
+		// The Linux console emits F1 to F5 as ESC [ [ A to ESC [ [ E
+		if (pParse < _pEnd && *pParse == '[')
+		{
+			++pParse;
+			if (pParse >= _pEnd)
+				return false;
+
+			ch8 Letter = *pParse;
+			++pParse;
+
+			if (Letter >= 'A' && Letter <= 'E')
+			{
+				CKeyEvent Event;
+				Event.m_ScanCode = ch32(EKey::mc_F1) + ch32(Letter - 'A');
+				fp_EmitKey(fg_Move(Event));
+			}
+
+			_pParse = pParse;
+
+			return true;
+		}
+
+		ch8 const *pParamsStart = pParse;
+		while (pParse < _pEnd && *pParse >= 0x30 && *pParse <= 0x3F)
+			++pParse;
+		CStr ParamsStr(pParamsStart, pParse - pParamsStart);
+
+		while (pParse < _pEnd && *pParse >= 0x20 && *pParse <= 0x2F)
+			++pParse;
+
+		if (pParse >= _pEnd)
+			return false;
+
+		char Final = *pParse;
+		++pParse;
+
+		fp_DispatchCsi(ParamsStr, Final);
+
+		_pParse = pParse;
+
+		return true;
+	}
+
+	void CAnsiEncodingParseInput::f_AddInput(CStr const &_Input)
+	{
+		mp_InputBuffer += _Input;
+
+		ch8 const *pStartParse = mp_InputBuffer.f_GetStr();
+		ch8 const *pEnd = pStartParse + mp_InputBuffer.f_GetLen();
+		ch8 const *pParse = pStartParse;
+		ch8 const *pFinishedParse = pParse;
+
+		while (pParse < pEnd)
+		{
+			ch8 Char = *pParse;
+
+			if (Char == '\x1B')
+			{
+				ch8 const *pSequence = pParse + 1;
+
+				if (pSequence >= pEnd)
+				{
+					// A trailing escape can be either the Escape key or a key sequence split
+					// across reads; only more input or the caller's flush timeout can decide
+					mp_InputBuffer = mp_InputBuffer.f_Extract(pParse - pStartParse);
+
+					return;
+				}
+
+				switch (*pSequence)
+				{
+					case '[': // CSI
+					{
+						++pSequence;
+						if (!fp_ParseCsi(pSequence, pEnd))
+						{
+							// Incomplete: keep from ESC and wait for more input
+							mp_InputBuffer = mp_InputBuffer.f_Extract(pParse - pStartParse);
+
+							return;
+						}
+
+						pParse = pSequence;
+
+						break;
+					}
+
+					case 'O': // SS3
+					{
+						++pSequence;
+						if (pSequence >= pEnd)
+						{
+							mp_InputBuffer = mp_InputBuffer.f_Extract(pParse - pStartParse);
+
+							return;
+						}
+
+						ch32 ScanCode = fg_LetterKeyCode(*pSequence);
+						++pSequence;
+
+						if (ScanCode)
+						{
+							CKeyEvent Event;
+							Event.m_ScanCode = ScanCode;
+							fp_EmitKey(fg_Move(Event));
+						}
+
+						pParse = pSequence;
+
+						break;
+					}
+
+					case ']': // OSC
+					case 'P': // DCS
+					case 'X': // SOS
+					case '^': // PM
+					case '_': // APC
+					{
+						// String sequences terminate with ST (ESC \) or BEL; skip their payload
+						++pSequence;
+
+						bool bTerminated = false;
+						while (pSequence < pEnd)
+						{
+							if (*pSequence == '\x07')
+							{
+								++pSequence;
+								bTerminated = true;
+
+								break;
+							}
+
+							if (*pSequence == '\x1B' && pSequence + 1 < pEnd && *(pSequence + 1) == '\\')
+							{
+								pSequence += 2;
+								bTerminated = true;
+
+								break;
+							}
+
+							++pSequence;
+						}
+
+						if (!bTerminated)
+						{
+							// Incomplete: keep from ESC so the remaining payload is not parsed as keystrokes
+							mp_InputBuffer = mp_InputBuffer.f_Extract(pParse - pStartParse);
+
+							return;
+						}
+
+						pParse = pSequence;
+
+						break;
+					}
+
+					case 'N': // SS2
+					case '\\': // ST
+					{
+						++pSequence;
+						pParse = pSequence;
+
+						break;
+					}
+
+					case '\x1B':
+					{
+						// ESC ESC: emit Escape, reparse the second ESC
+						CKeyEvent Event;
+						Event.m_ScanCode = ch32(EKey::mc_Escape);
+						fp_EmitKey(fg_Move(Event));
+
+						pParse = pSequence;
+
+						break;
+					}
+
+					default:
+					{
+						// ESC prefixed printable: legacy Alt+key, which may be a multibyte UTF-8 codepoint
+						umint SequenceLen = 1;
+						uch8 Lead = uch8(*pSequence);
+						if ((Lead & uch8(0xE0)) == uch8(0xC0))
+							SequenceLen = 2;
+						else if ((Lead & uch8(0xF0)) == uch8(0xE0))
+							SequenceLen = 3;
+						else if ((Lead & uch8(0xF8)) == uch8(0xF0))
+							SequenceLen = 4;
+
+						if (umint(pEnd - pSequence) < SequenceLen)
+						{
+							// Incomplete: keep from ESC and wait for more input
+							mp_InputBuffer = mp_InputBuffer.f_Extract(pParse - pStartParse);
+
+							return;
+						}
+
+						ch32 Character = ch32(Lead);
+						if (SequenceLen > 1)
+						{
+							CStr Sequence(pSequence, SequenceLen);
+							if (auto iSequence = Sequence.f_GetUnicodeIterator())
+								Character = *iSequence;
+						}
+
+						CKeyEvent Event;
+						Event.m_ScanCode = Character;
+						Event.m_Modifiers = EKeyModifier::mc_Alt;
+						Event.m_Text = fg_CharToString(Character);
+						fp_EmitKey(fg_Move(Event));
+
+						pSequence += SequenceLen;
+						pParse = pSequence;
+
+						break;
+					}
+				}
+
+				pFinishedParse = pParse;
+
+				continue;
+			}
+
+			if (uch8(Char) < 0x20 || Char == 0x7F)
+			{
+				fp_EmitControl(Char);
+
+				++pParse;
+				pFinishedParse = pParse;
+
+				continue;
+			}
+
+			// A run of printable input: emit one key event per codepoint
+			ch8 const *pRunStart = pParse;
+			while (pParse < pEnd && uch8(*pParse) >= 0x20 && *pParse != 0x7F)
+				++pParse;
+
+			bool bIncompleteCodepoint = false;
+			if (pParse == pEnd)
+			{
+				// Keep an incomplete trailing UTF-8 codepoint buffered until its continuation bytes arrive
+				ch8 const *pLead = pParse - 1;
+				while (pLead > pRunStart && (uch8(*pLead) & uch8(0xC0)) == uch8(0x80) && pParse - pLead < 4)
+					--pLead;
+
+				umint ExpectedLen = 0;
+				uch8 Lead = uch8(*pLead);
+				if ((Lead & uch8(0xE0)) == uch8(0xC0))
+					ExpectedLen = 2;
+				else if ((Lead & uch8(0xF0)) == uch8(0xE0))
+					ExpectedLen = 3;
+				else if ((Lead & uch8(0xF8)) == uch8(0xF0))
+					ExpectedLen = 4;
+
+				if (ExpectedLen > umint(pParse - pLead))
+				{
+					pParse = pLead;
+					bIncompleteCodepoint = true;
+				}
+			}
+
+			CStr Run(pRunStart, pParse - pRunStart);
+			for (ch32 Codepoint : Run.f_GetUnicodeIterator())
+			{
+				CKeyEvent Event;
+				Event.m_ScanCode = Codepoint;
+				Event.m_Text = fg_CharToString(Codepoint);
+				fp_EmitKey(fg_Move(Event));
+			}
+
+			pFinishedParse = pParse;
+
+			if (bIncompleteCodepoint)
+				break;
+		}
+
+		mp_InputBuffer = mp_InputBuffer.f_Extract(pFinishedParse - pStartParse);
+	}
+
+	bool CAnsiEncodingParseInput::f_HasBufferedInput() const
+	{
+		return !mp_InputBuffer.f_IsEmpty();
+	}
+
+	void CAnsiEncodingParseInput::f_Flush()
+	{
+		if (mp_InputBuffer.f_IsEmpty())
+			return;
+
+		// An incomplete UTF-8 codepoint can only be completed by more input
+		if (*mp_InputBuffer.f_GetStr() != '\x1B')
+			return;
+
+		// No continuation arrived for the buffered escape: it is the Escape key after all
+		CKeyEvent Event;
+		Event.m_ScanCode = ch32(EKey::mc_Escape);
+		fp_EmitKey(fg_Move(Event));
+
+		CStr Remaining = mp_InputBuffer.f_Extract(1);
+		mp_InputBuffer.f_Clear();
+		f_AddInput(Remaining);
+	}
+}

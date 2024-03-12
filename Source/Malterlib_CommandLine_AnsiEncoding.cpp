@@ -437,6 +437,12 @@ namespace NMib::NCommandLine
 		return NStr::CFStr24::CFormat("\x1B[?1049{}") << (_bEnable ? "h" : "l");
 	}
 
+	NStr::CFStr24 CAnsiEncoding::f_EnableMouseReporting(bool _bEnable) const
+	{
+		// Button-event tracking with SGR extended coordinates
+		return NStr::CFStr24::CFormat("\x1B[?1002{}\x1B[?1006{}") << (_bEnable ? "h" : "l") << (_bEnable ? "h" : "l");
+	}
+
 	NStr::CFStr24 CAnsiEncoding::f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const
 	{
 		return NStr::CFStr24::CFormat("\x1B[>{}u") << uint8(_KeyHandlingFlags);

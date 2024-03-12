@@ -143,6 +143,7 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_ClearToEndOfScreen() const;
 		NStr::CFStr24 f_ShowCursor(bool _bShow) const;
 		NStr::CFStr24 f_EnableAlternativeScreenBuffer(bool _bEnable) const;
+		NStr::CFStr24 f_EnableMouseReporting(bool _bEnable) const;
 		NStr::CFStr24 f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const;
 		NStr::CStr const &f_PopComprehensiveKeyHandling() const;
 
