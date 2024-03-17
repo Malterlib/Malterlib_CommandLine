@@ -23,6 +23,9 @@ namespace NMib::NCommandLine
 		using namespace NContainer;
 		using namespace NCommandLine;
 
+		static constexpr CStr c_VerboseValueIndent = gc_Str<"         ">;
+		static constexpr auto c_VerboseValueIndentWidth = c_VerboseValueIndent.f_GetStrLen();
+
 		bool bVerbose = _Params["Verbose"].f_Boolean();
 		bool bColor = _CommandLineClient.f_ColorEnabled();
 		auto AnsiFlags = _CommandLineClient.f_AnsiEncodingFlags();
@@ -294,6 +297,20 @@ namespace NMib::NCommandLine
 			}
 		;
 
+		auto fOutputVerboseValueSection = [&](CStr const &_SectionName, CStr const &_Value)
+			{
+				fOutputSectionedText
+					(
+						"{sj*,sf ,a-}{}"_f
+						<< _SectionName
+						<< c_VerboseValueIndentWidth
+						<< (_Value.f_Indent(c_VerboseValueIndent, false).f_ReplaceChar('\n', '\r'))
+						, c_VerboseValueIndentWidth
+					)
+				;
+			}
+		;
+
 		auto fOutputOptions = [&]
 			(
 				CStr const &_Heading
@@ -350,11 +367,11 @@ namespace NMib::NCommandLine
 					{
 						auto OptionScope = fOutputHeading(OptionLine, LongestName + 3);
 						fOutputSectionedText(Option.m_LongDescription);
+
+						fOutputVerboseValueSection(gc_Str<"Type:">, Option.f_FormatType(AnsiFlags));
+
 						if (Option.m_Default.f_IsValid())
-						{
-							CStr DefaultLine = "Default:   {}"_f << Option.f_FormatValue(Option.m_Default, AnsiFlags).f_ReplaceChar('\n', '\r');
-							fOutputSectionedText(DefaultLine, 11);
-						}
+							fOutputVerboseValueSection(gc_Str<"Default:">, Option.f_FormatValue(Option.m_Default, AnsiFlags));
 					}
 					else
 						fOutputTableText(OptionLine, LongestName + 3, false);
@@ -412,11 +429,11 @@ namespace NMib::NCommandLine
 					{
 						auto VerboseScope = fAddIndent(3);
 						fOutputSectionedText(Parameter.m_LongDescription);
+
+						fOutputVerboseValueSection(gc_Str<"Type:">, Parameter.f_FormatType(AnsiFlags));
+
 						if (Parameter.m_Default.f_IsValid())
-						{
-							CStr DefaultLine = fg_Format("Default:   {}", Parameter.f_FormatValue(Parameter.m_Default, AnsiFlags).f_ReplaceChar('\n', '\r'));
-							fOutputSectionedText(DefaultLine, 11);
-						}
+							fOutputVerboseValueSection(gc_Str<"Default:">, Parameter.f_FormatValue(Parameter.m_Default, AnsiFlags));
 					}
 				}
 				fOutputEndSection();

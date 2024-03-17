@@ -12,22 +12,55 @@ namespace NMib::NCommandLine
 
 	DMibImpErrorClassImplement(CCommandLineConvertException);
 
-	COneOfType fg_AnyType()
+	CAnyType::operator NEncoding::CEJSONOrdered () &&
 	{
-		return COneOfType
+		return NEncoding::fg_UserTypeOrdered
 			(
-				EEJSONType_String
-				, EEJSONType_Integer
-				, EEJSONType_Float
-				, EEJSONType_Boolean
-				, EEJSONType_Object
-				, EEJSONType_Array
-				, EEJSONType_Date
-				, EEJSONType_Binary
-				, EEJSONType_UserType
-				, COneOf(EEJSONType_Null)
+				"$AnyType"
+				, CEJSONOrdered
+				{
+					EEJSONType_String
+					, EEJSONType_Integer
+					, EEJSONType_Float
+					, EEJSONType_Boolean
+					, EEJSONType_Object
+					, EEJSONType_Array
+					, EEJSONType_Date
+					, EEJSONType_Binary
+					, EEJSONType_UserType
+					, COneOf(EEJSONType_Null)
+				}
+				.f_ToJson()
 			)
 		;
+	}
+
+	CAnyType::operator NEncoding::CEJSONOrdered () const &
+	{
+		return NEncoding::fg_UserTypeOrdered
+			(
+				"$AnyType"
+				, CEJSONOrdered
+				{
+					EEJSONType_String
+					, EEJSONType_Integer
+					, EEJSONType_Float
+					, EEJSONType_Boolean
+					, EEJSONType_Object
+					, EEJSONType_Array
+					, EEJSONType_Date
+					, EEJSONType_Binary
+					, EEJSONType_UserType
+					, COneOf(EEJSONType_Null)
+				}
+				.f_ToJson()
+			)
+		;
+	}
+	
+	CAnyType fg_AnyType()
+	{
+		return CAnyType();
 	}
 
 	EAnsiEncodingFlag CCommandLineDefaults::fs_ColorAnsiFlagsDefault()

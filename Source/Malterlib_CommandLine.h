@@ -31,7 +31,13 @@ namespace NMib::NCommandLine
 		NEncoding::CEJSONOrdered m_Config;
 	};
 
-	COneOfType fg_AnyType();
+	struct CAnyType
+	{
+		operator NEncoding::CEJSONOrdered () &&;
+		operator NEncoding::CEJSONOrdered () const &;
+	};
+
+	CAnyType fg_AnyType();
 
 	template <typename t_CCustomization, typename t_CThis = void>
 	struct TCCommandLineClient;

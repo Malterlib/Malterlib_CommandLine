@@ -29,6 +29,9 @@ namespace NMib::NCommandLine
 			, EColor_Error
 			, EColor_Heading1
 			, EColor_Default
+			, EColor_Type
+			, EColor_BuiltInType
+			, EColor_ObjectName
 		};
 
 		struct CSection;
@@ -44,13 +47,15 @@ namespace NMib::NCommandLine
 			void f_Parse(NEncoding::CEJSONOrdered &&_Option);
 			NEncoding::CEJSONSorted fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
 			NEncoding::CEJSONSorted fp_ConvertValue(NEncoding::CEJSONSorted const &_Template, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, bool _bStrict, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			NStr::CStr fp_FormatValue(NEncoding::CEJSONSorted const &_Template, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr fp_FormatValue(NEncoding::CEJSONSorted const &_Template, NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr fp_FormatType(NEncoding::CEJSONSorted const &_Template, bool _bType, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void fp_ValidateTemplate(NEncoding::CEJSONSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
 			NEncoding::CEJSONSorted f_ConvertValue(NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NEncoding::CEJSONSorted f_ConvertValue(NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void f_AppendConvertValue(NEncoding::CEJSONSorted &o_Value, NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void f_AppendConvertValue(NEncoding::CEJSONSorted &o_Value, NEncoding::CEJSONSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NStr::CStr f_FormatValue(NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr f_FormatType(NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 
 			NStr::CStr const m_Identifier;
 			bool const m_bOptional;

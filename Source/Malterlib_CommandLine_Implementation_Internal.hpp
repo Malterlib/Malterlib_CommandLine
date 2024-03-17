@@ -70,6 +70,9 @@ namespace NMib::NCommandLine
 		case EColor_Error: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x3f, 0x1c) << _String << AnsiEncoding.f_Default();
 		case EColor_Heading1: return "{}{}{}"_f << AnsiEncoding.f_Bold() << _String << AnsiEncoding.f_Default();
 		case EColor_Default: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x90, 0x90, 0x90) << _String << AnsiEncoding.f_Default();
+		case EColor_Type: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xb8, 0xaa, 0xff) << _String << AnsiEncoding.f_Default();
+		case EColor_BuiltInType: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x59, 0x66) << _String << AnsiEncoding.f_Default();
+		case EColor_ObjectName: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0xa6, 0x00) << _String << AnsiEncoding.f_Default();
 
 		case EColor_None:
 		default: return _String;
@@ -176,7 +179,13 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatValue(NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
 	{
-		return fp_FormatValue(m_TypeTemplate, _Value, m_Identifier, _AnsiFlags);
+		return fp_FormatValue(m_TypeTemplate, _Value, _AnsiFlags);
+	}
+
+	template <typename t_CCustomization>
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatType(NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	{
+		return fp_FormatType(m_TypeTemplate, true, _AnsiFlags);
 	}
 
 	template <typename t_CCustomization>
@@ -235,9 +244,9 @@ namespace NMib::NCommandLine
 		case EEJSONType_UserType:
 			{
 				auto &TemplateUserType = _Template.f_UserType();
-				if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
+				if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType" || TemplateUserType.m_Type == "$AnyType")
 				{
-					bool bIsType = TemplateUserType.m_Type == "$OneOfType";
+					bool bIsType = TemplateUserType.m_Type != "$OneOf";
 					NEncoding::CEJSONSorted TemplateSet = NEncoding::CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
 
 					auto &Set = TemplateSet.f_Array();
@@ -513,9 +522,9 @@ namespace NMib::NCommandLine
 			case EEJSONType_UserType:
 				{
 					auto &TemplateUserType = _Template.f_UserType();
-					if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType")
+					if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType" || TemplateUserType.m_Type == "$AnyType")
 					{
-						bool bIsType = TemplateUserType.m_Type == "$OneOfType";
+						bool bIsType = TemplateUserType.m_Type != "$OneOf";
 						CEJSONSorted TemplateSet = CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
 
 						auto &Set = TemplateSet.f_Array();
@@ -546,7 +555,7 @@ namespace NMib::NCommandLine
 							}
 						}
 
-						DMibError(fg_Format("Could not match '{jp}' to any member in set: {}", _Value, TemplateSet.f_ToString(nullptr)));
+						DMibError(fg_Format("Could not match {} to any member in set: {}", fp_FormatValue(_Template, _Value, _AnsiFlags), fp_FormatType(TemplateSet, bIsType, _AnsiFlags)));
 
 						break;
 					}
@@ -734,22 +743,171 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatType
 		(
 			NEncoding::CEJSONSorted const &_Template
-			, NEncoding::CEJSONSorted const &_Value
-			, NStr::CStr const &_Identifier
+			, bool _bType
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		using namespace NEncoding;
 		using namespace NStr;
 
-		CStr Return;
+		auto fToString = [&](CEJSONSorted const &_Value)
+			{
+				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJSONDialectFlag_AllowUndefined | EJSONDialectFlag_AllowInvalidFloat | EJSONDialectFlag_TrimWhitespace);
+			}
+		;
+		auto fColor = [&](CStr const &_Value, EColor _Color)
+			{
+				if (_AnsiFlags & NCommandLine::EAnsiEncodingFlag_Color)
+					return fs_Color(_Value, _Color, _AnsiFlags);
+				else
+					return _Value;
+			}
+		;
+
+		if (_Template.f_EType() == EEJSONType_UserType)
+		{
+			auto &UserType = _Template.f_UserType();
+			if (UserType.m_Type == "$OneOf")
+			{
+				CStr Return;
+
+				Return = fColor("one_of", EColor_Parameter);
+				Return += " [\n";
+				auto OneOfValue = CEJSONSorted::fs_FromJson(UserType.m_Value);
+				for (auto &Entry : OneOfValue.f_Array())
+					Return += "{}\n"_f << fp_FormatType(Entry, false, _AnsiFlags).f_Indent("    ");
+				Return += "]";
+
+				return Return;
+			}
+			else if (UserType.m_Type == "$OneOfType")
+			{
+				CStr Return;
+
+				Return = fColor("one_of_type", EColor_Parameter);
+				Return += " [\n";
+				auto OneOfValue = CEJSONSorted::fs_FromJson(UserType.m_Value);
+				for (auto &Entry : OneOfValue.f_Array())
+					Return += "{}\n"_f << fp_FormatType(Entry, true, _AnsiFlags).f_Indent("    ");
+				Return += "]";
+
+				return Return;
+			}
+			else if (UserType.m_Type == "$AnyType")
+				return fColor("any", EColor_Parameter);
+		}
+
+		if (_bType)
+		{
+			switch (_Template.f_EType())
+			{
+			case EEJSONType_String: return fColor("string", EColor_Parameter);
+			case EEJSONType_Integer: return fColor("int64", EColor_BuiltInType);
+			case EEJSONType_Float: return fColor("fp64", EColor_BuiltInType);
+			case EEJSONType_Boolean: return fColor("bool", EColor_BuiltInType);
+			case EEJSONType_Object:
+				{
+					CStr Return;
+
+					Return = fColor("object", EColor_Parameter);
+					Return += " {\n";
+					CEJSONSorted const *pHasWildcard = nullptr;
+					for (auto &Entry : _Template.f_Object())
+					{
+						if (Entry.f_Name() == "*")
+						{
+							pHasWildcard = &Entry.f_Value();
+							continue;
+						}
+
+						CStr FormattedName;
+						if (Entry.f_Name().f_EndsWith("?"))
+							FormattedName = "{}?"_f << fColor(Entry.f_Name().f_RemoveSuffix("?"), EColor_ObjectName);
+						else
+							FormattedName = fColor(Entry.f_Name(), EColor_ObjectName);
+
+						Return += "    {}: {}\n"_f << FormattedName << fp_FormatType(Entry.f_Value(), true, _AnsiFlags).f_Indent("    ", false);
+					}
+					if (pHasWildcard)
+						Return += "    {}: {}\n"_f << "*" << fp_FormatType(*pHasWildcard, true, _AnsiFlags).f_Indent("    ", false);
+
+					Return += "}";
+
+					return Return;
+				}
+				break;
+			case EEJSONType_Array:
+				{
+					CStr Return;
+
+					Return = fColor("array", EColor_Parameter);
+					Return += " [\n";
+					for (auto &Entry : _Template.f_Array())
+						Return += "    {}\n"_f << fp_FormatType(Entry, true, _AnsiFlags).f_Indent("    ", false);
+					Return += "]";
+
+					return Return;
+				}
+				break;
+			case EEJSONType_Null: return fColor("null", EColor_BuiltInType);
+			case EEJSONType_Binary: return fColor("binary", EColor_Parameter);
+			case EEJSONType_Date: return fColor("date", EColor_Parameter);
+			case EEJSONType_UserType:
+				{
+					CStr Return;
+
+					auto &UserType = _Template.f_UserType();
+					Return = fColor("user_type({}) "_f << UserType.m_Type, EColor_Parameter);
+					Return += fp_FormatType(CEJSONSorted::fs_FromJson(UserType.m_Value), true, _AnsiFlags);
+
+					return Return;
+				}
+				break;
+			default:
+				DMibError("Invalid template type");
+				break;
+			}
+			return {};
+		}
+
+		switch (_Template.f_EType())
+		{
+		case EEJSONType_String:
+		case EEJSONType_Integer:
+		case EEJSONType_Float:
+		case EEJSONType_Boolean:
+		case EEJSONType_Object:
+		case EEJSONType_Array:
+		case EEJSONType_Null: 
+			return fToString(_Template);
+		case EEJSONType_Binary: return fColor(fg_Base64Encode(_Template.f_Binary()), EColor_Binary);
+		case EEJSONType_Date: return fColor("{}"_f << _Template.f_Date(), EColor_Date);
+		case EEJSONType_UserType: return fToString(_Template);
+		default:
+			DMibError("Invalid template type");
+			break;
+		}
+
+		return {};
+	}
+	
+	template <typename t_CCustomization>
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
+		(
+			NEncoding::CEJSONSorted const &_Template
+			, NEncoding::CEJSONSorted const &_Value
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+		) const
+	{
+		using namespace NEncoding;
+		using namespace NStr;
 
 		auto fToString = [&](CEJSONSorted const &_Value)
 			{
-				return _Value.f_ToStringColored(_AnsiFlags, "    ");
+				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJSONDialectFlag_AllowUndefined | EJSONDialectFlag_AllowInvalidFloat | EJSONDialectFlag_TrimWhitespace);
 			}
 		;
 		auto fColor = [&](CStr const &_Value, EColor _Color)
@@ -770,37 +928,31 @@ namespace NMib::NCommandLine
 		case EEJSONType_Object:
 		case EEJSONType_Array:
 		case EEJSONType_Null:
-			{
-				Return = fToString(_Value);
-			}
-			break;
+			return fToString(_Value);
 		case EEJSONType_Binary:
 			{
 				if (!_Value.f_IsBinary())
-					Return = fToString(_Value);
+					return fToString(_Value);
 				else
-					Return = fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
+					return fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
 			}
 			break;
 		case EEJSONType_Date:
 			{
 				if (!_Value.f_IsDate())
-				{
-					Return = fToString(_Value);
-					break;
-				}
+					return fToString(_Value);
 
-				Return = fColor("{}"_f << _Value.f_Date(), EColor_Date);
+				return fColor("{}"_f << _Value.f_Date(), EColor_Date);
 			}
 			break;
 		case EEJSONType_UserType:
 			{
 				if (_Value.f_IsBinary())
-					Return = fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
+					return fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
 				else if (_Value.f_IsDate())
-					Return = fColor("{}"_f << _Value.f_Date(), EColor_Date);
+					return fColor("{}"_f << _Value.f_Date(), EColor_Date);
 				else
-					Return = fToString(_Value);
+					return fToString(_Value);
 			}
 			break;
 		default:
@@ -808,7 +960,7 @@ namespace NMib::NCommandLine
 			break;
 		}
 
-		return Return;
+		return {};
 	}
 
 	template <typename t_CCustomization>
