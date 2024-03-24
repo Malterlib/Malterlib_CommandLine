@@ -23,7 +23,7 @@ namespace NMib::NCommandLine
 						"Names"_o= {"--color"}
 						, "Default"_o= CCommandLineDefaults::fs_ColorEnabledDefault()
 						, "Description"_o= "Display text output with ansi colors where supported.\n"\
-						"You can override behaviour with MalterlibColor env var. Set it to true or false. "\
+						"You can override behaviour with MalterlibColor env var. Set it to true or false. "
 					}
 				}
 			)
@@ -37,7 +37,7 @@ namespace NMib::NCommandLine
 						, "Default"_o= CCommandLineDefaults::fs_Color24BitEnabledDefault()
 						, "Description"_o= "Display text output with 24 bit ansi colors.\n"\
 						"By default detected through COLORTERM. "\
-						"You can override behaviour with MalterlibColor24Bit env var. Set it to true or false. "\
+						"You can override behaviour with MalterlibColor24Bit env var. Set it to true or false. "
 					}
 				}
 			)
@@ -50,9 +50,7 @@ namespace NMib::NCommandLine
 						"Names"_o= {"--color-light"}
 						, "Default"_o= CCommandLineDefaults::fs_ColorLightBackgroundDefault()
 						, "Description"_o= "Force light background.\n"\
-						"You can override behaviour with MalterlibColorLight env var. Set it to true, false or auto. "\
-						"With auto a xterm secquence will be used to determine background color. "\
-						"Can interfere with commands that use std input processing."
+						"You can override behaviour with MalterlibColorLight env var. Set it to true, false. "
 					}
 				}
 			)
