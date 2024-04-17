@@ -5,6 +5,7 @@
 #include "Malterlib_CommandLine_AnsiEncodingParse.h"
 
 #include <Mib/Container/Regions>
+#include <Mib/Graphics/Utilities>
 #include <Mib/Storage/Optional>
 
 namespace NMib::NCommandLine
@@ -95,7 +96,7 @@ namespace NMib::NCommandLine
 			return BestColor;
 		}
 
-		uint32 fg_InvertBrightness(uint8 _Red, uint8 _Green, uint8 _Blue)
+		NGraphics::CColorR8G8B8 fg_InvertBrightness(uint8 _Red, uint8 _Green, uint8 _Blue)
 		{
 			fp32 R = fp32(1.0f/255.0f) * _Red;
 			fp32 G = fp32(1.0f/255.0f) * _Green;
@@ -118,7 +119,7 @@ namespace NMib::NCommandLine
 			Gf = fg_Clamp(Gf, fp32(0.0f), fp32(255.0f));
 			Bf = fg_Clamp(Bf, fp32(0.0f), fp32(255.0f));
 
-			return Rf.f_ToIntRound() | Gf.f_ToIntRound() << 8 | Bf.f_ToIntRound() << 16;
+			return NGraphics::CColorR8G8B8::fs_FromRGB(Rf.f_ToIntRound(), Gf.f_ToIntRound(), Bf.f_ToIntRound());
 		}
 	}
 
@@ -220,6 +221,12 @@ namespace NMib::NCommandLine
 		return "\x1B[48;5;{}m"_f << _Color;
 	}
 
+	NStr::CStr::CFormat CAnsiEncoding::f_ForegroundRGBFormat(uint32 _RGB) const
+	{
+		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
+		return f_ForegroundRGBFormat(Color.f_Red(), Color.f_Green(), Color.f_Blue());
+	}
+
 	NStr::CStr::CFormat CAnsiEncoding::f_ForegroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
@@ -227,16 +234,22 @@ namespace NMib::NCommandLine
 
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 		{
-			uint32 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
-			_Red = Inverted & 0xff;
-			_Green = (Inverted >> 8) & 0xff;
-			_Blue = (Inverted >> 16) & 0xff;
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
 		}
 
 		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
 			return "\x1B[38;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
 
 		return "\x1B[38;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+	}
+
+	NStr::CStr::CFormat CAnsiEncoding::f_BackgroundRGBFormat(uint32 _RGB) const
+	{
+		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
+		return f_BackgroundRGBFormat(Color.f_Red(), Color.f_Green(), Color.f_Blue());
 	}
 
 	NStr::CStr::CFormat CAnsiEncoding::f_BackgroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const
@@ -246,16 +259,22 @@ namespace NMib::NCommandLine
 
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 		{
-			uint32 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
-			_Red = Inverted & 0xff;
-			_Green = (Inverted >> 8) & 0xff;
-			_Blue = (Inverted >> 16) & 0xff;
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
 		}
 
 		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
 			return "\x1B[48;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
 
 		return "\x1B[48;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+	}
+
+	NStr::CStr CAnsiEncoding::f_ForegroundRGB(uint32 _RGB) const
+	{
+		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
+		return f_ForegroundRGB(Color.f_Red(), Color.f_Green(), Color.f_Blue());
 	}
 
 	NStr::CStr CAnsiEncoding::f_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue) const
@@ -265,16 +284,22 @@ namespace NMib::NCommandLine
 
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 		{
-			uint32 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
-			_Red = Inverted & 0xff;
-			_Green = (Inverted >> 8) & 0xff;
-			_Blue = (Inverted >> 16) & 0xff;
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
 		}
 
 		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
 			return "\x1B[38;5;{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
 
 		return "\x1B[38;2;{};{};{}m"_f << _Red << _Green << _Blue;
+	}
+
+	NStr::CStr CAnsiEncoding::f_BackgroundRGB(uint32 _RGB) const
+	{
+		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
+		return f_BackgroundRGB(Color.f_Red(), Color.f_Green(), Color.f_Blue());
 	}
 
 	NStr::CStr CAnsiEncoding::f_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue) const
@@ -284,10 +309,10 @@ namespace NMib::NCommandLine
 
 		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
 		{
-			uint32 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
-			_Red = Inverted & 0xff;
-			_Green = (Inverted >> 8) & 0xff;
-			_Blue = (Inverted >> 16) & 0xff;
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
 		}
 
 		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))

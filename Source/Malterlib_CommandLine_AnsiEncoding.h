@@ -55,13 +55,19 @@ namespace NMib::NCommandLine
 		NStr::CStr f_Background16(uint8 _Color) const;
 		NStr::CStr f_Foreground256(uint8 _Color) const;
 		NStr::CStr f_Background256(uint8 _Color) const;
+
 		NStr::CStr f_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue) const;
 		NStr::CStr f_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue) const;
+		NStr::CStr f_ForegroundRGB(uint32 _RGB) const;
+		NStr::CStr f_BackgroundRGB(uint32 _RGB) const;
+
 		NStr::CStr f_SyncronizeOutputStart() const;
 		NStr::CStr f_SyncronizeOutputFinish() const;
 
 		NStr::CStr::CFormat f_ForegroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const;
 		NStr::CStr::CFormat f_BackgroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const;
+		NStr::CStr::CFormat f_ForegroundRGBFormat(uint32 _RGB) const;
+		NStr::CStr::CFormat f_BackgroundRGBFormat(uint32 _RGB) const;
 
 		NStr::CStr const &f_Default() const;
 		NStr::CStr const &f_Reset() const;
