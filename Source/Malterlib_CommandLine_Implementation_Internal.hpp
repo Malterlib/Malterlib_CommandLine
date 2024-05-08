@@ -316,7 +316,7 @@ namespace NMib::NCommandLine
 
 #	define DMibCommandLineConvertException(_Description) DMibImpError(CCommandLineConvertException, _Description)
 
-	static void fg_CheckType(NEncoding::CEJSONSorted const &_Value, NEncoding::EEJSONType _Type)
+	static inline void fg_CheckType(NEncoding::CEJSONSorted const &_Value, NEncoding::EEJSONType _Type)
 	{
 		if (_Value.f_EType() != _Type)
 			DMibError(fg_Format("Expected '{}' but got '{}': {}", NEncoding::fg_EJSONTypeToString(_Type), NEncoding::fg_EJSONTypeToString(_Value.f_EType()), _Value).f_TrimRight());
