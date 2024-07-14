@@ -39,12 +39,15 @@ namespace NMib::NCommandLine
 		CParseState ParseState;
 		CParseState *pParseState = _pParseState ? _pParseState : &ParseState;
 
-		bool &bBold = pParseState->m_bBold;
+		CAnsiEncoding::EWeight &Weight = pParseState->m_Weight;
+		CAnsiEncoding::EUnderline &Underline = pParseState->m_Underline;
 		bool &bItalic = pParseState->m_bItalic;
+		bool &bStrikeout = pParseState->m_bStrikeout;
 		bool &bAborted = pParseState->m_bAborted;
 		int32 &LastForeground = pParseState->m_LastForeground;
 		CDecodedColor &CurrentColor = pParseState->m_CurrentColor;
 		CDecodedColor &CurrentColorBG = pParseState->m_CurrentColorBG;
+		CDecodedColor &CurrentColorUnderline = pParseState->m_CurrentColorUnderline;
 
 		CStr StringBuffer;
 
@@ -58,7 +61,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor)
+		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor, CDecodedColor const &_UnderlineColor)
 			{
 				fCommitBuffer();
 				if (_Color != CurrentColor)
@@ -71,15 +74,20 @@ namespace NMib::NCommandLine
 					_fPropertyChange(CBackgroundColor{_BGColor});
 					CurrentColorBG = _BGColor;
 				}
+				if (_UnderlineColor != CurrentColorUnderline)
+				{
+					_fPropertyChange(CUnderlineColor{_UnderlineColor});
+					CurrentColorUnderline = _UnderlineColor;
+				}
 			}
 		;
-		auto fSetBold = [&](bool _bBold)
+		auto fSetWeight = [&](CAnsiEncoding::EWeight _Weight)
 			{
 				fCommitBuffer();
-				if (bBold != _bBold)
+				if (Weight != _Weight)
 				{
-					_fPropertyChange(CBold{_bBold});
-					bBold = _bBold;
+					_fPropertyChange(CWeight{_Weight});
+					Weight = _Weight;
 				}
 			}
 		;
@@ -93,12 +101,39 @@ namespace NMib::NCommandLine
 				}
 			}
 		;
+		auto fSetUnderline = [&](CAnsiEncoding::EUnderline _Underline)
+			{
+				fCommitBuffer();
+				if (Underline != _Underline)
+				{
+					_fPropertyChange(CUnderline{_Underline});
+					Underline = _Underline;
+				}
+			}
+		;
+		auto fSetStrikeout = [&](bool _bStrikeout)
+			{
+				fCommitBuffer();
+				if (bStrikeout != _bStrikeout)
+				{
+					_fPropertyChange(CStrikeout{_bStrikeout});
+					bStrikeout = _bStrikeout;
+				}
+			}
+		;
 		auto fReset = [&]()
 			{
 				fCommitBuffer();
-				fSetBold(false);
+				fSetWeight(CAnsiEncoding::EWeight::mc_Normal);
 				fSetItalic(false);
+				fSetUnderline(CAnsiEncoding::EUnderline::mc_None);
+				fSetStrikeout(false);
 				_fPropertyChange(CReset{});
+
+				// Clear the tracked colors so colors selected again after the reset are emitted
+				CurrentColor = {};
+				CurrentColorBG = {};
+				CurrentColorUnderline = {};
 			}
 		;
 
@@ -133,11 +168,12 @@ namespace NMib::NCommandLine
 
 							CDecodedColor FgColor = CurrentColor;
 							CDecodedColor BgColor = CurrentColorBG;
+							CDecodedColor UnderlineColor = CurrentColorUnderline;
 
 							if (Params.f_IsEmpty() && Intermediate.f_IsEmpty())
 							{
 								fReset();
-								fSetColor({}, {});
+								fSetColor({}, {}, {});
 							}
 							else
 							{
@@ -148,7 +184,7 @@ namespace NMib::NCommandLine
 									uint32 ParamNumber = iParam->f_ToInt(uint32(0), ":");
 
 									auto Arguments = iParam->f_Split(":");
-									if (Arguments.f_GetLen() == 1 && (ParamNumber == 38 || ParamNumber == 48))
+									if (Arguments.f_GetLen() == 1 && (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58))
 									{
 										// Special case for broken encoding for true color
 										++iParam;
@@ -162,8 +198,10 @@ namespace NMib::NCommandLine
 													FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
 													LastForeground = -1;
 												}
-												else
+												else if (ParamNumber == 48)
 													BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+												else
+													UnderlineColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
 												++iParam;
 											}
 										}
@@ -187,8 +225,10 @@ namespace NMib::NCommandLine
 															FgColor.f_Set(Red, Green, Blue);
 															LastForeground = -1;
 														}
-														else
+														else if (ParamNumber == 48)
 															BgColor.f_Set(Red, Green, Blue);
+														else
+															UnderlineColor.f_Set(Red, Green, Blue);
 													}
 												}
 											}
@@ -198,13 +238,18 @@ namespace NMib::NCommandLine
 
 									if (ParamNumber == 1)
 									{
-										fSetBold(true);
+										if (Arguments.f_GetLen() > 1 && Arguments[1] == "2")
+											fSetWeight(CAnsiEncoding::EWeight::mc_Shadowed);
+										else
+											fSetWeight(CAnsiEncoding::EWeight::mc_Bold);
 										if (LastForeground >= 30 && LastForeground <= 37)
 											ParamNumber = LastForeground + 60;
 									}
+									else if (ParamNumber == 2)
+										fSetWeight(CAnsiEncoding::EWeight::mc_Dim);
 									else if (ParamNumber == 22)
 									{
-										fSetBold(false);
+										fSetWeight(CAnsiEncoding::EWeight::mc_Normal);
 										if (LastForeground >= 90 && LastForeground <= 97)
 											ParamNumber = LastForeground - 60;
 									}
@@ -212,10 +257,34 @@ namespace NMib::NCommandLine
 										fSetItalic(true);
 									else if (ParamNumber == 23)
 										fSetItalic(false);
+									else if (ParamNumber == 4)
+									{
+										auto UnderlineStyle = CAnsiEncoding::EUnderline::mc_Solid;
+										if (Arguments.f_GetLen() > 1)
+										{
+											switch (Arguments[1].f_ToInt(uint32(0)))
+											{
+											case 0: UnderlineStyle = CAnsiEncoding::EUnderline::mc_None; break;
+											case 1: UnderlineStyle = CAnsiEncoding::EUnderline::mc_Solid; break;
+											case 2: UnderlineStyle = CAnsiEncoding::EUnderline::mc_Double; break;
+											case 3: UnderlineStyle = CAnsiEncoding::EUnderline::mc_Wavy; break;
+											case 4: UnderlineStyle = CAnsiEncoding::EUnderline::mc_Dotted; break;
+											case 5: UnderlineStyle = CAnsiEncoding::EUnderline::mc_Dashed; break;
+											}
+										}
+
+										fSetUnderline(UnderlineStyle);
+									}
+									else if (ParamNumber == 24)
+										fSetUnderline(CAnsiEncoding::EUnderline::mc_None);
+									else if (ParamNumber == 9)
+										fSetStrikeout(true);
+									else if (ParamNumber == 29)
+										fSetStrikeout(false);
 									else if (ParamNumber >= 30 && ParamNumber <= 37)
 									{
 										LastForeground = ParamNumber;
-										if (bBold)
+										if (Weight == CAnsiEncoding::EWeight::mc_Bold)
 											ParamNumber += 60;
 									}
 									else if (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58)
@@ -315,9 +384,10 @@ namespace NMib::NCommandLine
 
 									switch (ParamNumber)
 									{
-									case 0: FgColor = {}; BgColor = {}; fReset(); break;
+									case 0: FgColor = {}; BgColor = {}; UnderlineColor = {}; fReset(); break;
 									case 39: FgColor = {}; break;
 									case 49: BgColor = {}; break;
+									case 59: UnderlineColor = {}; break;
 
 									case 30: FgColor.f_SetAnsi16(0); break;
 									case 40: BgColor.f_SetAnsi16(0); break;
@@ -357,7 +427,7 @@ namespace NMib::NCommandLine
 									++iParam;
 								}
 
-								fSetColor(FgColor, BgColor);
+								fSetColor(FgColor, BgColor, UnderlineColor);
 							}
 							break;
 						}

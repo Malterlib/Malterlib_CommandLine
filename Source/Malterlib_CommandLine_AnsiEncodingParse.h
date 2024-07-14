@@ -6,6 +6,7 @@
 #include <Mib/Function/Function>
 #include <Mib/Storage/Variant>
 #include <Mib/Storage/Tuple>
+#include <Mib/CommandLine/AnsiEncoding>
 
 namespace NMib::NCommandLine
 {
@@ -33,11 +34,22 @@ namespace NMib::NCommandLine
 		{
 		};
 
-		struct CBold
+		struct CUnderlineColor : public CDecodedColor
 		{
-			bool m_bEnabled = false;
+		};
 
-			auto operator <=> (CBold const &_Other) const noexcept = default;
+		struct CWeight
+		{
+			CAnsiEncoding::EWeight m_Weight = CAnsiEncoding::EWeight::mc_Normal;
+
+			auto operator <=> (CWeight const &_Other) const noexcept = default;
+		};
+
+		struct CUnderline
+		{
+			CAnsiEncoding::EUnderline m_Underline = CAnsiEncoding::EUnderline::mc_None;
+
+			auto operator <=> (CUnderline const &_Other) const noexcept = default;
 		};
 
 		struct CItalic
@@ -47,21 +59,31 @@ namespace NMib::NCommandLine
 			auto operator <=> (CItalic const &_Other) const noexcept = default;
 		};
 
+		struct CStrikeout
+		{
+			bool m_bEnabled = false;
+
+			auto operator <=> (CStrikeout const &_Other) const noexcept = default;
+		};
+
 		struct CReset
 		{
 			auto operator <=> (CReset const &_Other) const noexcept = default;
 		};
 
-		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CItalic, CReset>;
+		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CUnderlineColor, CWeight, CUnderline, CItalic, CStrikeout, CReset>;
 
 		struct CParseState
 		{
-			bool m_bBold = false;
+			CAnsiEncoding::EWeight m_Weight = CAnsiEncoding::EWeight::mc_Normal;
+			CAnsiEncoding::EUnderline m_Underline = CAnsiEncoding::EUnderline::mc_None;
 			bool m_bItalic = false;
+			bool m_bStrikeout = false;
 			bool m_bAborted = false;
 			int32 m_LastForeground = -1;
 			CDecodedColor m_CurrentColor;
 			CDecodedColor m_CurrentColorBG;
+			CDecodedColor m_CurrentColorUnderline;
 		};
 
 		static void fs_Parse

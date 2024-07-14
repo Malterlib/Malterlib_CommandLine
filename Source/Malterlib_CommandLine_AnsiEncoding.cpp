@@ -298,6 +298,31 @@ namespace NMib::NCommandLine
 		}
 	}
 
+	NStr::CStr::CFormat CAnsiEncoding::f_UnderlineRGBFormat(uint32 _RGB) const
+	{
+		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
+		return f_UnderlineRGBFormat(Color.f_Red(), Color.f_Green(), Color.f_Blue());
+	}
+
+	NStr::CStr::CFormat CAnsiEncoding::f_UnderlineRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return NStr::CStr::CFormat("");
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+			return "\x1B[58:5:{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+
+		return "\x1B[58:2::{}:{}:{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+	}
+
 	NStr::CStr CAnsiEncoding::f_ForegroundRGB(uint32 _RGB) const
 	{
 		NGraphics::CColorR8G8B8 Color{.m_Color = _RGB};
@@ -474,10 +499,45 @@ namespace NMib::NCommandLine
 		return gc_StatusError;
 	}
 
+	NStr::CStr const &CAnsiEncoding::f_Weight(EWeight _Weight) const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return gc_Empty;
+
+		switch (_Weight)
+		{
+		case EWeight::mc_Normal: return gc_NotBold;
+		case EWeight::mc_Bold: return gc_Bold;
+		case EWeight::mc_Dim: return gc_Str<"\x1B[2m">;
+		case EWeight::mc_Shadowed: return gc_Str<"\x1B[1:2m">;
+		}
+
+		return gc_Empty;
+	}
+
+	NStr::CStr const &CAnsiEncoding::f_Underline(EUnderline _Underline) const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return gc_Empty;
+
+		switch (_Underline)
+		{
+		case EUnderline::mc_None: return gc_Str<"\x1B[24m">;
+		case EUnderline::mc_Solid: return gc_Str<"\x1B[4m">;
+		case EUnderline::mc_Double: return gc_Str<"\x1B[4:2m">;
+		case EUnderline::mc_Wavy: return gc_Str<"\x1B[4:3m">;
+		case EUnderline::mc_Dotted: return gc_Str<"\x1B[4:4m">;
+		case EUnderline::mc_Dashed: return gc_Str<"\x1B[4:5m">;
+		}
+
+		return gc_Empty;
+	}
+
 	NStr::CStr const &CAnsiEncoding::f_Bold() const
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
 			return gc_Empty;
+
 		return gc_Bold;
 	}
 
@@ -485,6 +545,7 @@ namespace NMib::NCommandLine
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
 			return gc_Empty;
+
 		return gc_NotBold;
 	}
 
@@ -492,6 +553,7 @@ namespace NMib::NCommandLine
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
 			return gc_Empty;
+
 		return gc_Italic;
 	}
 
@@ -499,7 +561,24 @@ namespace NMib::NCommandLine
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
 			return gc_Empty;
+
 		return gc_NotItalic;
+	}
+
+	NStr::CStr const &CAnsiEncoding::f_Strikeout() const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return gc_Empty;
+
+		return gc_Str<"\x1B[9m">;
+	}
+
+	NStr::CStr const &CAnsiEncoding::f_NotStrikeout() const
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return gc_Empty;
+
+		return gc_Str<"\x1B[29m">;
 	}
 
 	EAnsiEncodingFlag CAnsiEncoding::f_Flags() const
@@ -564,22 +643,50 @@ namespace NMib::NCommandLine
 					if (!f_Color())
 						return;
 
-					if (_Change.f_IsOfType<CAnsiEncodingParse::CReset>())
-						Ret += f_Default();
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CBold>() && _Change.f_GetAsType<CAnsiEncodingParse::CBold>().m_bEnabled)
-						Ret += f_Bold();
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CItalic>() && _Change.f_GetAsType<CAnsiEncodingParse::CItalic>().m_bEnabled)
-						Ret += f_Italic();
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CForegroundColor>())
-					{
-						auto &Color = _Change.f_GetAsType<CAnsiEncodingParse::CForegroundColor>();
-						Ret += f_ForegroundRGB(Color.m_Red, Color.m_Green, Color.m_Blue);
-					}
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CBackgroundColor>())
-					{
-						auto &Color = _Change.f_GetAsType<CAnsiEncodingParse::CBackgroundColor>();
-						Ret += f_BackgroundRGB(Color.m_Red, Color.m_Green, Color.m_Blue);
-					}
+					_Change.f_Visit
+						(
+							[&]<typename tf_CType>(tf_CType const &_Change)
+							{
+								if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CReset>)
+									Ret += f_Default();
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CWeight>)
+									Ret += f_Weight(_Change.m_Weight);
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderline>)
+									Ret += f_Underline(_Change.m_Underline);
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CItalic>)
+								{
+									if (_Change.m_bEnabled)
+										Ret += f_Italic();
+									else
+										Ret += f_NotItalic();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CStrikeout>)
+								{
+									if (_Change.m_bEnabled)
+										Ret += f_Strikeout();
+									else
+										Ret += f_NotStrikeout();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CForegroundColor>)
+								{
+									auto &Color = _Change;
+									Ret += f_ForegroundRGBFormat(Color.m_Red, Color.m_Green, Color.m_Blue);
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CBackgroundColor>)
+								{
+									auto &Color = _Change;
+									Ret += f_BackgroundRGBFormat(Color.m_Red, Color.m_Green, Color.m_Blue);
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderlineColor>)
+								{
+									auto &Color = _Change;
+									Ret += f_UnderlineRGBFormat(Color.m_Red, Color.m_Green, Color.m_Blue);
+								}
+								else
+									static_assert(false);
+							}
+						)
+					;
 				}
 			)
 		;
@@ -597,8 +704,11 @@ namespace NMib::NCommandLine
 
 			TCOptional<CAnsiEncodingParse::CBackgroundColor> m_BackgroundColor;
 			TCOptional<CAnsiEncodingParse::CForegroundColor> m_ForegroundColor;
-			TCOptional<CAnsiEncodingParse::CBold> m_Bold;
+			TCOptional<CAnsiEncodingParse::CUnderlineColor> m_UnderlineColor;
+			TCOptional<CAnsiEncodingParse::CWeight> m_Weight;
+			TCOptional<CAnsiEncodingParse::CUnderline> m_Underline;
 			TCOptional<CAnsiEncodingParse::CItalic> m_Italic;
+			TCOptional<CAnsiEncodingParse::CStrikeout> m_Strikeout;
 		};
 
 		TCRegions<umint, CProperties> PropertyRegions;
@@ -629,33 +739,79 @@ namespace NMib::NCommandLine
 				}
 				, [&](CAnsiEncodingParse::CPropertyChange const &_Change)
 				{
-					if (_Change.f_IsOfType<CAnsiEncodingParse::CReset>())
-					{
-						CurrentProperties.m_BackgroundColor.f_Clear();
-						CurrentProperties.m_ForegroundColor.f_Clear();
-						CurrentProperties.m_Bold.f_Clear();
-						CurrentProperties.m_Italic.f_Clear();
-					}
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CBold>() && _Change.f_GetAsType<CAnsiEncodingParse::CBold>().m_bEnabled)
-						CurrentProperties.m_Bold = {true};
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CItalic>() && _Change.f_GetAsType<CAnsiEncodingParse::CItalic>().m_bEnabled)
-						CurrentProperties.m_Italic = {true};
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CBackgroundColor>())
-					{
-						auto &Color = _Change.f_GetAsType<CAnsiEncodingParse::CBackgroundColor>();
-						if (Color.m_bEnabled)
-							CurrentProperties.m_BackgroundColor= Color;
-						else
-							CurrentProperties.m_BackgroundColor.f_Clear();
-					}
-					else if (_Change.f_IsOfType<CAnsiEncodingParse::CForegroundColor>())
-					{
-						auto &Color = _Change.f_GetAsType<CAnsiEncodingParse::CForegroundColor>();
-						if (Color.m_bEnabled)
-							CurrentProperties.m_ForegroundColor = Color;
-						else
-							CurrentProperties.m_ForegroundColor.f_Clear();
-					}
+					_Change.f_Visit
+						(
+							[&]<typename tf_CType>(tf_CType const &_Change)
+							{
+								if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CReset>)
+								{
+									CurrentProperties.m_BackgroundColor.f_Clear();
+									CurrentProperties.m_ForegroundColor.f_Clear();
+									CurrentProperties.m_UnderlineColor.f_Clear();
+									CurrentProperties.m_Weight.f_Clear();
+									CurrentProperties.m_Underline.f_Clear();
+									CurrentProperties.m_Italic.f_Clear();
+									CurrentProperties.m_Strikeout.f_Clear();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CWeight>)
+								{
+									auto Weight = _Change.m_Weight;
+									if (Weight == CAnsiEncoding::EWeight::mc_Normal)
+										CurrentProperties.m_Weight.f_Clear();
+									else
+										CurrentProperties.m_Weight = {Weight};
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderline>)
+								{
+									auto Underline = _Change.m_Underline;
+									if (Underline == CAnsiEncoding::EUnderline::mc_None)
+										CurrentProperties.m_Underline.f_Clear();
+									else
+										CurrentProperties.m_Underline = {Underline};
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CItalic>)
+								{
+									if (_Change.m_bEnabled)
+										CurrentProperties.m_Italic = {true};
+									else
+										CurrentProperties.m_Italic.f_Clear();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CStrikeout>)
+								{
+									if (_Change.m_bEnabled)
+										CurrentProperties.m_Strikeout = {true};
+									else
+										CurrentProperties.m_Strikeout.f_Clear();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CForegroundColor>)
+								{
+									auto &Color = _Change;
+									if (Color.m_bEnabled)
+										CurrentProperties.m_ForegroundColor = Color;
+									else
+										CurrentProperties.m_ForegroundColor.f_Clear();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CBackgroundColor>)
+								{
+									auto &Color = _Change;
+									if (Color.m_bEnabled)
+										CurrentProperties.m_BackgroundColor= Color;
+									else
+										CurrentProperties.m_BackgroundColor.f_Clear();
+								}
+								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderlineColor>)
+								{
+									auto &Color = _Change;
+									if (Color.m_bEnabled)
+										CurrentProperties.m_UnderlineColor = Color;
+									else
+										CurrentProperties.m_UnderlineColor.f_Clear();
+								}
+								else
+									static_assert(false);
+							}
+						)
+					;
 				}
 			)
 		;
@@ -692,15 +848,27 @@ namespace NMib::NCommandLine
 							bSetProperties = false;
 						}
 
-						if (Properties.m_Bold && Properties.m_Bold->m_bEnabled)
+						if (Properties.m_Weight)
 						{
-							ToOutput += f_Bold();
+							ToOutput += f_Weight(Properties.m_Weight->m_Weight);
+							bSetProperties = true;
+						}
+
+						if (Properties.m_Underline)
+						{
+							ToOutput += f_Underline(Properties.m_Underline->m_Underline);
 							bSetProperties = true;
 						}
 
 						if (Properties.m_Italic && Properties.m_Italic->m_bEnabled)
 						{
 							ToOutput += f_Italic();
+							bSetProperties = true;
+						}
+
+						if (Properties.m_Strikeout && Properties.m_Strikeout->m_bEnabled)
+						{
+							ToOutput += f_Strikeout();
 							bSetProperties = true;
 						}
 
@@ -713,6 +881,12 @@ namespace NMib::NCommandLine
 						if (Properties.m_ForegroundColor && Properties.m_ForegroundColor->m_bEnabled)
 						{
 							ToOutput += f_ForegroundRGBFormat(Properties.m_ForegroundColor->m_Red, Properties.m_ForegroundColor->m_Green, Properties.m_ForegroundColor->m_Blue);
+							bSetProperties = true;
+						}
+
+						if (Properties.m_UnderlineColor && Properties.m_UnderlineColor->m_bEnabled)
+						{
+							ToOutput += f_UnderlineRGBFormat(Properties.m_UnderlineColor->m_Red, Properties.m_UnderlineColor->m_Green, Properties.m_UnderlineColor->m_Blue);
 							bSetProperties = true;
 						}
 

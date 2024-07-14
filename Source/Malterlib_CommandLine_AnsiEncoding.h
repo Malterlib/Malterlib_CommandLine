@@ -48,6 +48,24 @@ namespace NMib::NCommandLine
 			, mc_ReportAssociatedText = fg_Bit(4)
 		};
 
+		enum class EWeight : uint32
+		{
+			mc_Normal
+			, mc_Bold
+			, mc_Dim
+			, mc_Shadowed
+		};
+
+		enum class EUnderline : uint32
+		{
+			mc_None
+			, mc_Solid
+			, mc_Double
+			, mc_Wavy
+			, mc_Dotted
+			, mc_Dashed
+		};
+
 		struct CLine
 		{
 			bool operator == (CLine const &_Right) const noexcept = default;
@@ -80,8 +98,10 @@ namespace NMib::NCommandLine
 
 		NStr::CStr::CFormat f_ForegroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const;
 		NStr::CStr::CFormat f_BackgroundRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const;
+		NStr::CStr::CFormat f_UnderlineRGBFormat(uint8 _Red, uint8 _Green, uint8 _Blue) const;
 		NStr::CStr::CFormat f_ForegroundRGBFormat(uint32 _RGB) const;
 		NStr::CStr::CFormat f_BackgroundRGBFormat(uint32 _RGB) const;
+		NStr::CStr::CFormat f_UnderlineRGBFormat(uint32 _RGB) const;
 
 		NStr::CStr const &f_Default() const;
 		NStr::CStr const &f_Reset() const;
@@ -106,6 +126,12 @@ namespace NMib::NCommandLine
 		NStr::CStr const &f_NotBold() const;
 		NStr::CStr const &f_Italic() const;
 		NStr::CStr const &f_NotItalic() const;
+		NStr::CStr const &f_Strikeout() const;
+		NStr::CStr const &f_NotStrikeout() const;
+
+		NStr::CStr const &f_Weight(EWeight _Weight) const;
+		NStr::CStr const &f_Underline(EUnderline _Underline) const;
+
 		NStr::CStr f_Bold(NStr::CStr const &_ToWrap) const;
 		NStr::CStr const &f_Prompt() const;
 		NStr::CStr f_Prompt(NStr::CStr const &_ToWrap) const;
