@@ -197,7 +197,10 @@ namespace NMib::NCommandLine
 			_Color = fg_FindColor256(Color.m_Red, Color.m_Green, Color.m_Blue);
 		}
 
-		return "\x1B[38;5;{}m"_f << _Color;
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+			return "\x1B[38;5;{}m"_f << _Color;
+		else
+			return "\x1B[38:5:{}m"_f << _Color;
 	}
 
 	NStr::CStr CAnsiEncoding::f_Background256(uint8 _Color) const
@@ -219,7 +222,10 @@ namespace NMib::NCommandLine
 			_Color = fg_FindColor256(Color.m_Red, Color.m_Green, Color.m_Blue);
 		}
 
-		return "\x1B[48;5;{}m"_f << _Color;
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+			return "\x1B[48;5;{}m"_f << _Color;
+		else
+			return "\x1B[48:5:{}m"_f << _Color;
 	}
 
 	NStr::CStr::CFormat CAnsiEncoding::f_ForegroundRGBFormat(uint32 _RGB) const
@@ -241,10 +247,20 @@ namespace NMib::NCommandLine
 			_Blue = Inverted.f_Blue();
 		}
 
-		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
-			return "\x1B[38;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[38;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
 
-		return "\x1B[38;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+			return "\x1B[38;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
+		else
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[38:5:{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+
+			return "\x1B[38:2::{}:{}:{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
 	}
 
 	NStr::CStr::CFormat CAnsiEncoding::f_BackgroundRGBFormat(uint32 _RGB) const
@@ -266,10 +282,20 @@ namespace NMib::NCommandLine
 			_Blue = Inverted.f_Blue();
 		}
 
-		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
-			return "\x1B[48;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[48;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
 
-		return "\x1B[48;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+			return "\x1B[48;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
+		else
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[48:5:{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+
+			return "\x1B[48:2::{}:{}:{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
 	}
 
 	NStr::CStr CAnsiEncoding::f_ForegroundRGB(uint32 _RGB) const
@@ -291,10 +317,20 @@ namespace NMib::NCommandLine
 			_Blue = Inverted.f_Blue();
 		}
 
-		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
-			return "\x1B[38;5;{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[38;5;{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
 
-		return "\x1B[38;2;{};{};{}m"_f << _Red << _Green << _Blue;
+			return "\x1B[38;2;{};{};{}m"_f << _Red << _Green << _Blue;
+		}
+		else
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[38:5:{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
+
+			return "\x1B[38:2::{}:{}:{}m"_f << _Red << _Green << _Blue;
+		}
 	}
 
 	NStr::CStr CAnsiEncoding::f_BackgroundRGB(uint32 _RGB) const
@@ -316,10 +352,20 @@ namespace NMib::NCommandLine
 			_Blue = Inverted.f_Blue();
 		}
 
-		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
-			return "\x1B[48;5;{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[48;5;{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
 
-		return "\x1B[48;2;{};{};{}m"_f << _Red << _Green << _Blue;
+			return "\x1B[48;2;{};{};{}m"_f << _Red << _Green << _Blue;
+		}
+		else
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[48:5:{}m"_f << fg_FindColor256(_Red, _Green, _Blue);
+
+			return "\x1B[48:2::{}:{}:{}m"_f << _Red << _Green << _Blue;
+		}
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_Default() const

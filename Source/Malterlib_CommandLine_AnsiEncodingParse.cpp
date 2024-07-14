@@ -145,9 +145,12 @@ namespace NMib::NCommandLine
 
 								for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
 								{
-									uint32 ParamNumber = iParam->f_ToInt(uint32(0));
-									if (ParamNumber == 38 || ParamNumber == 48)
+									uint32 ParamNumber = iParam->f_ToInt(uint32(0), ":");
+
+									auto Arguments = iParam->f_Split(":");
+									if (Arguments.f_GetLen() == 1 && (ParamNumber == 38 || ParamNumber == 48))
 									{
+										// Special case for broken encoding for true color
 										++iParam;
 										if (iParam && *iParam == "5")
 										{
@@ -155,7 +158,10 @@ namespace NMib::NCommandLine
 											if (iParam)
 											{
 												if (ParamNumber == 38)
+												{
 													FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+													LastForeground = -1;
+												}
 												else
 													BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
 												++iParam;
@@ -177,7 +183,10 @@ namespace NMib::NCommandLine
 														uint8 Blue = iParam->f_ToInt(uint8(0));
 														++iParam;
 														if (ParamNumber == 38)
+														{
 															FgColor.f_Set(Red, Green, Blue);
+															LastForeground = -1;
+														}
 														else
 															BgColor.f_Set(Red, Green, Blue);
 													}
@@ -208,6 +217,98 @@ namespace NMib::NCommandLine
 										LastForeground = ParamNumber;
 										if (bBold)
 											ParamNumber += 60;
+									}
+									else if (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58)
+									{
+										auto iArgument = Arguments.f_GetIterator();
+										++iArgument;
+
+										if (iArgument && *iArgument == "5")
+										{
+											++iArgument;
+											if (iArgument)
+											{
+												if (ParamNumber == 38)
+												{
+													FgColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+													LastForeground = -1;
+												}
+												else if (ParamNumber == 48)
+													BgColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+												else
+													UnderlineColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+												++iArgument;
+											}
+										}
+										else if (iArgument && *iArgument == "2")
+										{
+											++iArgument;
+											if (iArgument.f_GetLen() >= 3)
+											{
+												// A length of exactly 3 means the colour space id slot was omitted
+												if (iArgument.f_GetLen() >= 4)
+													++iArgument;
+												auto Red = iArgument->f_ToInt(uint8(0));
+												auto Green = (++iArgument)->f_ToInt(uint8(0));
+												auto Blue = (++iArgument)->f_ToInt(uint8(0));
+												if (ParamNumber == 38)
+												{
+													FgColor.f_Set(Red, Green, Blue);
+													LastForeground = -1;
+												}
+												else if (ParamNumber == 48)
+													BgColor.f_Set(Red, Green, Blue);
+												else
+													UnderlineColor.f_Set(Red, Green, Blue);
+											}
+										}
+										else if (iArgument && *iArgument == "3")
+										{
+											++iArgument;
+											if (iArgument.f_GetLen() >= 5)
+											{
+												fp64 Scale = (++iArgument)->f_ToInt(uint8(0));
+												auto CompC = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												auto CompM = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												auto CompY = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												uint8 Red = ((fp64(1.0) - CompC) * 255.0).f_ToInt();
+												uint8 Green = ((fp64(1.0) - CompM) * 255.0).f_ToInt();
+												uint8 Blue = ((fp64(1.0) - CompY) * 255.0).f_ToInt();
+												if (ParamNumber == 38)
+												{
+													FgColor.f_Set(Red, Green, Blue);
+													LastForeground = -1;
+												}
+												else if (ParamNumber == 48)
+													BgColor.f_Set(Red, Green, Blue);
+												else
+													UnderlineColor.f_Set(Red, Green, Blue);
+											}
+										}
+										else if (iArgument && *iArgument == "4")
+										{
+											++iArgument;
+											if (iArgument.f_GetLen() >= 6)
+											{
+												fp64 Scale = (++iArgument)->f_ToInt(uint8(0));
+												auto CompC = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												auto CompM = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												auto CompY = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												auto CompK = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												uint8 Red = ((fp64(1.0) - fg_Min(CompC + CompK, fp64(1.0))) * 255.0).f_ToInt();
+												uint8 Green = ((fp64(1.0) - fg_Min(CompM + CompK, fp64(1.0))) * 255.0).f_ToInt();
+												uint8 Blue = ((fp64(1.0) - fg_Min(CompY + CompK, fp64(1.0))) * 255.0).f_ToInt();
+												if (ParamNumber == 38)
+												{
+													FgColor.f_Set(Red, Green, Blue);
+													LastForeground = -1;
+												}
+												else if (ParamNumber == 48)
+													BgColor.f_Set(Red, Green, Blue);
+												else
+													UnderlineColor.f_Set(Red, Green, Blue);
+											}
+										}
 									}
 									else
 										LastForeground = -1;
@@ -252,6 +353,7 @@ namespace NMib::NCommandLine
 									case 97: FgColor.f_SetAnsi16(15); break;
 									case 107: BgColor.f_SetAnsi16(15); break;
 									}
+
 									++iParam;
 								}
 

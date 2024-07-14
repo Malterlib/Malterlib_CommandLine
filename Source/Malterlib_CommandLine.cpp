@@ -75,6 +75,8 @@ namespace NMib::NCommandLine
 			Flags |= EAnsiEncodingFlag_ColorLightBackground;
 		if (fs_BoxDrawingDefault())
 			Flags |= EAnsiEncodingFlag_BoxDrawing;
+		if (fs_ColorSgrUsesSemiColonDefault())
+			Flags |= EAnsiEncodingFlag_ColorSgrUsesSemiColon;
 		return Flags;
 	}
 
@@ -121,6 +123,31 @@ namespace NMib::NCommandLine
 					return true;
 #endif
 				return false;
+			}
+			()
+		;
+		return bValue;
+	}
+
+	bool CCommandLineDefaults::fs_ColorSgrUsesSemiColonDefault()
+	{
+		static bool bValue = []
+			{
+				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColorSgrUsesSemiColon", ""))
+					return Value == "true";
+
+				auto ColorTerm = fg_GetSys()->f_GetEnvironmentVariable("COLORTERM", "");
+				if (ColorTerm == "truecolor" || ColorTerm == "24bit")
+					return false;
+
+#ifdef DPlatformFamily_Windows
+				// Colon subparameter support depends on the terminal host, not the Windows
+				// version: Windows Terminal supports it while classic conhost only accepts the
+				// semicolon form
+				if (fg_GetSys()->f_GetEnvironmentVariable("WT_SESSION", "") != "")
+					return false;
+#endif
+				return true;
 			}
 			()
 		;
@@ -214,6 +241,8 @@ namespace NMib::NCommandLine
 			AnsiFlags |= EAnsiEncodingFlag_ColorLightBackground;
 		if (_Params.f_GetMemberValue("BoxDrawing", CCommandLineDefaults::fs_BoxDrawingDefault()).f_Boolean())
 			AnsiFlags |= EAnsiEncodingFlag_BoxDrawing;
+		if (_Params.f_GetMemberValue("ColorSgrUsesSemiColon", CCommandLineDefaults::fs_ColorSgrUsesSemiColonDefault()).f_Boolean())
+			AnsiFlags |= EAnsiEncodingFlag_ColorSgrUsesSemiColon;
 
 		return AnsiFlags;
 	}

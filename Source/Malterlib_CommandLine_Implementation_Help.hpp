@@ -10,7 +10,7 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NContainer::TCVector<NStr::CStr> TCCommandLineSpecification<t_CCustomization>::fs_RelevantHelpGlobalOptions()
 	{
-		return {"HelpCurrentCommand", "HelpCurrentCommandVerbose", "Color", "Color24Bit", "ColorLight", "BoxDrawing", "TerminalWidth", "TerminalHeight"};
+		return {"HelpCurrentCommand", "HelpCurrentCommandVerbose", "Color", "Color24Bit", "ColorLight", "ColorSgrUsesSemiColon", "BoxDrawing", "TerminalWidth", "TerminalHeight"};
 	}
 
 	template <typename t_CCustomization>

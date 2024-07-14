@@ -12,6 +12,7 @@ namespace NMib::NCommandLine
 		, EAnsiEncodingFlag_Color24Bit = DMibBit(2)
 		, EAnsiEncodingFlag_ColorLightBackground = DMibBit(3)
 		, EAnsiEncodingFlag_BoxDrawing = DMibBit(4)
+		, EAnsiEncodingFlag_ColorSgrUsesSemiColon = DMibBit(5)
 
 		, EAnsiEncodingFlag_AllFeatures = EAnsiEncodingFlag_Color | EAnsiEncodingFlag_Color24Bit | EAnsiEncodingFlag_BoxDrawing
 	};

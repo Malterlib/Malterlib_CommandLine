@@ -143,6 +143,7 @@ namespace NMib::NCommandLine
 		static NCommandLine::EAnsiEncodingFlag fs_ColorAnsiFlagsDefault();
 		static bool fs_ColorEnabledDefault();
 		static bool fs_Color24BitEnabledDefault();
+		static bool fs_ColorSgrUsesSemiColonDefault();
 		static bool fs_ColorLightBackgroundDefault();
 		static bool fs_BoxDrawingDefault();
 		static NCommandLine::EAnsiEncodingFlag fs_ParseAnsiEncodingParams(NEncoding::CEJsonSorted const &_Params);

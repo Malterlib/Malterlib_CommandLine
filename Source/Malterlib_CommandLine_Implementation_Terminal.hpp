@@ -58,6 +58,20 @@ namespace NMib::NCommandLine
 		f_RegisterGlobalOptions
 			(
 				{
+					"ColorSgrUsesSemiColon?"_o=
+					{
+						"Names"_o= _o["--color-sgr-semi"]
+						, "Default"_o= CCommandLineDefaults::fs_ColorSgrUsesSemiColonDefault()
+						, "Description"_o= "Use ';' to delimit colors for SGR palatte and 24 bit colors.\n"\
+						"By default detected through COLORTERM. "\
+						"You can override behaviour with MalterlibColorSgrUsesSemiColon env var. Set it to true or false. "
+					}
+				}
+			)
+		;
+		f_RegisterGlobalOptions
+			(
+				{
 					"BoxDrawing?"_o=
 					{
 						"Names"_o= _o["--box-drawing"]

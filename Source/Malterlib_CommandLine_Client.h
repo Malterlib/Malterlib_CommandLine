@@ -32,6 +32,7 @@ namespace NMib::NCommandLine
 		bool f_ColorEnabled() const;
 		bool f_Color24BitEnabled() const;
 		bool f_ColorLightBackground() const;
+		bool f_ColorSgrUsesSemiColon() const;
 
 		EAnsiEncodingFlag f_AnsiEncodingFlags() const;
 		CAnsiEncoding f_AnsiEncoding() const;

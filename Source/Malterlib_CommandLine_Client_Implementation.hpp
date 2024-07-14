@@ -41,6 +41,12 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
+	bool TCCommandLineClient<t_CCustomization, t_CThis>::f_ColorSgrUsesSemiColon() const
+	{
+		return mp_AnsiFlags & EAnsiEncodingFlag_ColorSgrUsesSemiColon;
+	}
+
+	template <typename t_CCustomization, typename t_CThis>
 	EAnsiEncodingFlag TCCommandLineClient<t_CCustomization, t_CThis>::f_AnsiEncodingFlags() const
 	{
 		return mp_AnsiFlags;
@@ -147,6 +153,7 @@ namespace NMib::NCommandLine
 					, f_ColorEnabled() ? "--color" : "--no-color"
 					, f_Color24BitEnabled() ? "--color-24bit" : "--no-color-24bit"
 					, f_ColorLightBackground() ? "--color-light" : "--no-color-light"
+					, f_ColorSgrUsesSemiColon() ? "--color-sgr-semi" : "--no-color-sgr-semi"
 					, (mp_AnsiFlags & EAnsiEncodingFlag_BoxDrawing) ? "--box-drawing" : "--no-box-drawing"
 					, "--terminal-width={}"_f << _Params.f_GetMemberValue("TerminalWidth", -1).f_Integer()
 					, "--terminal-height={}"_f << _Params.f_GetMemberValue("TerminalHeight", -1).f_Integer()
