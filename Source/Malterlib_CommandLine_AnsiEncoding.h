@@ -78,6 +78,34 @@ namespace NMib::NCommandLine
 			umint m_Width = 0;
 		};
 
+		struct CSgrSequence
+		{
+			CSgrSequence(NStr::CStr::CAppender *_pAppender, EAnsiEncodingFlag _Flags);
+			~CSgrSequence();
+
+			void f_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue);
+			void f_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue);
+			void f_UnderlineRGB(uint8 _Red, uint8 _Green, uint8 _Blue);
+
+			uint32 f_ForegroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
+			uint32 f_BackgroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
+			uint32 f_UnderlineRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
+
+			void f_Weight(EWeight _Weight);
+			void f_Underline(EUnderline _Underline);
+			void f_Italic();
+			void f_NotItalic();
+			void f_Strikeout();
+			void f_NotStrikeout();
+
+		private:
+			void fp_StartSequence();
+
+			NStr::CStr::CAppender *mp_pAppender = nullptr;
+			EAnsiEncodingFlag mp_Flags = EAnsiEncodingFlag_None;
+			bool mp_bFirst = true;
+		};
+
 		CAnsiEncoding(EAnsiEncodingFlag _Flags);
 
 		NStr::CStr f_ReEncode(NStr::CStr const &_In) const;
@@ -102,6 +130,8 @@ namespace NMib::NCommandLine
 		NStr::CStr::CFormat f_ForegroundRGBFormat(uint32 _RGB) const;
 		NStr::CStr::CFormat f_BackgroundRGBFormat(uint32 _RGB) const;
 		NStr::CStr::CFormat f_UnderlineRGBFormat(uint32 _RGB) const;
+
+		CSgrSequence f_StartSgr(NStr::CStr::CAppender &_Appender);
 
 		NStr::CStr const &f_Default() const;
 		NStr::CStr const &f_Reset() const;

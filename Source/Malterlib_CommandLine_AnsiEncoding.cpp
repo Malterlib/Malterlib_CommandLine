@@ -7,6 +7,7 @@
 #include <Mib/Container/Regions>
 #include <Mib/Graphics/Utilities>
 #include <Mib/Storage/Optional>
+#include <Mib/String/Appender>
 
 namespace NMib::NCommandLine
 {
@@ -317,10 +318,20 @@ namespace NMib::NCommandLine
 			_Blue = Inverted.f_Blue();
 		}
 
-		if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
-			return "\x1B[58:5:{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[58;5;{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
 
-		return "\x1B[58:2::{}:{}:{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+			return "\x1B[58;2;{};{};{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
+		else
+		{
+			if (!(mp_Flags & EAnsiEncodingFlag_Color24Bit))
+				return "\x1B[58:5:{}m"_f << fg_ByValue(fg_FindColor256(_Red, _Green, _Blue));
+
+			return "\x1B[58:2::{}:{}:{}m"_f << fg_ByValue(_Red) << fg_ByValue(_Green) << fg_ByValue(_Blue);
+		}
 	}
 
 	NStr::CStr CAnsiEncoding::f_ForegroundRGB(uint32 _RGB) const
@@ -1095,5 +1106,397 @@ namespace NMib::NCommandLine
 		}
 
 		return f_ForegroundRGB(Red, Green, Blue);
+	}
+
+	CAnsiEncoding::CSgrSequence::CSgrSequence(NStr::CStr::CAppender *_pAppender, EAnsiEncodingFlag _Flags)
+		: mp_pAppender(_pAppender)
+		, mp_Flags(_Flags)
+	{
+	}
+
+	CAnsiEncoding::CSgrSequence::~CSgrSequence()
+	{
+		if (!mp_bFirst)
+			*mp_pAppender += 'm';
+	}
+
+	CAnsiEncoding::CSgrSequence CAnsiEncoding::f_StartSgr(NStr::CStr::CAppender &_Appender)
+	{
+		return CSgrSequence(&_Appender, mp_Flags);
+	}
+
+	void CAnsiEncoding::CSgrSequence::fp_StartSequence()
+	{
+		if (mp_bFirst)
+		{
+			*mp_pAppender += gc_Str<"\x1B[">.m_Str;
+			mp_bFirst = false;
+			return;
+		}
+
+		*mp_pAppender += ';';
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_ForegroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		fp_StartSequence();
+		
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("38;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("38;5;{}") << Color;
+			*mp_pAppender += Format;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("38:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("38:5:{}") << Color;
+			*mp_pAppender += Format;
+		}
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_BackgroundRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		fp_StartSequence();
+		
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("48;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("48;5;{}") << Color;
+			*mp_pAppender += Format;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("48:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("48:5:{}") << Color;
+			*mp_pAppender += Format;
+		}
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_UnderlineRGB(uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		fp_StartSequence();
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon)
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("58;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("58;5;{}") << Color;
+			*mp_pAppender += Format;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				CFStr24 Format = CFStr24::CFormat("58:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			CFStr24 Format = CFStr24::CFormat("58:5:{}") << Color;
+			*mp_pAppender += Format;
+		}
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_ForegroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		if (!(mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon))
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("38:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("38:5:{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("38;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("38;5;{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_BackgroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		if (!(mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon))
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("48:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("48:5:{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("48;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("48;5;{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+	}
+
+	uint32 CAnsiEncoding::CSgrSequence::f_UnderlineRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return 0;
+
+		if (mp_Flags & EAnsiEncodingFlag_ColorLightBackground)
+		{
+			NGraphics::CColorR8G8B8 Inverted = fg_InvertBrightness(_Red, _Green, _Blue);
+			_Red = Inverted.f_Red();
+			_Green = Inverted.f_Green();
+			_Blue = Inverted.f_Blue();
+		}
+
+		if (!(mp_Flags & EAnsiEncodingFlag_ColorSgrUsesSemiColon))
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("58:2::{}:{}:{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("58:5:{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+		else
+		{
+			if (mp_Flags & EAnsiEncodingFlag_Color24Bit)
+			{
+				fp_StartSequence();
+				CFStr24 Format = CFStr24::CFormat("58;2;{};{};{}") << _Red << _Green << _Blue;
+				*mp_pAppender += Format;
+				return 0;
+			}
+
+			auto Color = fg_FindColor256(_Red, _Green, _Blue);
+			if (Color == _Previous)
+				return Color;
+
+			fp_StartSequence();
+			CFStr24 Format = CFStr24::CFormat("58;5;{}") << Color;
+			*mp_pAppender += Format;
+			return Color;
+		}
+	}
+
+	
+	void CAnsiEncoding::CSgrSequence::f_Weight(EWeight _Weight)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		switch (_Weight)
+		{
+		case EWeight::mc_Normal: *mp_pAppender += gc_Str<"22">.m_Str; break;
+		case EWeight::mc_Bold: *mp_pAppender += gc_Str<"1">.m_Str; break;
+		case EWeight::mc_Dim: *mp_pAppender += gc_Str<"2">.m_Str; break;
+		case EWeight::mc_Shadowed: *mp_pAppender += gc_Str<"1:2">.m_Str; break;
+		}
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_Underline(EUnderline _Underline)
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		switch (_Underline)
+		{
+		case EUnderline::mc_None: *mp_pAppender += gc_Str<"24">.m_Str; break;
+		case EUnderline::mc_Solid: *mp_pAppender += gc_Str<"4">.m_Str; break;
+		case EUnderline::mc_Double: *mp_pAppender += gc_Str<"4:2">.m_Str; break;
+		case EUnderline::mc_Wavy: *mp_pAppender += gc_Str<"4:3">.m_Str; break;
+		case EUnderline::mc_Dotted: *mp_pAppender += gc_Str<"4:4">.m_Str; break;
+		case EUnderline::mc_Dashed: *mp_pAppender += gc_Str<"4:5">.m_Str; break;
+		}
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_Italic()
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		*mp_pAppender += '3';
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_NotItalic()
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		*mp_pAppender += gc_Str<"23">.m_Str;
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_Strikeout()
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		*mp_pAppender += '9';
+	}
+
+	void CAnsiEncoding::CSgrSequence::f_NotStrikeout()
+	{
+		if (!(mp_Flags & EAnsiEncodingFlag_Color))
+			return;
+
+		fp_StartSequence();
+
+		*mp_pAppender += gc_Str<"29">.m_Str;
 	}
 }
