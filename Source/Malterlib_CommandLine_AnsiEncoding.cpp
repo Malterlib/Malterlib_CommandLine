@@ -345,14 +345,14 @@ namespace NMib::NCommandLine
 		return gc_Str<"\x1B[?2026l">;
 	}
 
-	NStr::CStr::CFormat CAnsiEncoding::f_ShowCursor(bool _bShow) const
+	NStr::CFStr24 CAnsiEncoding::f_ShowCursor(bool _bShow) const
 	{
-		return "\x1B[?25{}"_f << fg_ByValue(_bShow ? "h" : "l");
+		return NStr::CFStr24::CFormat("\x1B[?25{}") << (_bShow ? "h" : "l");
 	}
 
-	NStr::CStr::CFormat CAnsiEncoding::f_EnableAlternativeScreenBuffer(bool _bEnable) const
+	NStr::CFStr24 CAnsiEncoding::f_EnableAlternativeScreenBuffer(bool _bEnable) const
 	{
-		return "\x1B[?1049{}"_f << fg_ByValue(_bEnable ? "h" : "l");
+		return NStr::CFStr24::CFormat("\x1B[?1049{}") << (_bEnable ? "h" : "l");
 	}
 
 	NStr::CFStr24 CAnsiEncoding::f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const
@@ -370,9 +370,9 @@ namespace NMib::NCommandLine
 		return gc_UpperLeft;
 	}
 
-	NStr::CStr::CFormat CAnsiEncoding::f_Move(uint32 _Row, uint32 _Column) const
+	NStr::CFStr24 CAnsiEncoding::f_Move(uint32 _Row, uint32 _Column) const
 	{
-		return "\x1B[{};{}H"_f << fg_ByValue(_Row + 1) << fg_ByValue(_Column + 1);
+		return NStr::CFStr24::CFormat("\x1B[{};{}H") << (_Row + 1) << (_Column + 1);
 	}
 
 	NStr::CStr::CFormat CAnsiEncoding::f_MoveToColumn(uint32 _Column) const
@@ -388,12 +388,12 @@ namespace NMib::NCommandLine
 			return "\x1B[{}A"_f << fg_ByValue(_nLines);
 	}
 
-	NStr::CStr::CFormat CAnsiEncoding::f_MoveNextLine(uint32 _nLines) const
+	NStr::CFStr24 CAnsiEncoding::f_MoveNextLine(uint32 _nLines) const
 	{
 		if (_nLines == 1)
-			return "\x1B[E"_f;
+			return "\x1B[E";
 		else
-			return "\x1B[{}E"_f << fg_ByValue(_nLines);
+			return NStr::CFStr24::CFormat("\x1B[{}E") << _nLines;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_ClearToEndOfScreen() const
