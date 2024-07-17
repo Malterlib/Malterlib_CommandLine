@@ -5,7 +5,7 @@
 #include "Malterlib_CommandLine_AnsiEncodingParse.h"
 
 #include <Mib/Container/Regions>
-#include <Mib/Graphics/Utilities>
+#include <Mib/Graphics/ColorR8G8B8>
 #include <Mib/Storage/Optional>
 #include <Mib/String/Appender>
 

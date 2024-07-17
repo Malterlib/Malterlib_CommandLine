@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Mib/Core/Core>
-#include <Mib/Graphics/Utilities>
+#include <Mib/Graphics/ColorR8G8B8>
 
 namespace NMib::NCommandLine
 {
