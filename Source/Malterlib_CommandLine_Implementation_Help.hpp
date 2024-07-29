@@ -572,7 +572,7 @@ namespace NMib::NCommandLine
 			{
 				auto &Command = *_CommandEntry.m_pCommand;
 				CStr Usage;
-				Usage = fColor("./" + NFile::CFile::fs_GetFileNoExt(NFile::CFile::fs_GetProgramPath()), CInternal::EColor_Executable);
+				Usage = fColor("./" + NFile::CFile::fs_GetFileNoExt(NFile::CFile::fs_GetOriginalProgramPath()), CInternal::EColor_Executable);
 				o_Indent = fg_Min(fRenderLength(Usage) + 1, MaxExecutableIndent);
 				Usage += " ";
 				Usage += fColor(Command.m_Names.f_GetFirst(), CInternal::EColor_Command);
@@ -848,7 +848,7 @@ namespace NMib::NCommandLine
 			{
 				{
 					auto UsageScope = fOutputHeading(fHeading1("Usage"));
-					auto Executable = "./" + NFile::CFile::fs_GetFileNoExt(NFile::CFile::fs_GetProgramPath());
+					auto Executable = "./" + NFile::CFile::fs_GetFileNoExt(NFile::CFile::fs_GetOriginalProgramPath());
 					fOutputLine
 						(
 							fg_Format
