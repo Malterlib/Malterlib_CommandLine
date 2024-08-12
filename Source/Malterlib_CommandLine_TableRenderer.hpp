@@ -11,16 +11,15 @@ namespace NMib::NCommandLine
 	{
 		DMibRequire(mp_Headings.f_IsEmpty());
 
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					fp_AddHeading(p_Headings);
-					return true;
-				}()...
+				fp_AddHeading(p_Headings);
+				return true;
 			}
-		;
-		(void)Dummy;
+			()
+			, ...
+		);
 	}
 
 	template <typename ...tfp_CString>
@@ -31,17 +30,17 @@ namespace NMib::NCommandLine
 		DMibRequire(sizeof...(p_RowColumns) == mp_Headings.f_GetLen());
 
 		NContainer::TCVector<NContainer::TCVector<NStr::CStr>> RowColumns;
-		TCInitializerList<bool> Dummy =
+
+		(
+			[&]
 			{
-				[&]
-				{
-					fp_AddRowColumn(RowColumns, NStr::CStr::fs_ToStr(p_RowColumns));
-					return true;
-				}()...
+				fp_AddRowColumn(RowColumns, NStr::CStr::fs_ToStr(p_RowColumns));
+				return true;
 			}
-		;
+			()
+			, ...
+		);
 
 		mp_Rows.f_Insert(RowColumns);
-		(void)Dummy;
 	}
 }

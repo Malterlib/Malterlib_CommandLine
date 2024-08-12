@@ -15,17 +15,15 @@ namespace NMib::NCommandLine
 	{
 		auto &Array = m_Config.f_Array();
 
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
-					return false;
-				}
-				()...
+				Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
+				return false;
 			}
-		;
-		(void)Dummy;
+			()
+			, ...
+		);
 	}
 
 	COneOf::operator NEncoding::CEJSONOrdered () &&
@@ -48,17 +46,15 @@ namespace NMib::NCommandLine
 	{
 		auto &Array = m_Config.f_Array();
 
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
-					return false;
-				}
-				()...
+				Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
+				return false;
 			}
-		;
-		(void)Dummy;
+			()
+			, ...
+		);
 	}
 
 	COneOfType::operator NEncoding::CEJSONOrdered () &&
