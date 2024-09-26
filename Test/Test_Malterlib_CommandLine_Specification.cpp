@@ -39,13 +39,13 @@ namespace
 						(
 							{
 								"Names"_o= {"--test", "-t"}
-								, "Description"_o= "Test 3."
+								, "Description"_o= "Test"
 								, "Parameters"_o=
 								{
 									"ArgString?"_o=
 									{
 										"Default"_o= ""
-										, "Description"_o= "Test 5"
+										, "Description"_o= "Test"
 									}
 								}
 								, "Options"_o=
@@ -54,52 +54,64 @@ namespace
 									{
 										"Names"_o= {"--boolean"}
 										, "Default"_o= false
-										, "Description"_o= "Test 1"
+										, "Description"_o= "Test"
 									}
 									, "Integer?"_o=
 									{
 										"Names"_o= {"--integer"}
 										, "Default"_o= 5
-										, "Description"_o= "Test 2"
+										, "Description"_o= "Test"
 									}
 									, "Float?"_o=
 									{
 										"Names"_o= {"--float"}
 										, "Default"_o= 5.5
-										, "Description"_o= "Test 3"
+										, "Description"_o= "Test"
 									}
 									, "String?"_o=
 									{
 										"Names"_o= {"--string"}
 										, "Default"_o= "TestStr"
-										, "Description"_o= "Test 4"
+										, "Description"_o= "Test"
 									}
 									, "Binary?"_o=
 									{
 										"Names"_o= {"--binary"}
 										, "Default"_o= fg_CreateVector<uint8>(5, 6, 7)
-										, "Description"_o= "Test 4"
+										, "Description"_o= "Test"
 									}
 									, "StringChoice?"_o=
 									{
 										"Names"_o= {"--string-choice"}
 										, "Type"_o= COneOf{"TestStr", "TestStr2"}
 										, "Default"_o= "TestStr"
-										, "Description"_o= "Test 4"
+										, "Description"_o= "Test"
 									}
 									, "Array?"_o=
 									{
 										"Names"_o= {"--array"}
 										, "Type"_o= _[_]
 										, "Default"_o= {"Test1", "Test2", {"Test"_o= 5}}
-										, "Description"_o= "Test 5"
+										, "Description"_o= "Test"
+									}
+									, "ArraySpecified1"_o=
+									{
+										"Names"_o= {"--array-specified1"}
+										, "Type"_o= fg_CreateVector<CStr>()
+										, "Description"_o= "Test"
+									}
+									, "ArraySpecified2"_o=
+									{
+										"Names"_o= {"--array-specified2"}
+										, "Type"_o= fg_CreateVector<CStr>()
+										, "Description"_o= "Test"
 									}
 									, "ArrayChoice?"_o=
 									{
 										"Names"_o= {"--array-choice"}
 										, "Type"_o= {COneOf{"", "Test1", "Test2"}}
 										, "Default"_o= {"Test1", "Test2"}
-										, "Description"_o= "Test 5"
+										, "Description"_o= "Test"
 									}
 									, "ComplexObject?"_o=
 									{
@@ -129,7 +141,7 @@ namespace
 					CCommandLineClient Client(pSpecification);
 
 					DMibTestPath("General");
-					aint Ret = Client.f_RunCommandLine(fg_CreateVector<CStr>("App", "--test"));
+					aint Ret = Client.f_RunCommandLine(fg_CreateVector<CStr>("App", "--test", "--array-specified1", "[\"Test1\", \"Test2\"]", "--array-specified2", "Test1,Test2"));
 					DMibExpect(Ret, ==, 66);
 					DMibExpect
 						(
@@ -145,6 +157,8 @@ namespace
 									, "Binary"_= fg_CreateVector<uint8>(5, 6, 7)
 									, "StringChoice"_= "TestStr"
 									, "Array"_= {"Test1", "Test2", {"Test"_= 5}}
+									, "ArraySpecified1"_= {"Test1", "Test2"}
+									, "ArraySpecified2"_= {"Test1", "Test2"}
 									, "ArrayChoice"_= {"Test1", "Test2"}
 									, "ComplexObject"_= {"Key2"_= {"Test2"}}
 									, "ArgString"_= ""
