@@ -16,9 +16,9 @@ namespace NMib::NCommandLine
 		using CThis = typename TCChooseType<NTraits::TCIsVoid<t_CThis>::mc_Value, TCCommandLineClient, t_CThis>::CType;
 		using CCommandLineSpecification = TCCommandLineSpecification<t_CCustomization>;
 
-		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params = fg_GetSys()->f_GetCommandLineArgs());
-		aint f_RunCommandLine(NContainer::TCVector<NStr::CStr> const &_CommandLine = fg_GetSys()->f_GetCommandLineArgs());
-		aint f_RunCommand(NStr::CStr const &_Command, NEncoding::CEJSONSorted const &_Params);
+		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params = fg_GetSys()->f_GetCommandLineArgs());
+		aint f_RunCommandLine(NContainer::TCVector<NStr::CStr> &&_CommandLine = fg_GetSys()->f_GetCommandLineArgs());
+		aint f_RunCommand(NStr::CStr &&_Command, NEncoding::CEJSONSorted &&_Params);
 		void f_MutateCommandLineSpecification(NFunction::TCFunction<void (CCommandLineSpecification &o_CommandLine)> const &_fMutate);
 
 		bool f_ColorEnabled() const;
@@ -43,7 +43,7 @@ namespace NMib::NCommandLine
 	protected:
 		struct CInternal;
 
-		uint32 fp_RunCommand(void const *_pCommand, NEncoding::CEJSONSorted const &_Params);
+		uint32 fp_RunCommand(void const *_pCommand, NEncoding::CEJSONSorted &&_Params);
 
 		NStorage::TCSharedPointer<CCommandLineSpecification> mp_pCommandLineSpecification;
 		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;

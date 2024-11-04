@@ -322,7 +322,7 @@ namespace NMib::NCommandLine
 	auto TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterDirectCommand
 		(
 			NEncoding::CEJSONOrdered &&_CommandDescription
-			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted const &_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 		)
 		-> CCommand
 	{

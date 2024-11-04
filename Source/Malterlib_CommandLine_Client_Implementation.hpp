@@ -8,18 +8,18 @@
 namespace NMib::NCommandLine
 {
 	template <typename t_CCustomization, typename t_CThis>
-	auto TCCommandLineClient<t_CCustomization, t_CThis>::f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params) -> typename CCommandLineSpecification::CParsedCommandLine
+	auto TCCommandLineClient<t_CCustomization, t_CThis>::f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params) -> typename CCommandLineSpecification::CParsedCommandLine
 	{
 		NException::CDisableExceptionTraceScope DisableTrace;
-		return mp_pCommandLineSpecification->f_ParseCommandLine(_Params, f_AnsiEncodingFlags());
+		return mp_pCommandLineSpecification->f_ParseCommandLine(fg_Move(_Params), f_AnsiEncodingFlags());
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
-	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommandLine(NContainer::TCVector<NStr::CStr> const &_CommandLine)
+	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommandLine(NContainer::TCVector<NStr::CStr> &&_CommandLine)
 	{
 		NException::CDisableExceptionTraceScope DisableTrace;
-		auto ParsedCommandLine = mp_pCommandLineSpecification->f_ParseCommandLine(_CommandLine, f_AnsiEncodingFlags());
-		return f_RunCommand(ParsedCommandLine.m_Command, ParsedCommandLine.m_Params);
+		auto ParsedCommandLine = mp_pCommandLineSpecification->f_ParseCommandLine(fg_Move(_CommandLine), f_AnsiEncodingFlags());
+		return f_RunCommand(fg_Move(ParsedCommandLine.m_Command), fg_Move(ParsedCommandLine.m_Params));
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
@@ -83,7 +83,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
-	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommand(NStr::CStr const &_Command, NEncoding::CEJSONSorted const &_Params)
+	aint TCCommandLineClient<t_CCustomization, t_CThis>::f_RunCommand(NStr::CStr &&_Command, NEncoding::CEJSONSorted &&_Params)
 	{
 		using namespace NStr;
 
@@ -143,7 +143,7 @@ namespace NMib::NCommandLine
 			if (HelpCommand == EHelpCommand_Verbose)
 				Params.f_Insert("-v");
 
-			return f_RunCommandLine(Params);
+			return f_RunCommandLine(fg_Move(Params));
 		}
 
 		auto pFoundCommand = CommandLineSpec.m_CommandByName.f_FindEqual(_Command);
@@ -152,21 +152,21 @@ namespace NMib::NCommandLine
 
 		auto &Command = **pFoundCommand;
 
-		return static_cast<CThis *>(this)->fp_RunCommand(&Command, _Params);
+		return static_cast<CThis *>(this)->fp_RunCommand(&Command, fg_Move(_Params));
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
 	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::fp_RunCommand
 		(
 			void const *_pCommand
-			, NEncoding::CEJSONSorted const &_Params
+			, NEncoding::CEJSONSorted &&_Params
 		)
 	{
 		if constexpr (NTraits::TCIsSame<CThis, TCCommandLineClient>::mc_Value)
 		{
 			typename CCommandLineSpecification::CInternal::CCommand const *pCommand = fg_AutoStaticCast(_pCommand);
 			if (pCommand->m_pDirectRunCommand)
-				return (*pCommand->m_pDirectRunCommand)(_Params, *this);
+				return (*pCommand->m_pDirectRunCommand)(fg_Move(_Params), *this);
 		}
 		return 0;
 	}

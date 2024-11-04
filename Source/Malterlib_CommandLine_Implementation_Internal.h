@@ -137,7 +137,7 @@ namespace NMib::NCommandLine
 
 			NStorage::TCSharedPointer
 				<
-					NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted const &_Parameters, CCommandLineClient &_CommandLineClient)>
+					NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>
 				>
 				m_pDirectRunCommand
 			;

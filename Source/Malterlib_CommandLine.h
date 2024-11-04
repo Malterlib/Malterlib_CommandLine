@@ -90,7 +90,7 @@ namespace NMib::NCommandLine
 			CCommand f_RegisterDirectCommand
 				(
 					NEncoding::CEJSONOrdered &&_CommandDescription
-					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted const &_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 				)
 			;
 
@@ -123,7 +123,7 @@ namespace NMib::NCommandLine
 		void f_SetDefaultCommand(CCommand const &_Command);
 		void f_SetProgramDescription(NStr::CStr const &_Heading, NStr::CStr const &_Description);
 		void f_RegisterGlobalOptions(NEncoding::CEJSONOrdered &&_Options);
-		CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
+		CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
 
 		CInternal &f_AccessInternal();
 

@@ -8,7 +8,7 @@
 namespace NMib::NCommandLine
 {
 	template <typename t_CCustomization>
-	auto TCCommandLineSpecification<t_CCustomization>::f_ParseCommandLine(NContainer::TCVector<NStr::CStr> const &_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags) -> CParsedCommandLine
+	auto TCCommandLineSpecification<t_CCustomization>::f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags) -> CParsedCommandLine
 	{
 		using namespace NEncoding;
 		using namespace NStr;
@@ -103,7 +103,7 @@ namespace NMib::NCommandLine
 				fFoundCommand(*pCommand, *iParameter);
 			}
 			else
-				Params.f_Insert(*iParameter);
+				Params.f_Insert(fg_Move(*iParameter));
 		}
 
 		if (pCurrentCommand && pCurrentCommand->m_bGreedyDefaultCommand)
