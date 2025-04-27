@@ -162,7 +162,7 @@ namespace NMib::NCommandLine
 
 				auto Params = CStdInReaderParams::fs_Create
 					(
-						[pState](EStdInReaderOutputType _Type, CStrSecure const &_Input)
+						[pState](EStdInReaderOutputType _Type, CStrIO const &_Input)
 						{
 							if (_Type != EStdInReaderOutputType_StdIn)
 								return;
