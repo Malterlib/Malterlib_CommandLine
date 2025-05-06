@@ -4,6 +4,7 @@
 #include "Malterlib_CommandLine.h"
 #include "Malterlib_CommandLine_Implementation.h"
 
+#include <Mib/Encoding/JSONShortcuts>
 #include <Mib/Process/StdIn>
 
 namespace NMib::NCommandLine
@@ -17,8 +18,8 @@ namespace NMib::NCommandLine
 		return NEncoding::fg_UserTypeOrdered
 			(
 				"$AnyType"
-				, CEJSONOrdered
-				{
+				, _o
+				[
 					EEJSONType_String
 					, EEJSONType_Integer
 					, EEJSONType_Float
@@ -29,7 +30,7 @@ namespace NMib::NCommandLine
 					, EEJSONType_Binary
 					, EEJSONType_UserType
 					, COneOf(EEJSONType_Null)
-				}
+				]
 				.f_ToJson()
 			)
 		;
@@ -40,8 +41,8 @@ namespace NMib::NCommandLine
 		return NEncoding::fg_UserTypeOrdered
 			(
 				"$AnyType"
-				, CEJSONOrdered
-				{
+				, _o
+				[
 					EEJSONType_String
 					, EEJSONType_Integer
 					, EEJSONType_Float
@@ -52,7 +53,7 @@ namespace NMib::NCommandLine
 					, EEJSONType_Binary
 					, EEJSONType_UserType
 					, COneOf(EEJSONType_Null)
-				}
+				]
 				.f_ToJson()
 			)
 		;

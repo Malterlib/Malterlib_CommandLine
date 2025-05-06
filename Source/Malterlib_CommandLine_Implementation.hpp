@@ -346,7 +346,7 @@ namespace NMib::NCommandLine
 				{
 					"MalterlibCommand?"_o=
 					{
-						"Names"_o= {"--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89"}
+						"Names"_o= _o["--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89"]
 						, "Type"_o= ""
 						, "Description"_o= "Override the command to run anywhere on the command line."
 						, "Hidden"_o= true

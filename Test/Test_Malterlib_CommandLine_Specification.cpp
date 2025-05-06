@@ -38,7 +38,7 @@ namespace
 					[[maybe_unused]] auto Command = Section.f_RegisterDirectCommand
 						(
 							{
-								"Names"_o= {"--test", "-t"}
+								"Names"_o= _o["--test", "-t"]
 								, "Description"_o= "Test"
 								, "Parameters"_o=
 								{
@@ -52,79 +52,79 @@ namespace
 								{
 									"Boolean?"_o=
 									{
-										"Names"_o= {"--boolean"}
+										"Names"_o= _o["--boolean"]
 										, "Default"_o= false
 										, "Description"_o= "Test"
 									}
 									, "Integer?"_o=
 									{
-										"Names"_o= {"--integer"}
+										"Names"_o= _o["--integer"]
 										, "Default"_o= 5
 										, "Description"_o= "Test"
 									}
 									, "Float?"_o=
 									{
-										"Names"_o= {"--float"}
+										"Names"_o= _o["--float"]
 										, "Default"_o= 5.5
 										, "Description"_o= "Test"
 									}
 									, "String?"_o=
 									{
-										"Names"_o= {"--string"}
+										"Names"_o= _o["--string"]
 										, "Default"_o= "TestStr"
 										, "Description"_o= "Test"
 									}
 									, "Binary?"_o=
 									{
-										"Names"_o= {"--binary"}
+										"Names"_o= _o["--binary"]
 										, "Default"_o= fg_CreateVector<uint8>(5, 6, 7)
 										, "Description"_o= "Test"
 									}
 									, "StringChoice?"_o=
 									{
-										"Names"_o= {"--string-choice"}
+										"Names"_o= _o["--string-choice"]
 										, "Type"_o= COneOf{"TestStr", "TestStr2"}
 										, "Default"_o= "TestStr"
 										, "Description"_o= "Test"
 									}
 									, "Array?"_o=
 									{
-										"Names"_o= {"--array"}
-										, "Type"_o= _[_]
-										, "Default"_o= {"Test1", "Test2", {"Test"_o= 5}}
+										"Names"_o= _o["--array"]
+										, "Type"_o= _o[]
+										, "Default"_o= _o["Test1", "Test2", _o={"Test"_o= 5}]
 										, "Description"_o= "Test"
 									}
 									, "ArraySpecified1"_o=
 									{
-										"Names"_o= {"--array-specified1"}
+										"Names"_o= _o["--array-specified1"]
 										, "Type"_o= fg_CreateVector<CStr>()
 										, "Description"_o= "Test"
 									}
 									, "ArraySpecified2"_o=
 									{
-										"Names"_o= {"--array-specified2"}
+										"Names"_o= _o["--array-specified2"]
 										, "Type"_o= fg_CreateVector<CStr>()
 										, "Description"_o= "Test"
 									}
 									, "ArrayChoice?"_o=
 									{
-										"Names"_o= {"--array-choice"}
-										, "Type"_o= {COneOf{"", "Test1", "Test2"}}
-										, "Default"_o= {"Test1", "Test2"}
+										"Names"_o= _o["--array-choice"]
+										, "Type"_o= _o[COneOf{"", "Test1", "Test2"}]
+										, "Default"_o= _o["Test1", "Test2"]
 										, "Description"_o= "Test"
 									}
 									, "ComplexObject?"_o=
 									{
-										"Names"_o= {"--complex-object"}
+										"Names"_o= _o["--complex-object"]
 										, "Type"_o=
 										{
 											"Key1?"_o= ""
-											, "Key2?"_o= {""}
-											, "Key3?"_o= {COneOf{"Test1", "Test2"}}
+											, "Key2?"_o= _o[""]
+											, "Key3?"_o= _o[COneOf{"Test1", "Test2"}]
 										}
 										, "Default"_o=
 										{
-											"Key2"_o= {"Test2"}
+											"Key2"_o= _o["Test2"]
 										}
 										, "Description"_o= "Test 4"
 									}
@@ -147,8 +147,9 @@ namespace
 						(
 							RunParams
 							, ==
-							, CEJSONSorted
+							, 
 							(
+								_=
 								{
 									"Boolean"_= false
 									, "Integer"_= 5
@@ -156,11 +157,14 @@ namespace
 									, "String"_= "TestStr"
 									, "Binary"_= fg_CreateVector<uint8>(5, 6, 7)
 									, "StringChoice"_= "TestStr"
-									, "Array"_= {"Test1", "Test2", {"Test"_= 5}}
-									, "ArraySpecified1"_= {"Test1", "Test2"}
-									, "ArraySpecified2"_= {"Test1", "Test2"}
-									, "ArrayChoice"_= {"Test1", "Test2"}
-									, "ComplexObject"_= {"Key2"_= {"Test2"}}
+									, "Array"_= _["Test1", "Test2", _={"Test"_= 5}]
+									, "ArraySpecified1"_= _["Test1", "Test2"]
+									, "ArraySpecified2"_= _["Test1", "Test2"]
+									, "ArrayChoice"_= _["Test1", "Test2"]
+									, "ComplexObject"_=
+									{
+										"Key2"_= _["Test2"]
+									}
 									, "ArgString"_= ""
 									, "Command"_= "--test"
 								}

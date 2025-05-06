@@ -958,14 +958,14 @@ namespace NMib::NCommandLine
 				{
 					"HelpCurrentCommand?"_o=
 					{
-						"Names"_o= {"-?"}
+						"Names"_o= _o["-?"]
 						, "Default"_o= false
 						, "Description"_o= "Display help for the current command."
 						, "DisablesAllErrors"_o= true
 					}
 					, "HelpCurrentCommandVerbose?"_o=
 					{
-						"Names"_o= {"-??"}
+						"Names"_o= _o["-??"]
 						, "Default"_o= false
 						, "Description"_o= "Display verbose help for the current command."
 						, "DisablesAllErrors"_o= true
@@ -976,18 +976,18 @@ namespace NMib::NCommandLine
 		auto Command = DefaultSection.f_RegisterDirectCommand
 			(
 				{
-					"Names"_o= {"--help", "-h"}
+					"Names"_o= _o["--help", "-h"]
 					, "Description"_o= "Display help."
 					, "AlwaysVerbose"_o= true
 					, "ErrorOnCommandAsParameter"_o= false
 					, "ErrorOnOptionAsParameter"_o= false
-					, "DisableGlobalOptions"_o= {"ConcurrentLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"}
+					, "DisableGlobalOptions"_o= _o["ConcurrentLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"]
 					, "Parameters"_o=
 					{
 						"Commands...?"_o=
 						{
-							"Type"_o= {""}
-							, "Default"_o= _[_]
+							"Type"_o= _o[""]
+							, "Default"_o= _o[]
 							, "Description"_o= "Specify the command(s) to display help for."
 						}
 					}
@@ -995,13 +995,13 @@ namespace NMib::NCommandLine
 					{
 						"Verbose?"_o=
 						{
-							"Names"_o= {"--verbose", "-v"}
+							"Names"_o= _o["--verbose", "-v"]
 							, "Default"_o= false
 							, "Description"_o= "Display the full documentation."
 						}
 						, "OnlyCommands?"_o=
 						{
-							"Names"_o= {"--only-commands", "-c"}
+							"Names"_o= _o["--only-commands", "-c"]
 							, "Default"_o= false
 							, "Description"_o= "Display commands only."
 						}

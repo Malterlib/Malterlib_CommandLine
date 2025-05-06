@@ -20,7 +20,7 @@ namespace NMib::NCommandLine
 				{
 					"Color?"_o=
 					{
-						"Names"_o= {"--color"}
+						"Names"_o= _o["--color"]
 						, "Default"_o= CCommandLineDefaults::fs_ColorEnabledDefault()
 						, "Description"_o= "Display text output with ansi colors where supported.\n"\
 						"You can override behaviour with MalterlibColor env var. Set it to true or false. "
@@ -33,7 +33,7 @@ namespace NMib::NCommandLine
 				{
 					"Color24Bit?"_o=
 					{
-						"Names"_o= {"--color-24bit"}
+						"Names"_o= _o["--color-24bit"]
 						, "Default"_o= CCommandLineDefaults::fs_Color24BitEnabledDefault()
 						, "Description"_o= "Display text output with 24 bit ansi colors.\n"\
 						"By default detected through COLORTERM. "\
@@ -47,7 +47,7 @@ namespace NMib::NCommandLine
 				{
 					"ColorLight?"_o=
 					{
-						"Names"_o= {"--color-light"}
+						"Names"_o= _o["--color-light"]
 						, "Default"_o= CCommandLineDefaults::fs_ColorLightBackgroundDefault()
 						, "Description"_o= "Force light background.\n"\
 						"You can override behaviour with MalterlibColorLight env var. Set it to true, false. "
@@ -60,7 +60,7 @@ namespace NMib::NCommandLine
 				{
 					"BoxDrawing?"_o=
 					{
-						"Names"_o= {"--box-drawing"}
+						"Names"_o= _o["--box-drawing"]
 						, "Default"_o= CCommandLineDefaults::fs_BoxDrawingDefault()
 						, "Description"_o= "Enable box drawing characters.\n"\
 					}
@@ -72,7 +72,7 @@ namespace NMib::NCommandLine
 				{
 					"TerminalWidth?"_o=
 					{
-						"Names"_o= {"--terminal-width"}
+						"Names"_o= _o["--terminal-width"]
 						, "Default"_o= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalWidth", "-1").f_ToInt(int64(-1))
 						, "Description"_o= "Override detected terminal width.\n"\
 						"Useful for when for whatever reason tty is not accessible. "\
@@ -85,7 +85,7 @@ namespace NMib::NCommandLine
 				{
 					"TerminalHeight?"_o=
 					{
-						"Names"_o= {"--terminal-height"}
+						"Names"_o= _o["--terminal-height"]
 						, "Default"_o= fg_GetSys()->f_GetEnvironmentVariable("MalterlibTerminalHeight", "-1").f_ToInt(int64(-1))
 						, "Description"_o= "Override detected terminal height.\n"\
 						"Useful for when for whatever reason tty is not accessible. "\

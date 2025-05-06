@@ -28,8 +28,8 @@ namespace NMib::NCommandLine
 	{
 		return "TableType?"_o=
 			{
-				"Names"_o= {"--table-type"}
-				, "Type"_o= NEncoding::fg_UserTypeSorted("$OneOf", CJSONSorted{"human-readable", "tab-separated", "json", "colored-json"})
+				"Names"_o= _o["--table-type"]
+				, "Type"_o= NEncoding::fg_UserTypeOrdered("$OneOf", _jo["human-readable", "tab-separated", "json", "colored-json"])
 				, "Default"_o= [&]
 				{
 					switch (_Default)
