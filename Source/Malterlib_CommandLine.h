@@ -3,38 +3,38 @@
 
 #pragma once
 
-#include <Mib/Encoding/EJSON>
+#include <Mib/Encoding/EJson>
 
 namespace NMib::NCommandLine
 {
 	struct COneOf
 	{
-		inline_always COneOf(NEncoding::CEJSONOrdered const &_Config);
+		inline_always COneOf(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
 		inline_always COneOf(tfp_CParams const &...p_Config);
 
-		inline_always operator NEncoding::CEJSONOrdered () &&;
-		inline_always operator NEncoding::CEJSONOrdered () const &;
+		inline_always operator NEncoding::CEJsonOrdered () &&;
+		inline_always operator NEncoding::CEJsonOrdered () const &;
 
-		NEncoding::CEJSONOrdered m_Config;
+		NEncoding::CEJsonOrdered m_Config;
 	};
 
 	struct COneOfType
 	{
-		inline_always COneOfType(NEncoding::CEJSONOrdered const &_Config);
+		inline_always COneOfType(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
 		inline_always COneOfType(tfp_CParams const &...p_Config);
 
-		inline_always operator NEncoding::CEJSONOrdered () &&;
-		inline_always operator NEncoding::CEJSONOrdered () const &;
+		inline_always operator NEncoding::CEJsonOrdered () &&;
+		inline_always operator NEncoding::CEJsonOrdered () const &;
 
-		NEncoding::CEJSONOrdered m_Config;
+		NEncoding::CEJsonOrdered m_Config;
 	};
 
 	struct CAnyType
 	{
-		operator NEncoding::CEJSONOrdered () &&;
-		operator NEncoding::CEJSONOrdered () const &;
+		operator NEncoding::CEJsonOrdered () &&;
+		operator NEncoding::CEJsonOrdered () const &;
 	};
 
 	CAnyType fg_AnyType();
@@ -74,7 +74,7 @@ namespace NMib::NCommandLine
 			friend struct CSectionCommon;
 			friend CSection;
 
-			void f_RegisterOptions(NEncoding::CEJSONOrdered &&_Options);
+			void f_RegisterOptions(NEncoding::CEJsonOrdered &&_Options);
 		private:
 			CCommand(CInternal *_pInternal, void *_pCommand);
 			void *mp_pCommand;
@@ -85,12 +85,12 @@ namespace NMib::NCommandLine
 		{
 			friend struct TCCommandLineSpecification;
 			friend struct TCCommandLineSpecification;
-			void f_RegisterSectionOptions(NEncoding::CEJSONOrdered &&_Options);
+			void f_RegisterSectionOptions(NEncoding::CEJsonOrdered &&_Options);
 
 			CCommand f_RegisterDirectCommand
 				(
-					NEncoding::CEJSONOrdered &&_CommandDescription
-					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+					NEncoding::CEJsonOrdered &&_CommandDescription
+					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 				)
 			;
 
@@ -103,7 +103,7 @@ namespace NMib::NCommandLine
 		struct CParsedCommandLine
 		{
 			NStr::CStr m_Command;
-			NEncoding::CEJSONSorted m_Params;
+			NEncoding::CEJsonSorted m_Params;
 		};
 
 		TCCommandLineSpecification();
@@ -122,13 +122,13 @@ namespace NMib::NCommandLine
 		void f_AddTerminalOptions();
 		void f_SetDefaultCommand(CCommand const &_Command);
 		void f_SetProgramDescription(NStr::CStr const &_Heading, NStr::CStr const &_Description);
-		void f_RegisterGlobalOptions(NEncoding::CEJSONOrdered &&_Options);
+		void f_RegisterGlobalOptions(NEncoding::CEJsonOrdered &&_Options);
 		CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
 
 		CInternal &f_AccessInternal();
 
 	private:
-		uint32 fp_HelpCommand(NEncoding::CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient);
+		uint32 fp_HelpCommand(NEncoding::CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient);
 
 		NStorage::TCUniquePointer<CInternal> mp_pInternal;
 	};
@@ -143,7 +143,7 @@ namespace NMib::NCommandLine
 		static bool fs_Color24BitEnabledDefault();
 		static bool fs_ColorLightBackgroundDefault();
 		static bool fs_BoxDrawingDefault();
-		static NCommandLine::EAnsiEncodingFlag fs_ParseAnsiEncodingParams(NEncoding::CEJSONSorted const &_Params);
+		static NCommandLine::EAnsiEncodingFlag fs_ParseAnsiEncodingParams(NEncoding::CEJsonSorted const &_Params);
 	};
 }
 

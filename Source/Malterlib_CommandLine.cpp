@@ -4,7 +4,7 @@
 #include "Malterlib_CommandLine.h"
 #include "Malterlib_CommandLine_Implementation.h"
 
-#include <Mib/Encoding/JSONShortcuts>
+#include <Mib/Encoding/JsonShortcuts>
 #include <Mib/Process/StdIn>
 
 namespace NMib::NCommandLine
@@ -13,46 +13,46 @@ namespace NMib::NCommandLine
 
 	DMibImpErrorClassImplement(CCommandLineConvertException);
 
-	CAnyType::operator NEncoding::CEJSONOrdered () &&
+	CAnyType::operator NEncoding::CEJsonOrdered () &&
 	{
 		return NEncoding::fg_UserTypeOrdered
 			(
 				"$AnyType"
 				, _o
 				[
-					EEJSONType_String
-					, EEJSONType_Integer
-					, EEJSONType_Float
-					, EEJSONType_Boolean
-					, EEJSONType_Object
-					, EEJSONType_Array
-					, EEJSONType_Date
-					, EEJSONType_Binary
-					, EEJSONType_UserType
-					, COneOf(EEJSONType_Null)
+					EEJsonType_String
+					, EEJsonType_Integer
+					, EEJsonType_Float
+					, EEJsonType_Boolean
+					, EEJsonType_Object
+					, EEJsonType_Array
+					, EEJsonType_Date
+					, EEJsonType_Binary
+					, EEJsonType_UserType
+					, COneOf(EEJsonType_Null)
 				]
 				.f_ToJson()
 			)
 		;
 	}
 
-	CAnyType::operator NEncoding::CEJSONOrdered () const &
+	CAnyType::operator NEncoding::CEJsonOrdered () const &
 	{
 		return NEncoding::fg_UserTypeOrdered
 			(
 				"$AnyType"
 				, _o
 				[
-					EEJSONType_String
-					, EEJSONType_Integer
-					, EEJSONType_Float
-					, EEJSONType_Boolean
-					, EEJSONType_Object
-					, EEJSONType_Array
-					, EEJSONType_Date
-					, EEJSONType_Binary
-					, EEJSONType_UserType
-					, COneOf(EEJSONType_Null)
+					EEJsonType_String
+					, EEJsonType_Integer
+					, EEJsonType_Float
+					, EEJsonType_Boolean
+					, EEJsonType_Object
+					, EEJsonType_Array
+					, EEJsonType_Date
+					, EEJsonType_Binary
+					, EEJsonType_UserType
+					, COneOf(EEJsonType_Null)
 				]
 				.f_ToJson()
 			)
@@ -203,7 +203,7 @@ namespace NMib::NCommandLine
 		return bValue;
 	}
 
-	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJSONSorted const &_Params)
+	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJsonSorted const &_Params)
 	{
 		NCommandLine::EAnsiEncodingFlag AnsiFlags = EAnsiEncodingFlag_None;
 		if (_Params.f_GetMemberValue("Color", CCommandLineDefaults::fs_ColorEnabledDefault()).f_Boolean())

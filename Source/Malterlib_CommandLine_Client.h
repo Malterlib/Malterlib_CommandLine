@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <Mib/Encoding/EJSON>
+#include <Mib/Encoding/EJson>
 #include "Malterlib_CommandLine.h"
 
 namespace NMib::NCommandLine
@@ -18,7 +18,7 @@ namespace NMib::NCommandLine
 
 		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params = fg_GetSys()->f_GetCommandLineArgs());
 		aint f_RunCommandLine(NContainer::TCVector<NStr::CStr> &&_CommandLine = fg_GetSys()->f_GetCommandLineArgs());
-		aint f_RunCommand(NStr::CStr &&_Command, NEncoding::CEJSONSorted &&_Params);
+		aint f_RunCommand(NStr::CStr &&_Command, NEncoding::CEJsonSorted &&_Params);
 		void f_MutateCommandLineSpecification(NFunction::TCFunction<void (CCommandLineSpecification &o_CommandLine)> const &_fMutate);
 
 		bool f_ColorEnabled() const;
@@ -43,7 +43,7 @@ namespace NMib::NCommandLine
 	protected:
 		struct CInternal;
 
-		uint32 fp_RunCommand(void const *_pCommand, NEncoding::CEJSONSorted &&_Params);
+		uint32 fp_RunCommand(void const *_pCommand, NEncoding::CEJsonSorted &&_Params);
 
 		NStorage::TCSharedPointer<CCommandLineSpecification> mp_pCommandLineSpecification;
 		EAnsiEncodingFlag mp_AnsiFlags = EAnsiEncodingFlag_None;

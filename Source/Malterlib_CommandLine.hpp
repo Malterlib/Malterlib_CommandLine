@@ -5,7 +5,7 @@
 
 namespace NMib::NCommandLine
 {
-	COneOf::COneOf(NEncoding::CEJSONOrdered const &_Config)
+	COneOf::COneOf(NEncoding::CEJsonOrdered const &_Config)
 	{
 		m_Config.f_Array().f_Insert(_Config);
 	}
@@ -18,7 +18,7 @@ namespace NMib::NCommandLine
 		(
 			[&]
 			{
-				Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
+				Array.f_Insert(NEncoding::CEJsonOrdered(p_Config));
 				return false;
 			}
 			()
@@ -26,17 +26,17 @@ namespace NMib::NCommandLine
 		);
 	}
 
-	COneOf::operator NEncoding::CEJSONOrdered () &&
+	COneOf::operator NEncoding::CEJsonOrdered () &&
 	{
 		return NEncoding::fg_UserTypeOrdered("$OneOf", m_Config.f_ToJson());
 	}
 
-	COneOf::operator NEncoding::CEJSONOrdered () const &
+	COneOf::operator NEncoding::CEJsonOrdered () const &
 	{
 		return NEncoding::fg_UserTypeOrdered("$OneOf", m_Config.f_ToJson());
 	}
 
-	COneOfType::COneOfType(NEncoding::CEJSONOrdered const &_Config)
+	COneOfType::COneOfType(NEncoding::CEJsonOrdered const &_Config)
 	{
 		m_Config.f_Array().f_Insert(_Config);
 	}
@@ -49,7 +49,7 @@ namespace NMib::NCommandLine
 		(
 			[&]
 			{
-				Array.f_Insert(NEncoding::CEJSONOrdered(p_Config));
+				Array.f_Insert(NEncoding::CEJsonOrdered(p_Config));
 				return false;
 			}
 			()
@@ -57,12 +57,12 @@ namespace NMib::NCommandLine
 		);
 	}
 
-	COneOfType::operator NEncoding::CEJSONOrdered () &&
+	COneOfType::operator NEncoding::CEJsonOrdered () &&
 	{
 		return NEncoding::fg_UserTypeOrdered("$OneOfType", m_Config.f_ToJson());
 	}
 
-	COneOfType::operator NEncoding::CEJSONOrdered () const &
+	COneOfType::operator NEncoding::CEJsonOrdered () const &
 	{
 		return NEncoding::fg_UserTypeOrdered("$OneOfType", m_Config.f_ToJson());
 	}

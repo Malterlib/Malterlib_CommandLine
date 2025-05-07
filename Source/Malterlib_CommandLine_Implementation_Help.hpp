@@ -1,7 +1,7 @@
 // Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
-#include <Mib/Encoding/JSONShortcuts>
+#include <Mib/Encoding/JsonShortcuts>
 #include <Mib/CommandLine/AnsiEncodingParse>
 #include "Malterlib_CommandLine_Client_Implementation.h"
 
@@ -14,7 +14,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	uint32 TCCommandLineSpecification<t_CCustomization>::fp_HelpCommand(NEncoding::CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient)
+	uint32 TCCommandLineSpecification<t_CCustomization>::fp_HelpCommand(NEncoding::CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient)
 	{
 		using namespace NStr;
 		using namespace NFile;
@@ -1007,7 +1007,7 @@ namespace NMib::NCommandLine
 						}
 					}
 				}
-				, [this](CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
+				, [this](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 				{
 					return fp_HelpCommand(_Params, _CommandLineClient);
 				}

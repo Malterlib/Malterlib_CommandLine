@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <Mib/Encoding/JSONShortcuts>
+#include <Mib/Encoding/JsonShortcuts>
 
 namespace NMib::NCommandLine
 {
@@ -22,7 +22,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CCommand::f_RegisterOptions(NEncoding::CEJSONOrdered &&_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CCommand::f_RegisterOptions(NEncoding::CEJsonOrdered &&_Options)
 	{
 		auto &Internal = *mp_pInternal;
 		typename CInternal::CCommand *pCommand = fg_AutoStaticCast(mp_pCommand);
@@ -39,7 +39,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterSectionOptions(NEncoding::CEJSONOrdered &&_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterSectionOptions(NEncoding::CEJsonOrdered &&_Options)
 	{
 		using namespace NStr;
 		
@@ -73,9 +73,9 @@ namespace NMib::NCommandLine
 				DMibError("You need to specify at least one name for option");
 
 			NContainer::TCVector<CStr> Names;
-			for (auto &NameJSON : NameArray)
+			for (auto &NameJson : NameArray)
 			{
-				auto &Name = NameJSON.f_String();
+				auto &Name = NameJson.f_String();
 				Internal.f_CheckName(Name);
 				if (Internal.m_CommandByName.f_FindEqual(Name))
 					DMibError(fg_Format("Name is already used as a command '{}'", Name));
@@ -92,9 +92,9 @@ namespace NMib::NCommandLine
 			Section.m_SectionOptionsByIdentifier[Identifier] = &NewOption;
 			Internal.m_SectionOptionsIdentifiers[Identifier].f_Insert(Section.m_Heading);
 
-			for (auto &NameJSON : NameArray)
+			for (auto &NameJson : NameArray)
 			{
-				auto &Name = NameJSON.f_String();
+				auto &Name = NameJson.f_String();
 				Section.m_SectionOptionsByName[Name] = &NewOption;
 				Internal.m_SectionOptionsNames[Name].f_Insert(Section.m_Heading);
 			}
@@ -104,7 +104,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::f_RegisterGlobalOptions(NEncoding::CEJSONOrdered &&_Options)
+	void TCCommandLineSpecification<t_CCustomization>::f_RegisterGlobalOptions(NEncoding::CEJsonOrdered &&_Options)
 	{
 		using namespace NStr;
 		
@@ -135,9 +135,9 @@ namespace NMib::NCommandLine
 				DMibError("You need to specify at least one name for option");
 
 			NContainer::TCVector<CStr> Names;
-			for (auto &NameJSON : NameArray)
+			for (auto &NameJson : NameArray)
 			{
-				auto &Name = NameJSON.f_String();
+				auto &Name = NameJson.f_String();
 				Internal.f_CheckName(Name);
 				if (Internal.m_CommandByName.f_FindEqual(Name))
 					DMibError(fg_Format("Name is already used as a command '{}'", Name));
@@ -153,8 +153,8 @@ namespace NMib::NCommandLine
 			auto &NewOption = Internal.m_GlobalOptions.f_Insert(fg_Construct(Identifier, Names, nullptr, bOptional));
 			Internal.m_GlobalOptionsByIdentifier[Identifier] = &NewOption;
 
-			for (auto &NameJSON : NameArray)
-				Internal.m_GlobalOptionsByName[NameJSON.f_String()] = &NewOption;
+			for (auto &NameJson : NameArray)
+				Internal.m_GlobalOptionsByName[NameJson.f_String()] = &NewOption;
 
 			NewOption.f_ParseOption(fg_Move(OptionMutable.f_Value()));
 
@@ -164,7 +164,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	auto TCCommandLineSpecification<t_CCustomization>::CInternal::f_RegisterCommand(CSection &_Section, NEncoding::CEJSONOrdered &&_CommandDescription) -> CCommand *
+	auto TCCommandLineSpecification<t_CCustomization>::CInternal::f_RegisterCommand(CSection &_Section, NEncoding::CEJsonOrdered &&_CommandDescription) -> CCommand *
 	{
 		using namespace NStr;
 
@@ -203,9 +203,9 @@ namespace NMib::NCommandLine
 			DMibError("You need to specify at least one name for command");
 
 		NContainer::TCVector<CStr> Names;
-		for (auto &NameJSON : NameArray)
+		for (auto &NameJson : NameArray)
 		{
-			auto &Name = NameJSON.f_String();
+			auto &Name = NameJson.f_String();
 			f_CheckName(Name);
 			if (m_GlobalOptionsByName.f_FindEqual(Name))
 				DMibError(fg_Format("A global option with same name '{}' already exists", Name));
@@ -220,9 +220,9 @@ namespace NMib::NCommandLine
 
 		auto &NewCommand = _Section.m_Commands.f_Insert(fg_Construct(&_Section, Names));
 
-		for (auto &NameJSON : NameArray)
+		for (auto &NameJson : NameArray)
 		{
-			auto &Name = NameJSON.f_String();
+			auto &Name = NameJson.f_String();
 			m_CommandByName[Name] = &NewCommand;
 		}
 
@@ -321,8 +321,8 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	auto TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterDirectCommand
 		(
-			NEncoding::CEJSONOrdered &&_CommandDescription
-			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJSONSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
+			NEncoding::CEJsonOrdered &&_CommandDescription
+			, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 		)
 		-> CCommand
 	{

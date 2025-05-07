@@ -16,7 +16,7 @@ namespace NMib::NCommandLine
 
 		auto &CommandLineSpec = *mp_pInternal;
 
-		CEJSONSorted CommandParams = EJSONType_Object;
+		CEJsonSorted CommandParams = EJsonType_Object;
 
 		for (auto &Option : CommandLineSpec.m_GlobalOptions)
 		{

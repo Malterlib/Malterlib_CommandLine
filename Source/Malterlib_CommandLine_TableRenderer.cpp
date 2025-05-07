@@ -5,8 +5,8 @@
 
 #include <Mib/CommandLine/AnsiEncoding>
 #include <Mib/CommandLine/AnsiEncodingParse>
-#include <Mib/Encoding/JSON>
-#include <Mib/Encoding/JSONShortcuts>
+#include <Mib/Encoding/Json>
+#include <Mib/Encoding/JsonShortcuts>
 
 #include "Malterlib_CommandLine_TableRenderer.h"
 
@@ -24,7 +24,7 @@ namespace NMib::NCommandLine
 	{
 	}
 
-	NEncoding::CEJSONOrdered::CKeyValue CTableRenderHelper::fs_OutputTypeOption(EOutputType _Default)
+	NEncoding::CEJsonOrdered::CKeyValue CTableRenderHelper::fs_OutputTypeOption(EOutputType _Default)
 	{
 		return "TableType?"_o=
 			{
@@ -37,21 +37,21 @@ namespace NMib::NCommandLine
 						default:
 						case EOutputType_HumanReadable: return "human-readable";
 						case EOutputType_TabSeparated: return "tab-separated";
-						case EOutputType_JSON: return "json";
-						case EOutputType_ColoredJSON: return "colored-json";
+						case EOutputType_Json: return "json";
+						case EOutputType_ColoredJson: return "colored-json";
 					}
 				}
 				()
 				, "Description"_o= "How to output the table.\n"
 					"human-readable    - Display the table rendered with borders.\n"
 					"tab-separated     - Output the table as tab separated output suitable for scripting.\n"
-					"json              - Output the table as JSON.\n"
-					"colored-json      - Output the table as syntax highlighted JSON.\n"
+					"json              - Output the table as Json.\n"
+					"colored-json      - Output the table as syntax highlighted Json.\n"
 			}
 		;
 	}
 
-	auto CTableRenderHelper::fs_ParseOutputTypeOption(NEncoding::CEJSONSorted const &_Params) -> EOutputType
+	auto CTableRenderHelper::fs_ParseOutputTypeOption(NEncoding::CEJsonSorted const &_Params) -> EOutputType
 	{
 		return fs_ParseOutputTypeOption(_Params["TableType"].f_String());
 	}
@@ -63,9 +63,9 @@ namespace NMib::NCommandLine
 		else if (_String == "tab-separated")
 			return EOutputType_TabSeparated;
 		else if (_String == "json")
-			return EOutputType_JSON;
+			return EOutputType_Json;
 		else if (_String == "colored-json")
-			return EOutputType_ColoredJSON;
+			return EOutputType_ColoredJson;
 
 		DMibNeverGetHere;
 
@@ -194,7 +194,7 @@ namespace NMib::NCommandLine
 		f_Output(fs_ParseOutputTypeOption(_OutputType));
 	}
 
-	void CTableRenderHelper::f_Output(NEncoding::CEJSONSorted const &_Params)
+	void CTableRenderHelper::f_Output(NEncoding::CEJsonSorted const &_Params)
 	{
 		f_Output(fs_ParseOutputTypeOption(_Params));
 	}
@@ -269,9 +269,9 @@ namespace NMib::NCommandLine
 
 			return;
 		}
-		else if (_OutputType == EOutputType_JSON || _OutputType == EOutputType_ColoredJSON)
+		else if (_OutputType == EOutputType_Json || _OutputType == EOutputType_ColoredJson)
 		{
-			CJSONSorted Output;
+			CJsonSorted Output;
 
 			if (!mp_Description.f_IsEmpty())
 			{
@@ -283,14 +283,14 @@ namespace NMib::NCommandLine
 
 			if (!mp_MaxWidths.f_IsEmpty())
 			{
-				auto &OutputMaxWidths = Output["MaxWidths"] = EJSONType_Object;
+				auto &OutputMaxWidths = Output["MaxWidths"] = EJsonType_Object;
 
 				for (auto &Width : mp_MaxWidths)
 					OutputMaxWidths[CStr::fs_ToStr(mp_MaxWidths.fs_GetKey(Width))] = Width;
 			}
 
 			{
-				auto &OutputAlignRight = Output["AlignRight"] = EJSONType_Array;
+				auto &OutputAlignRight = Output["AlignRight"] = EJsonType_Array;
 				OutputAlignRight.f_SetLen(mp_AlignRight.f_GetLen());
 
 				for (auto &bAlign : mp_AlignRight)
@@ -318,7 +318,7 @@ namespace NMib::NCommandLine
 				}
 			}
 
-			if (_OutputType == EOutputType_ColoredJSON)
+			if (_OutputType == EOutputType_ColoredJson)
 				fp_Output(Output.f_ToStringColored(mp_AnsiFlags));
 			else
 				fp_Output(Output.f_ToString());

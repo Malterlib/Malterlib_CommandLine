@@ -37,7 +37,7 @@ namespace NMib::NCommandLine
 		return Identifier;
 	}
 
-	[[maybe_unused]] static void fg_ParseDescription(NEncoding::CEJSONOrdered const &_Object, NStr::CStr &o_Short, NStr::CStr &o_Long)
+	[[maybe_unused]] static void fg_ParseDescription(NEncoding::CEJsonOrdered const &_Object, NStr::CStr &o_Short, NStr::CStr &o_Long)
 	{
 		NStr::CStr Description = _Object["Description"].f_String();
 		o_Short = fg_GetStrLineSep(Description).f_Trim();
@@ -80,12 +80,12 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_Parse(NEncoding::CEJSONOrdered &&_Value)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_Parse(NEncoding::CEJsonOrdered &&_Value)
 	{
 		if (auto *pDefault = _Value.f_GetMember("Default"))
-			m_Default = NEncoding::CEJSONSorted::fs_FromCompatible(fg_Move(*pDefault));
+			m_Default = NEncoding::CEJsonSorted::fs_FromCompatible(fg_Move(*pDefault));
 		if (auto *pType = _Value.f_GetMember("Type"))
-			m_TypeTemplate = NEncoding::CEJSONSorted::fs_FromCompatible(fg_Move(*pType));
+			m_TypeTemplate = NEncoding::CEJsonSorted::fs_FromCompatible(fg_Move(*pType));
 
 		if (!m_Default.f_IsValid() && !m_TypeTemplate.f_IsValid())
 			DMibError("An option needs to specify at least 'Default' or 'Type'");
@@ -101,9 +101,9 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::f_ValidateParams(CCommand const &_Command, NEncoding::CEJSONSorted const &_Params) const
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::f_ValidateParams(CCommand const &_Command, NEncoding::CEJsonSorted const &_Params) const
 	{
-		NEncoding::CEJSONSorted Params;
+		NEncoding::CEJsonSorted Params;
 
 		auto fCheckValue = [&](CValue const &_Value)
 			{
@@ -159,15 +159,15 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue(NEncoding::CEJSONSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue(NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
 	{
 		return fp_ConvertValue(m_TypeTemplate, _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
 		(
-			NEncoding::CEJSONSorted const &_Value
+			NEncoding::CEJsonSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
@@ -177,7 +177,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatValue(NEncoding::CEJSONSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_FormatValue(NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
 	{
 		return fp_FormatValue(m_TypeTemplate, _Value, _AnsiFlags);
 	}
@@ -191,36 +191,36 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-			NEncoding::CEJSONSorted &o_Value
-			, NEncoding::CEJSONSorted const &_Value
+			NEncoding::CEJsonSorted &o_Value
+			, NEncoding::CEJsonSorted const &_Value
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
-		NEncoding::CEJSONSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
+		NEncoding::CEJsonSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
 	}
 
 	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_AppendConvertValue
 		(
-			NEncoding::CEJSONSorted &o_Value
-			, NEncoding::CEJSONSorted const &_Value
+			NEncoding::CEJsonSorted &o_Value
+			, NEncoding::CEJsonSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
-		NEncoding::CEJSONSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
+		NEncoding::CEJsonSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ParseEJSON(NStr::CStr const &_Value, NStr::CStr const &_Error) const
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ParseEJson(NStr::CStr const &_Value, NStr::CStr const &_Error) const
 	{
 		try
 		{
-			return NEncoding::CEJSONSorted::fs_FromString(_Value);
+			return NEncoding::CEJsonSorted::fs_FromString(_Value);
 		}
 		catch (NException::CException const &_Exception)
 		{
@@ -229,25 +229,25 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate(NEncoding::CEJSONSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate(NEncoding::CEJsonSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const
 	{
 		using namespace NEncoding;
 		switch (_Template.f_EType())
 		{
-		case EEJSONType_String:
-		case EEJSONType_Integer:
-		case EEJSONType_Float:
-		case EEJSONType_Boolean:
-		case EEJSONType_Binary:
-		case EEJSONType_Date:
+		case EEJsonType_String:
+		case EEJsonType_Integer:
+		case EEJsonType_Float:
+		case EEJsonType_Boolean:
+		case EEJsonType_Binary:
+		case EEJsonType_Date:
 			break;
-		case EEJSONType_UserType:
+		case EEJsonType_UserType:
 			{
 				auto &TemplateUserType = _Template.f_UserType();
 				if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType" || TemplateUserType.m_Type == "$AnyType")
 				{
 					bool bIsType = TemplateUserType.m_Type != "$OneOf";
-					NEncoding::CEJSONSorted TemplateSet = NEncoding::CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
+					NEncoding::CEJsonSorted TemplateSet = NEncoding::CEJsonSorted::fs_FromJson(TemplateUserType.m_Value);
 
 					auto &Set = TemplateSet.f_Array();
 
@@ -266,7 +266,7 @@ namespace NMib::NCommandLine
 				}
 			}
 			break;
-		case EEJSONType_Object:
+		case EEJsonType_Object:
 			{
 				auto &TemplateObject = _Template.f_Object();
 
@@ -288,7 +288,7 @@ namespace NMib::NCommandLine
 				}
 			}
 			break;
-		case EEJSONType_Array:
+		case EEJsonType_Array:
 			{
 				auto &TemplateArray = _Template.f_Array();
 				if (TemplateArray.f_IsEmpty())
@@ -301,7 +301,7 @@ namespace NMib::NCommandLine
 				fp_ValidateTemplate(Template, fg_Format("{}.[]", _Identifier), false);
 			}
 			break;
-		case EEJSONType_Null:
+		case EEJsonType_Null:
 			if (_bPrevIsSetOf)
 				break;
 			DMibError("null can only be used in COneOf statements");
@@ -316,17 +316,17 @@ namespace NMib::NCommandLine
 
 #	define DMibCommandLineConvertException(_Description) DMibImpError(CCommandLineConvertException, _Description)
 
-	static inline void fg_CheckType(NEncoding::CEJSONSorted const &_Value, NEncoding::EEJSONType _Type)
+	static inline void fg_CheckType(NEncoding::CEJsonSorted const &_Value, NEncoding::EEJsonType _Type)
 	{
 		if (_Value.f_EType() != _Type)
-			DMibError(fg_Format("Expected '{}' but got '{}': {}", NEncoding::fg_EJSONTypeToString(_Type), NEncoding::fg_EJSONTypeToString(_Value.f_EType()), _Value).f_TrimRight());
+			DMibError(fg_Format("Expected '{}' but got '{}': {}", NEncoding::fg_EJsonTypeToString(_Type), NEncoding::fg_EJsonTypeToString(_Value.f_EType()), _Value).f_TrimRight());
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJSONSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ConvertValue
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ConvertValue
 		(
-			NEncoding::CEJSONSorted const &_Template
-			, NEncoding::CEJSONSorted const &_Value
+			NEncoding::CEJsonSorted const &_Template
+			, NEncoding::CEJsonSorted const &_Value
 			, NStr::CStr const &_Identifier
 			, bool _bStrict
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
@@ -334,18 +334,18 @@ namespace NMib::NCommandLine
 	{
 		using namespace NEncoding;
 		using namespace NStr;
-		CEJSONSorted Return;
+		CEJsonSorted Return;
 		try
 		{
 			switch (_Template.f_EType())
 			{
-			case EEJSONType_String:
+			case EEJsonType_String:
 				{
 					fg_CheckType(_Value, _Template.f_EType());
 					Return = _Value.f_String();
 				}
 				break;
-			case EEJSONType_Integer:
+			case EEJsonType_Integer:
 				{
 					if (_bStrict)
 					{
@@ -367,7 +367,7 @@ namespace NMib::NCommandLine
 						Return = _Value.f_AsInteger();
 				}
 				break;
-			case EEJSONType_Float:
+			case EEJsonType_Float:
 				{
 					if (_bStrict)
 					{
@@ -385,7 +385,7 @@ namespace NMib::NCommandLine
 						Return = _Value.f_AsFloat();
 				}
 				break;
-			case EEJSONType_Boolean:
+			case EEJsonType_Boolean:
 				{
 					if (_bStrict)
 					{
@@ -413,7 +413,7 @@ namespace NMib::NCommandLine
 						Return = _Value.f_AsBoolean();
 				}
 				break;
-			case EEJSONType_Binary:
+			case EEJsonType_Binary:
 				{
 					if (_Value.f_IsBinary())
 						Return = _Value;
@@ -427,7 +427,7 @@ namespace NMib::NCommandLine
 						DMibError("Binary can only be converted from string");
 				}
 				break;
-			case EEJSONType_Date:
+			case EEJsonType_Date:
 				{
 					if (_Value.f_IsDate())
 					{
@@ -519,13 +519,13 @@ namespace NMib::NCommandLine
 					Return = NTime::CTimeConvert::fs_CreateTime(Year, Month, Day, Hour, Minute, Second, Fraction);
 				}
 				break;
-			case EEJSONType_UserType:
+			case EEJsonType_UserType:
 				{
 					auto &TemplateUserType = _Template.f_UserType();
 					if (TemplateUserType.m_Type == "$OneOf" || TemplateUserType.m_Type == "$OneOfType" || TemplateUserType.m_Type == "$AnyType")
 					{
 						bool bIsType = TemplateUserType.m_Type != "$OneOf";
-						CEJSONSorted TemplateSet = CEJSONSorted::fs_FromJson(TemplateUserType.m_Value);
+						CEJsonSorted TemplateSet = CEJsonSorted::fs_FromJson(TemplateUserType.m_Value);
 
 						auto &Set = TemplateSet.f_Array();
 
@@ -542,7 +542,7 @@ namespace NMib::NCommandLine
 							{
 								try
 								{
-									CEJSONSorted Value = fp_ConvertValue(PossibleMatch, _Value, FormatIdentifier, _bStrict, _AnsiFlags);
+									CEJsonSorted Value = fp_ConvertValue(PossibleMatch, _Value, FormatIdentifier, _bStrict, _AnsiFlags);
 									if (bIsType)
 										return Value;
 									else if (Value == PossibleMatch)
@@ -570,9 +570,9 @@ namespace NMib::NCommandLine
 					DMibError("Converting to user type is not supported");
 				}
 				break;
-			case EEJSONType_Object:
+			case EEJsonType_Object:
 				{
-					CEJSONSorted RawValue;
+					CEJsonSorted RawValue;
 					if (_bStrict)
 					{
 						fg_CheckType(_Value, _Template.f_EType());
@@ -582,7 +582,7 @@ namespace NMib::NCommandLine
 						RawValue = _Value;
 					else if (_Value.f_IsString())
 					{
-						RawValue = fp_ParseEJSON(_Value.f_String(), "Error parsing object parameter");
+						RawValue = fp_ParseEJson(_Value.f_String(), "Error parsing object parameter");
 						if (!RawValue.f_IsObject())
 							DMibError("Expected object");
 					}
@@ -602,7 +602,7 @@ namespace NMib::NCommandLine
 						auto &OutputObject = Return.f_Object();
 						NContainer::TCSet<CStr> TemplateMemberNames;
 
-						CEJSONSorted const *pWildcard = nullptr;
+						CEJsonSorted const *pWildcard = nullptr;
 
 						for (auto &TemplateMember : TemplateObject)
 						{
@@ -648,9 +648,9 @@ namespace NMib::NCommandLine
 					}
 				}
 				break;
-			case EEJSONType_Array:
+			case EEJsonType_Array:
 				{
-					CEJSONSorted RawValue;
+					CEJsonSorted RawValue;
 					if (_bStrict)
 					{
 						fg_CheckType(_Value, _Template.f_EType());
@@ -663,14 +663,14 @@ namespace NMib::NCommandLine
 						CStr TrimmedValue = _Value.f_String().f_Trim();
 						if (TrimmedValue.f_StartsWith("["))
 						{
-							RawValue = fp_ParseEJSON(_Value.f_String(), "Error parsing array parameter");
+							RawValue = fp_ParseEJson(_Value.f_String(), "Error parsing array parameter");
 							if (!RawValue.f_IsArray())
 								DMibError("Expected array");
 						}
 						else
 						{
 							if (_Value.f_String().f_IsEmpty())
-								RawValue = EEJSONType_Array;
+								RawValue = EEJsonType_Array;
 							else
 								RawValue = _Value.f_String().f_SplitEscaped(',');
 						}
@@ -700,7 +700,7 @@ namespace NMib::NCommandLine
 					Return = RawValue;
 				}
 				break;
-			case EEJSONType_Null:
+			case EEJsonType_Null:
 				if (_bStrict)
 				{
 					fg_CheckType(_Value, _Template.f_EType());
@@ -745,7 +745,7 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatType
 		(
-			NEncoding::CEJSONSorted const &_Template
+			NEncoding::CEJsonSorted const &_Template
 			, bool _bType
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
@@ -753,9 +753,9 @@ namespace NMib::NCommandLine
 		using namespace NEncoding;
 		using namespace NStr;
 
-		auto fToString = [&](CEJSONSorted const &_Value)
+		auto fToString = [&](CEJsonSorted const &_Value)
 			{
-				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJSONDialectFlag_AllowUndefined | EJSONDialectFlag_AllowInvalidFloat | EJSONDialectFlag_TrimWhitespace);
+				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJsonDialectFlag_AllowUndefined | EJsonDialectFlag_AllowInvalidFloat | EJsonDialectFlag_TrimWhitespace);
 			}
 		;
 		auto fColor = [&](CStr const &_Value, EColor _Color)
@@ -767,7 +767,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		if (_Template.f_EType() == EEJSONType_UserType)
+		if (_Template.f_EType() == EEJsonType_UserType)
 		{
 			auto &UserType = _Template.f_UserType();
 			if (UserType.m_Type == "$OneOf")
@@ -776,7 +776,7 @@ namespace NMib::NCommandLine
 
 				Return = fColor("one_of", EColor_Parameter);
 				Return += " [\n";
-				auto OneOfValue = CEJSONSorted::fs_FromJson(UserType.m_Value);
+				auto OneOfValue = CEJsonSorted::fs_FromJson(UserType.m_Value);
 				for (auto &Entry : OneOfValue.f_Array())
 					Return += "{}\n"_f << fp_FormatType(Entry, false, _AnsiFlags).f_Indent("    ");
 				Return += "]";
@@ -789,7 +789,7 @@ namespace NMib::NCommandLine
 
 				Return = fColor("one_of_type", EColor_Parameter);
 				Return += " [\n";
-				auto OneOfValue = CEJSONSorted::fs_FromJson(UserType.m_Value);
+				auto OneOfValue = CEJsonSorted::fs_FromJson(UserType.m_Value);
 				for (auto &Entry : OneOfValue.f_Array())
 					Return += "{}\n"_f << fp_FormatType(Entry, true, _AnsiFlags).f_Indent("    ");
 				Return += "]";
@@ -804,17 +804,17 @@ namespace NMib::NCommandLine
 		{
 			switch (_Template.f_EType())
 			{
-			case EEJSONType_String: return fColor("string", EColor_Parameter);
-			case EEJSONType_Integer: return fColor("int64", EColor_BuiltInType);
-			case EEJSONType_Float: return fColor("fp64", EColor_BuiltInType);
-			case EEJSONType_Boolean: return fColor("bool", EColor_BuiltInType);
-			case EEJSONType_Object:
+			case EEJsonType_String: return fColor("string", EColor_Parameter);
+			case EEJsonType_Integer: return fColor("int64", EColor_BuiltInType);
+			case EEJsonType_Float: return fColor("fp64", EColor_BuiltInType);
+			case EEJsonType_Boolean: return fColor("bool", EColor_BuiltInType);
+			case EEJsonType_Object:
 				{
 					CStr Return;
 
 					Return = fColor("object", EColor_Parameter);
 					Return += " {\n";
-					CEJSONSorted const *pHasWildcard = nullptr;
+					CEJsonSorted const *pHasWildcard = nullptr;
 					for (auto &Entry : _Template.f_Object())
 					{
 						if (Entry.f_Name() == "*")
@@ -839,7 +839,7 @@ namespace NMib::NCommandLine
 					return Return;
 				}
 				break;
-			case EEJSONType_Array:
+			case EEJsonType_Array:
 				{
 					CStr Return;
 
@@ -852,16 +852,16 @@ namespace NMib::NCommandLine
 					return Return;
 				}
 				break;
-			case EEJSONType_Null: return fColor("null", EColor_BuiltInType);
-			case EEJSONType_Binary: return fColor("binary", EColor_Parameter);
-			case EEJSONType_Date: return fColor("date", EColor_Parameter);
-			case EEJSONType_UserType:
+			case EEJsonType_Null: return fColor("null", EColor_BuiltInType);
+			case EEJsonType_Binary: return fColor("binary", EColor_Parameter);
+			case EEJsonType_Date: return fColor("date", EColor_Parameter);
+			case EEJsonType_UserType:
 				{
 					CStr Return;
 
 					auto &UserType = _Template.f_UserType();
 					Return = fColor("user_type({}) "_f << UserType.m_Type, EColor_Parameter);
-					Return += fp_FormatType(CEJSONSorted::fs_FromJson(UserType.m_Value), true, _AnsiFlags);
+					Return += fp_FormatType(CEJsonSorted::fs_FromJson(UserType.m_Value), true, _AnsiFlags);
 
 					return Return;
 				}
@@ -875,17 +875,17 @@ namespace NMib::NCommandLine
 
 		switch (_Template.f_EType())
 		{
-		case EEJSONType_String:
-		case EEJSONType_Integer:
-		case EEJSONType_Float:
-		case EEJSONType_Boolean:
-		case EEJSONType_Object:
-		case EEJSONType_Array:
-		case EEJSONType_Null: 
+		case EEJsonType_String:
+		case EEJsonType_Integer:
+		case EEJsonType_Float:
+		case EEJsonType_Boolean:
+		case EEJsonType_Object:
+		case EEJsonType_Array:
+		case EEJsonType_Null:
 			return fToString(_Template);
-		case EEJSONType_Binary: return fColor(fg_Base64Encode(_Template.f_Binary()), EColor_Binary);
-		case EEJSONType_Date: return fColor("{}"_f << _Template.f_Date(), EColor_Date);
-		case EEJSONType_UserType: return fToString(_Template);
+		case EEJsonType_Binary: return fColor(fg_Base64Encode(_Template.f_Binary()), EColor_Binary);
+		case EEJsonType_Date: return fColor("{}"_f << _Template.f_Date(), EColor_Date);
+		case EEJsonType_UserType: return fToString(_Template);
 		default:
 			DMibError("Invalid template type");
 			break;
@@ -897,17 +897,17 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
 		(
-			NEncoding::CEJSONSorted const &_Template
-			, NEncoding::CEJSONSorted const &_Value
+			NEncoding::CEJsonSorted const &_Template
+			, NEncoding::CEJsonSorted const &_Value
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 		) const
 	{
 		using namespace NEncoding;
 		using namespace NStr;
 
-		auto fToString = [&](CEJSONSorted const &_Value)
+		auto fToString = [&](CEJsonSorted const &_Value)
 			{
-				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJSONDialectFlag_AllowUndefined | EJSONDialectFlag_AllowInvalidFloat | EJSONDialectFlag_TrimWhitespace);
+				return _Value.f_ToStringColored(_AnsiFlags, "    ", EJsonDialectFlag_AllowUndefined | EJsonDialectFlag_AllowInvalidFloat | EJsonDialectFlag_TrimWhitespace);
 			}
 		;
 		auto fColor = [&](CStr const &_Value, EColor _Color)
@@ -921,15 +921,15 @@ namespace NMib::NCommandLine
 
 		switch (_Template.f_EType())
 		{
-		case EEJSONType_String:
-		case EEJSONType_Integer:
-		case EEJSONType_Float:
-		case EEJSONType_Boolean:
-		case EEJSONType_Object:
-		case EEJSONType_Array:
-		case EEJSONType_Null:
+		case EEJsonType_String:
+		case EEJsonType_Integer:
+		case EEJsonType_Float:
+		case EEJsonType_Boolean:
+		case EEJsonType_Object:
+		case EEJsonType_Array:
+		case EEJsonType_Null:
 			return fToString(_Value);
-		case EEJSONType_Binary:
+		case EEJsonType_Binary:
 			{
 				if (!_Value.f_IsBinary())
 					return fToString(_Value);
@@ -937,7 +937,7 @@ namespace NMib::NCommandLine
 					return fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
 			}
 			break;
-		case EEJSONType_Date:
+		case EEJsonType_Date:
 			{
 				if (!_Value.f_IsDate())
 					return fToString(_Value);
@@ -945,7 +945,7 @@ namespace NMib::NCommandLine
 				return fColor("{}"_f << _Value.f_Date(), EColor_Date);
 			}
 			break;
-		case EEJSONType_UserType:
+		case EEJsonType_UserType:
 			{
 				if (_Value.f_IsBinary())
 					return fColor(fg_Base64Encode(_Value.f_Binary()), EColor_Binary);
@@ -986,7 +986,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::COption::f_ParseOption(NEncoding::CEJSONOrdered &&_Option)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::COption::f_ParseOption(NEncoding::CEJsonOrdered &&_Option)
 	{
 		fs_CheckValidObject(_Option, {"Type", "Default", "Names", "Description", "DefaultEnabled", "Hidden", "CanNegate", "DisablesAllErrors", "ValidForDirectCommand"});
 
@@ -1005,7 +1005,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CParameter::f_ParseParameter(NEncoding::CEJSONOrdered &&_Parameter)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CParameter::f_ParseParameter(NEncoding::CEJsonOrdered &&_Parameter)
 	{
 		fs_CheckValidObject(_Parameter, {"Type", "Default", "Description"});
 		CValue::f_Parse(fg_Move(_Parameter));
@@ -1021,7 +1021,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::fs_CheckValidObject(NEncoding::CEJSONOrdered const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::fs_CheckValidObject(NEncoding::CEJsonOrdered const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys)
 	{
 		if (!_ToCheck.f_IsObject())
 			DMibError("Command line description is not an object");
@@ -1050,7 +1050,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CCommandCommon::f_RegisterOptions(CInternal &_Internal, NEncoding::CEJSONOrdered &&_Options)
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CCommandCommon::f_RegisterOptions(CInternal &_Internal, NEncoding::CEJsonOrdered &&_Options)
 	{
 		auto &Internal = _Internal;
 
@@ -1078,9 +1078,9 @@ namespace NMib::NCommandLine
 			auto &NameArray = Option.f_Value()["Names"].f_Array();
 
 			NContainer::TCVector<NStr::CStr> Names;
-			for (auto &NameJSON : NameArray)
+			for (auto &NameJson : NameArray)
 			{
-				auto &Name = NameJSON.f_String();
+				auto &Name = NameJson.f_String();
 				Internal.f_CheckName(Name);
 				if (Internal.m_CommandByName.f_FindEqual(Name))
 					DMibError(fg_Format("Name is already used as a command '{}'", Name));
@@ -1098,9 +1098,9 @@ namespace NMib::NCommandLine
 			Internal.m_CommandOptionsIdentifiers[Identifier].f_Insert(m_Names.f_GetFirst());
 			m_pSection->m_CommandOptionsIdentifiers[Identifier].f_Insert(m_Names.f_GetFirst());
 
-			for (auto &NameJSON : NameArray)
+			for (auto &NameJson : NameArray)
 			{
-				auto &Name = NameJSON.f_String();
+				auto &Name = NameJson.f_String();
 				Internal.m_CommandOptionsNames[Name].f_Insert(m_Names.f_GetFirst());
 				m_OptionsByName[Name] = &NewOption;
 			}

@@ -4,7 +4,7 @@
 #define DMibRuntimeTypeRegistry
 
 #include <Mib/Test/Exception>
-#include <Mib/Encoding/JSONShortcuts>
+#include <Mib/Encoding/JsonShortcuts>
 #include <Mib/CommandLine/CommandLine>
 #include <Mib/CommandLine/CommandLineClient>
 
@@ -27,7 +27,7 @@ namespace
 			{
 				DMibTestSuite("General")
 				{
-					CEJSONSorted RunParams;
+					CEJsonSorted RunParams;
 
 					TCSharedPointer<CCommandLineSpecification> pSpecification = fg_Construct();
 
@@ -130,7 +130,7 @@ namespace
 									}
 								}
 							}
-							, [&](CEJSONSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 66;
