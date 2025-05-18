@@ -13,7 +13,7 @@ namespace NMib::NCommandLine
 	template <typename t_CCustomization, typename t_CThis>
 	struct TCCommandLineClient
 	{
-		using CThis = typename TCChooseType<NTraits::TCIsVoid<t_CThis>::mc_Value, TCCommandLineClient, t_CThis>::CType;
+		using CThis = TCConditional<NTraits::cIsVoid<t_CThis>, TCCommandLineClient, t_CThis>;
 		using CCommandLineSpecification = TCCommandLineSpecification<t_CCustomization>;
 
 		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params = fg_GetSys()->f_GetCommandLineArgs());

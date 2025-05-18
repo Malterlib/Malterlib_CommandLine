@@ -162,7 +162,7 @@ namespace NMib::NCommandLine
 			, NEncoding::CEJsonSorted &&_Params
 		)
 	{
-		if constexpr (NTraits::TCIsSame<CThis, TCCommandLineClient>::mc_Value)
+		if constexpr (NTraits::cIsSame<CThis, TCCommandLineClient>)
 		{
 			typename CCommandLineSpecification::CInternal::CCommand const *pCommand = fg_AutoStaticCast(_pCommand);
 			if (pCommand->m_pDirectRunCommand)
