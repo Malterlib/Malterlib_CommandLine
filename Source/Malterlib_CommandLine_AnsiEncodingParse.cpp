@@ -186,13 +186,13 @@ namespace NMib::NCommandLine
 								{
 									fSetBold(true);
 									if (LastForeground >= 30 && LastForeground <= 37)
-										ParamNumber = LastForeground + 10;
+										ParamNumber = LastForeground + 60;
 								}
 								else if (ParamNumber == 22)
 								{
 									fSetBold(false);
-									if (LastForeground >= 40 && LastForeground <= 47)
-										ParamNumber = LastForeground - 10;
+									if (LastForeground >= 90 && LastForeground <= 97)
+										ParamNumber = LastForeground - 60;
 								}
 								else if (ParamNumber == 3)
 									fSetItalic(true);
@@ -202,7 +202,7 @@ namespace NMib::NCommandLine
 								{
 									LastForeground = ParamNumber;
 									if (bBold)
-										ParamNumber += 10;
+										ParamNumber += 60;
 								}
 								else
 									LastForeground = -1;
