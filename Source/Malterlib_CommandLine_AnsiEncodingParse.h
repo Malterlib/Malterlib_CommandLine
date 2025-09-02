@@ -54,11 +54,22 @@ namespace NMib::NCommandLine
 
 		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CItalic, CReset>;
 
+		struct CParseState
+		{
+			bool m_bBold = false;
+			bool m_bItalic = false;
+			bool m_bAborted = false;
+			int32 m_LastForeground = -1;
+			CDecodedColor m_CurrentColor;
+			CDecodedColor m_CurrentColorBG;
+		};
+
 		static void fs_Parse
 			(
 				NStr::CStr const &_In
 				, NFunction::TCFunction<bool (NStr::CStr const &_String)> const &_fOnString
 				, NFunction::TCFunction<void (CPropertyChange const &_Property)> const &_fOnPropertyChange
+				, CParseState *_pParseState = nullptr
 			)
 		;
 

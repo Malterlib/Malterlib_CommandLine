@@ -33,24 +33,34 @@ namespace NMib::NCommandLine
 			CStr const &_In
 			, TCFunction<bool (CStr const &_String)> const &_fOnString
 			, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
+			, CParseState *_pParseState
 		)
 	{
-		bool bBold = false;
-		bool bItalic = false;
-		bool bAborted = false;
-		int32 LastForeground = -1;
-		CDecodedColor CurrentColor;
-		CDecodedColor CurrentColorBG;
+		CParseState ParseState;
+		CParseState *pParseState = _pParseState ? _pParseState : &ParseState;
+
+		bool &bBold = pParseState->m_bBold;
+		bool &bItalic = pParseState->m_bItalic;
+		bool &bAborted = pParseState->m_bAborted;
+		int32 &LastForeground = pParseState->m_LastForeground;
+		CDecodedColor &CurrentColor = pParseState->m_CurrentColor;
+		CDecodedColor &CurrentColorBG = pParseState->m_CurrentColorBG;
 
 		CStr StringBuffer;
 
-		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor)
+		auto fCommitBuffer = [&]
 			{
 				if (!StringBuffer.f_IsEmpty())
 				{
 					bAborted = bAborted || !_fOnString(StringBuffer);
 					StringBuffer.f_Clear();
 				}
+			}
+		;
+
+		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor)
+			{
+				fCommitBuffer();
 				if (_Color != CurrentColor)
 				{
 					_fPropertyChange(CForegroundColor{_Color});
@@ -65,11 +75,7 @@ namespace NMib::NCommandLine
 		;
 		auto fSetBold = [&](bool _bBold)
 			{
-				if (!StringBuffer.f_IsEmpty())
-				{
-					bAborted = bAborted || !_fOnString(StringBuffer);
-					StringBuffer.f_Clear();
-				}
+				fCommitBuffer();
 				if (bBold != _bBold)
 				{
 					_fPropertyChange(CBold{_bBold});
@@ -79,11 +85,7 @@ namespace NMib::NCommandLine
 		;
 		auto fSetItalic = [&](bool _bItalic)
 			{
-				if (!StringBuffer.f_IsEmpty())
-				{
-					bAborted = bAborted || !_fOnString(StringBuffer);
-					StringBuffer.f_Clear();
-				}
+				fCommitBuffer();
 				if (bItalic != _bItalic)
 				{
 					_fPropertyChange(CItalic{_bItalic});
@@ -93,11 +95,7 @@ namespace NMib::NCommandLine
 		;
 		auto fReset = [&]()
 			{
-				if (!StringBuffer.f_IsEmpty())
-				{
-					bAborted = bAborted || !_fOnString(StringBuffer);
-					StringBuffer.f_Clear();
-				}
+				fCommitBuffer();
 				fSetBold(false);
 				fSetItalic(false);
 				_fPropertyChange(CReset{});
@@ -136,121 +134,129 @@ namespace NMib::NCommandLine
 							CDecodedColor FgColor = CurrentColor;
 							CDecodedColor BgColor = CurrentColorBG;
 
-							auto ParamsVector = Params.f_Split<true>(";");
-
-							for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
+							if (Params.f_IsEmpty() && Intermediate.f_IsEmpty())
 							{
-								uint32 ParamNumber = iParam->f_ToInt(uint32(0));
-								if (ParamNumber == 38 || ParamNumber == 48)
+								fReset();
+								fSetColor({}, {});
+							}
+							else
+							{
+								auto ParamsVector = Params.f_Split<true>(";");
+
+								for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
 								{
-									++iParam;
-									if (iParam && *iParam == "5")
+									uint32 ParamNumber = iParam->f_ToInt(uint32(0));
+									if (ParamNumber == 38 || ParamNumber == 48)
 									{
 										++iParam;
-										if (iParam)
+										if (iParam && *iParam == "5")
 										{
-											if (ParamNumber == 38)
-												FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
-											else
-												BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
-											++iParam;
-										}
-									}
-									else if (iParam && *iParam == "2")
-									{
-										++iParam;
-										if (iParam)
-										{
-											uint8 Red = iParam->f_ToInt(uint8(0));
 											++iParam;
 											if (iParam)
 											{
-												uint8 Green = iParam->f_ToInt(uint8(0));
+												if (ParamNumber == 38)
+													FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+												else
+													BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+												++iParam;
+											}
+										}
+										else if (iParam && *iParam == "2")
+										{
+											++iParam;
+											if (iParam)
+											{
+												uint8 Red = iParam->f_ToInt(uint8(0));
 												++iParam;
 												if (iParam)
 												{
-													uint8 Blue = iParam->f_ToInt(uint8(0));
+													uint8 Green = iParam->f_ToInt(uint8(0));
 													++iParam;
-													if (ParamNumber == 38)
-														FgColor.f_Set(Red, Green, Blue);
-													else
-														BgColor.f_Set(Red, Green, Blue);
+													if (iParam)
+													{
+														uint8 Blue = iParam->f_ToInt(uint8(0));
+														++iParam;
+														if (ParamNumber == 38)
+															FgColor.f_Set(Red, Green, Blue);
+														else
+															BgColor.f_Set(Red, Green, Blue);
+													}
 												}
 											}
 										}
+										continue;
 									}
-									continue;
+
+									if (ParamNumber == 1)
+									{
+										fSetBold(true);
+										if (LastForeground >= 30 && LastForeground <= 37)
+											ParamNumber = LastForeground + 60;
+									}
+									else if (ParamNumber == 22)
+									{
+										fSetBold(false);
+										if (LastForeground >= 90 && LastForeground <= 97)
+											ParamNumber = LastForeground - 60;
+									}
+									else if (ParamNumber == 3)
+										fSetItalic(true);
+									else if (ParamNumber == 23)
+										fSetItalic(false);
+									else if (ParamNumber >= 30 && ParamNumber <= 37)
+									{
+										LastForeground = ParamNumber;
+										if (bBold)
+											ParamNumber += 60;
+									}
+									else
+										LastForeground = -1;
+
+									switch (ParamNumber)
+									{
+									case 0: FgColor = {}; BgColor = {}; fReset(); break;
+									case 39: FgColor = {}; break;
+									case 49: BgColor = {}; break;
+
+									case 30: FgColor.f_SetAnsi16(0); break;
+									case 40: BgColor.f_SetAnsi16(0); break;
+									case 31: FgColor.f_SetAnsi16(1); break;
+									case 41: BgColor.f_SetAnsi16(1); break;
+									case 32: FgColor.f_SetAnsi16(2); break;
+									case 42: BgColor.f_SetAnsi16(2); break;
+									case 33: FgColor.f_SetAnsi16(3); break;
+									case 43: BgColor.f_SetAnsi16(3); break;
+									case 34: FgColor.f_SetAnsi16(4); break;
+									case 44: BgColor.f_SetAnsi16(4); break;
+									case 35: FgColor.f_SetAnsi16(5); break;
+									case 45: BgColor.f_SetAnsi16(5); break;
+									case 36: FgColor.f_SetAnsi16(6); break;
+									case 46: BgColor.f_SetAnsi16(6); break;
+									case 37: FgColor.f_SetAnsi16(7); break;
+									case 47: BgColor.f_SetAnsi16(7); break;
+
+									case 90: FgColor.f_SetAnsi16(8); break;
+									case 100: BgColor.f_SetAnsi16(8); break;
+									case 91: FgColor.f_SetAnsi16(9); break;
+									case 101: BgColor.f_SetAnsi16(9); break;
+									case 92: FgColor.f_SetAnsi16(10); break;
+									case 102: BgColor.f_SetAnsi16(10); break;
+									case 93: FgColor.f_SetAnsi16(11); break;
+									case 103: BgColor.f_SetAnsi16(11); break;
+									case 94: FgColor.f_SetAnsi16(12); break;
+									case 104: BgColor.f_SetAnsi16(12); break;
+									case 95: FgColor.f_SetAnsi16(13); break;
+									case 105: BgColor.f_SetAnsi16(13); break;
+									case 96: FgColor.f_SetAnsi16(14); break;
+									case 106: BgColor.f_SetAnsi16(14); break;
+									case 97: FgColor.f_SetAnsi16(15); break;
+									case 107: BgColor.f_SetAnsi16(15); break;
+									}
+									++iParam;
 								}
 
-								if (ParamNumber == 1)
-								{
-									fSetBold(true);
-									if (LastForeground >= 30 && LastForeground <= 37)
-										ParamNumber = LastForeground + 60;
-								}
-								else if (ParamNumber == 22)
-								{
-									fSetBold(false);
-									if (LastForeground >= 90 && LastForeground <= 97)
-										ParamNumber = LastForeground - 60;
-								}
-								else if (ParamNumber == 3)
-									fSetItalic(true);
-								else if (ParamNumber == 23)
-									fSetItalic(false);
-								else if (ParamNumber >= 30 && ParamNumber <= 37)
-								{
-									LastForeground = ParamNumber;
-									if (bBold)
-										ParamNumber += 60;
-								}
-								else
-									LastForeground = -1;
-
-								switch (ParamNumber)
-								{
-								case 0: FgColor = {}; BgColor = {}; fReset(); break;
-								case 39: FgColor = {}; break;
-								case 49: BgColor = {}; break;
-
-								case 30: FgColor.f_SetAnsi16(0); break;
-								case 40: BgColor.f_SetAnsi16(0); break;
-								case 31: FgColor.f_SetAnsi16(1); break;
-								case 41: BgColor.f_SetAnsi16(1); break;
-								case 32: FgColor.f_SetAnsi16(2); break;
-								case 42: BgColor.f_SetAnsi16(2); break;
-								case 33: FgColor.f_SetAnsi16(3); break;
-								case 43: BgColor.f_SetAnsi16(3); break;
-								case 34: FgColor.f_SetAnsi16(4); break;
-								case 44: BgColor.f_SetAnsi16(4); break;
-								case 35: FgColor.f_SetAnsi16(5); break;
-								case 45: BgColor.f_SetAnsi16(5); break;
-								case 36: FgColor.f_SetAnsi16(6); break;
-								case 46: BgColor.f_SetAnsi16(6); break;
-								case 37: FgColor.f_SetAnsi16(7); break;
-								case 47: BgColor.f_SetAnsi16(7); break;
-
-								case 90: FgColor.f_SetAnsi16(8); break;
-								case 100: BgColor.f_SetAnsi16(8); break;
-								case 91: FgColor.f_SetAnsi16(9); break;
-								case 101: BgColor.f_SetAnsi16(9); break;
-								case 92: FgColor.f_SetAnsi16(10); break;
-								case 102: BgColor.f_SetAnsi16(10); break;
-								case 93: FgColor.f_SetAnsi16(11); break;
-								case 103: BgColor.f_SetAnsi16(11); break;
-								case 94: FgColor.f_SetAnsi16(12); break;
-								case 104: BgColor.f_SetAnsi16(12); break;
-								case 95: FgColor.f_SetAnsi16(13); break;
-								case 105: BgColor.f_SetAnsi16(13); break;
-								case 96: FgColor.f_SetAnsi16(14); break;
-								case 106: BgColor.f_SetAnsi16(14); break;
-								case 97: FgColor.f_SetAnsi16(15); break;
-								case 107: BgColor.f_SetAnsi16(15); break;
-								}
-								++iParam;
+								fSetColor(FgColor, BgColor);
 							}
-
-							fSetColor(FgColor, BgColor);
 							break;
 						}
 					}
@@ -263,7 +269,7 @@ namespace NMib::NCommandLine
 			++pParse;
 		}
 
-		fSetColor({}, {});
+		fCommitBuffer();
 	}
 
 	CStr CAnsiEncodingParse::fs_StripEncoding(CStr const &_In)
