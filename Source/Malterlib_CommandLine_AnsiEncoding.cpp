@@ -364,6 +364,14 @@ namespace NMib::NCommandLine
 		return "\x1B[{};{}H"_f << fg_ByValue(_Row + 1) << fg_ByValue(_Column + 1);
 	}
 
+	NStr::CStr::CFormat CAnsiEncoding::f_MovePreviousLine(uint32 _nLines) const
+	{
+		if (_nLines == 1)
+			return "\x1B[A"_f;
+		else
+			return "\x1B[{}A"_f << fg_ByValue(_nLines);
+	}
+
 	NStr::CStr::CFormat CAnsiEncoding::f_MoveNextLine(uint32 _nLines) const
 	{
 		if (_nLines == 1)
@@ -690,7 +698,7 @@ namespace NMib::NCommandLine
 		auto pLastDisplayPoint = pParse;
 		mint LastWordLen = 0;
 		mint LastDisplayPointLen = 0;
-		
+
 		while (*pParse)
 		{
 			ch32 Char = *pParse;
