@@ -981,7 +981,7 @@ namespace NMib::NCommandLine
 					, "AlwaysVerbose"_o= true
 					, "ErrorOnCommandAsParameter"_o= false
 					, "ErrorOnOptionAsParameter"_o= false
-					, "DisableGlobalOptions"_o= _o["ConcurrentLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"]
+					, "DisableGlobalOptions"_o= _o["ConcurrentLogging", "ShutdownLogging", "StdErrLogger", "LogSeverities", "TraceLogger", "AuthenticationLifetime", "AuthenticationUser"]
 					, "Parameters"_o=
 					{
 						"Commands...?"_o=
