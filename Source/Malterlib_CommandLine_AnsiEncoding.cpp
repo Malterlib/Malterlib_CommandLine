@@ -28,6 +28,7 @@ namespace NMib::NCommandLine
 		constexpr NStr::CStr gc_Default = gc_Str<DMibCommandLineAnsiColor_Reset>;
 		constexpr NStr::CStr gc_Reset = gc_Str<"\x1B""c">;
 		constexpr NStr::CStr gc_UpperLeft = gc_Str<"\x1B[H">;
+		constexpr NStr::CStr gc_ClearToEndOfScreen = gc_Str<"\x1B[J">;
 
 		constexpr NStr::CStr gc_StatusNormal = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(118)>;
 		constexpr NStr::CStr gc_StatusWarning = gc_Str<DMibCommandLineAnsiColor_Reset DMibCommandLineAnsiColor_256(207)>;
@@ -364,6 +365,11 @@ namespace NMib::NCommandLine
 		return "\x1B[{};{}H"_f << fg_ByValue(_Row + 1) << fg_ByValue(_Column + 1);
 	}
 
+	NStr::CStr::CFormat CAnsiEncoding::f_MoveToColumn(uint32 _Column) const
+	{
+		return "\x1B[{}G"_f << fg_ByValue(_Column + 1);
+	}
+
 	NStr::CStr::CFormat CAnsiEncoding::f_MovePreviousLine(uint32 _nLines) const
 	{
 		if (_nLines == 1)
@@ -378,6 +384,11 @@ namespace NMib::NCommandLine
 			return "\x1B[E"_f;
 		else
 			return "\x1B[{}E"_f << fg_ByValue(_nLines);
+	}
+
+	NStr::CStr const &CAnsiEncoding::f_ClearToEndOfScreen() const
+	{
+		return gc_ClearToEndOfScreen;
 	}
 
 	NStr::CStr const &CAnsiEncoding::f_StatusNormal() const
