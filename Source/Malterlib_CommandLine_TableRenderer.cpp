@@ -92,6 +92,11 @@ namespace NMib::NCommandLine
 		mp_MaxWidths[_iColumn] = _MaxWidth;
 	}
 
+	void CTableRenderHelper::f_SetMinColumnWidth(uint32 _iColumn, uint32 _MinWidth)
+	{
+		mp_MinWidths[_iColumn] = _MinWidth;
+	}
+
 	void CTableRenderHelper::f_SetAlignRight(uint32 _iColumn)
 	{
 		mp_AlignRight[_iColumn] = true;
@@ -395,6 +400,10 @@ namespace NMib::NCommandLine
 					MaxWidth = *pMaxWidth;
 
 				LimitedWidths[iColumn] = fg_Min(mp_Widths[iColumn], MaxWidth);
+
+				auto pMinWidth = mp_MinWidths.f_FindEqual(iColumn);
+				if (pMinWidth)
+					LimitedWidths[iColumn] = fg_Max(LimitedWidths[iColumn], *pMinWidth);
 			}
 
 			uint32 TotalWidth = 1;

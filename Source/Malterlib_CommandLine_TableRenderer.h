@@ -63,6 +63,7 @@ namespace NMib::NCommandLine
 		void f_MergeColumnWidths(CTableRenderHelper const &_Other);
 		void f_ForceRowSeparator();
 		void f_SetMaxColumnWidth(uint32 _iColumn, uint32 _MaxWidth);
+		void f_SetMinColumnWidth(uint32 _iColumn, uint32 _MinWidth);
 		void f_SetAlignRight(uint32 _iColumn);
 		void f_SetPrefix(NStr::CStr const &_Prefix);
 		void f_RemoveColumn(uint32 _iColumn);
@@ -91,6 +92,7 @@ namespace NMib::NCommandLine
 		NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> mp_Rows;
 		NContainer::TCVector<zuint32> mp_Widths;
 		NContainer::TCMap<uint32, uint32> mp_MaxWidths;
+		NContainer::TCMap<uint32, uint32> mp_MinWidths;
 		NContainer::TCVector<zbool> mp_AlignRight;
 		NContainer::TCSet<mint> mp_RowSeparators;
 		NContainer::TCVector<NStr::CStr> mp_Description;
