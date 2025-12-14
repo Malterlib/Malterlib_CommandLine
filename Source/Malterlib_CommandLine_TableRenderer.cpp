@@ -349,6 +349,7 @@ namespace NMib::NCommandLine
 
 		bool bAvoidLineSeparators = !!(mp_Options & CTableRenderHelper::EOption_AvoidRowSeparators);
 		bool bNoExtraLines = !!(mp_Options & CTableRenderHelper::EOption_NoExtraLines);
+		bool bNoHeadings = !!(mp_Options & CTableRenderHelper::EOption_NoHeadings);
 
 		CUStr Description;
 		bool bHasDescription = !mp_Description.f_IsEmpty();
@@ -500,6 +501,9 @@ namespace NMib::NCommandLine
 				BottomLine += AnsiColor.f_Default();
 			}
 
+			if (bNoHeadings)
+				fp_Output("{}{}{}\n"_f << ((bUseBoxDrawing || bNoExtraLines) ? "" : "\n") << Description << TopLine);
+			else
 			{
 				mint iColumn = 0;
 				CUStr Line = LineSeparator;
@@ -524,7 +528,7 @@ namespace NMib::NCommandLine
 				fp_Output("{}{}{}\n{}\n"_f << ((bUseBoxDrawing || bNoExtraLines) ? "" : "\n") << Description << TopLine << Line);
 			}
 
-			bool bWasMultiLine = true;
+			bool bWasMultiLine = !bNoHeadings;
 
 			NContainer::TCVector<NContainer::TCVector<NContainer::TCVector<NStr::CStr>>> LinebrokenRows;
 			for (auto &Row : mp_Rows)
