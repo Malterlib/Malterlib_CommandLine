@@ -642,7 +642,7 @@ namespace NMib::NCommandLine
 							bSetProperties = true;
 						}
 
-						if (Properties.m_Italic && Properties.m_Bold->m_bEnabled)
+						if (Properties.m_Italic && Properties.m_Italic->m_bEnabled)
 						{
 							ToOutput += f_Italic();
 							bSetProperties = true;
