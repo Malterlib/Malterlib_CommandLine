@@ -81,7 +81,16 @@ namespace NMib::NCommandLine
 	{
 		CAnsiEncoding AnsiColor(mp_AnsiFlags);
 
-		auto Lines = AnsiColor.f_LineBreak(_Description, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+		// Wrap description with default formatting (bold + yellow foreground) before line-breaking,
+		// so any ANSI resets in _Description return to this default rather than terminal default
+		CStr FormattedDescription = "{}{}{}{}"_f
+			<< AnsiColor.f_Bold()
+			<< AnsiColor.f_Foreground256(11)
+			<< _Description
+			<< AnsiColor.f_Default()
+		;
+
+		auto Lines = AnsiColor.f_LineBreak(FormattedDescription, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &Line : Lines)
 			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line.m_String)));
@@ -370,10 +379,8 @@ namespace NMib::NCommandLine
 
 			auto fAddLine = [&](CUStr const &_Line)
 				{
-					Description += U"{} {}{}{sj*,sf ,a-}{}{} {}\n"_f
+					Description += U"{} {sj*,sf ,a-}{}{} {}\n"_f
 						<< LineSeparator
-						<< AnsiColor.f_Bold()
-						<< AnsiColor.f_Foreground256(11)
 						<< _Line
 						<< (mp_DescriptionWidth + (_Line.f_GetLen() - CAnsiEncodingParse::fs_RenderedStrLen(_Line)))
 						<< AnsiColor.f_Default()
