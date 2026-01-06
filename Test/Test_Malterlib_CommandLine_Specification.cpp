@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #define DMibRuntimeTypeRegistry
@@ -147,7 +147,7 @@ namespace
 						(
 							RunParams
 							, ==
-							, 
+							,
 							(
 								_=
 								{
@@ -174,7 +174,7 @@ namespace
 				};
 			};
 		}
-		
+
 		/* TODO
 		Optional
 			Parameters
@@ -189,7 +189,7 @@ namespace
 		Register command
 			Direct
 			Actor
-			
+
 		Validate Command Params
 		Errors
 			DMibError("An optional option needs to specify the 'Default' value");
@@ -230,11 +230,11 @@ namespace
 			DMibError(fg_Format("Unexpected parameter: {}", Parameter));
 			DMibError(fg_Format("Missing parameter for option: {}", pCurrentOption->m_Names.f_GetFirst()));
 			DMibError(fg_Format("Missing required command parameter: {}", iCommandParameter->m_Identifier));
-			DMibError("No command specified")		 
+			DMibError("No command specified")
 			DMibError(fg_Format("Missing required option: {}", _Option.m_Names.f_GetFirst()));
-		
-		*/ 
-		
+
+		*/
+
 	};
 
 	DMibTestRegister(CCommandLine_Tests, Malterlib::CommandLine);

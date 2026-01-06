@@ -893,7 +893,7 @@ namespace NMib::NCommandLine
 
 		return {};
 	}
-	
+
 	template <typename t_CCustomization>
 	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_FormatValue
 		(

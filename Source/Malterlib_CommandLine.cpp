@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include "Malterlib_CommandLine.h"
@@ -58,7 +58,7 @@ namespace NMib::NCommandLine
 			)
 		;
 	}
-	
+
 	CAnyType fg_AnyType()
 	{
 		return CAnyType();
@@ -144,7 +144,7 @@ namespace NMib::NCommandLine
 	bool CCommandLineDefaults::fs_ColorLightBackgroundDefault()
 	{
 		using namespace NProcess;
-		
+
 		static bool bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColorLight", ""); Value == "true")

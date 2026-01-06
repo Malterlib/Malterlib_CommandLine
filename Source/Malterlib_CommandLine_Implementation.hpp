@@ -42,7 +42,7 @@ namespace NMib::NCommandLine
 	void TCCommandLineSpecification<t_CCustomization>::CSectionCommon::f_RegisterSectionOptions(NEncoding::CEJsonOrdered &&_Options)
 	{
 		using namespace NStr;
-		
+
 		typename CInternal::CSection *pSection = fg_AutoStaticCast(mp_pSection);
 		auto &Section = *pSection;
 		auto &Internal = *mp_pInternal;
@@ -107,7 +107,7 @@ namespace NMib::NCommandLine
 	void TCCommandLineSpecification<t_CCustomization>::f_RegisterGlobalOptions(NEncoding::CEJsonOrdered &&_Options)
 	{
 		using namespace NStr;
-		
+
 		auto &Internal = *mp_pInternal;
 
 		for (auto &OptionMutable : _Options.f_Object())
