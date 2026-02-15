@@ -191,7 +191,7 @@ namespace NMib::NCommandLine
 
 				CStdInReader StdIn(fg_Move(Params));
 
-				DMibConOut2("\x1B]11;?\x1B\\");
+				DMibConOut("\x1B]11;?\x1B\\");
 
 				if (pState->m_Event.f_WaitTimeout(1.0))
 					return false;

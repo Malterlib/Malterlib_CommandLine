@@ -149,7 +149,7 @@ namespace NMib::NCommandLine
 					COnScopeExitShared SubsequentIndentScope;
 					for (auto &Line : Lines)
 					{
-						DMibConOut("{sj*}{}{\n}", "" << Indentation << Line.f_Replace(" ", " "));
+						DMibConOut("{sj*}{}{\n}", "", Indentation, Line.f_Replace(" ", " "));
 						if (!SubsequentIndentScope)
 							SubsequentIndentScope = fAddIndent(_SubsequentIndent);
 					}
