@@ -537,7 +537,7 @@ namespace NMib::NCommandLine
 
 		struct CProperties
 		{
-			auto operator <=> (CProperties const &_Right) const = default;
+			auto operator <=> (CProperties const &_Right) const noexcept = default;
 
 			TCOptional<CAnsiEncodingParse::CBackgroundColor> m_BackgroundColor;
 			TCOptional<CAnsiEncodingParse::CForegroundColor> m_ForegroundColor;

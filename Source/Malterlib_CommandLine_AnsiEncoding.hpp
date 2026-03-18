@@ -24,21 +24,6 @@ namespace NMib::NCommandLine
 		return NStr::CStr::CFormat("{}{}{}") << f_CreateSemiUniqueColor(_Data) << _Data << f_Default();
 	}
 
-	inline auto CAnsiEncoding::CLine::f_Tuple() const
-	{
-		return NStorage::fg_TupleReferences(m_String, m_Width);
-	}
-
-	inline bool CAnsiEncoding::CLine::operator == (CLine const &_Right) const
-	{
-		return f_Tuple() == _Right.f_Tuple();
-	}
-
-	inline bool CAnsiEncoding::CLine::operator < (CLine const &_Right) const
-	{
-		return f_Tuple() < _Right.f_Tuple();
-	}
-
 	template <typename tf_CStr>
 	void CAnsiEncoding::CLine::f_Format(tf_CStr &o_String) const
 	{

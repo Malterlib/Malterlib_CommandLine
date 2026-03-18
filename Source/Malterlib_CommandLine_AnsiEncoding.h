@@ -37,9 +37,8 @@ namespace NMib::NCommandLine
 
 		struct CLine
 		{
-			auto f_Tuple() const;
-			bool operator == (CLine const &_Right) const;
-			bool operator < (CLine const &_Right) const;
+			bool operator == (CLine const &_Right) const noexcept = default;
+			auto operator <=> (CLine const &_Right) const noexcept = default;
 
 			template <typename tf_CStr>
 			void f_Format(tf_CStr &o_String) const;

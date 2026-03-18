@@ -17,7 +17,7 @@ namespace NMib::NCommandLine
 			void f_SetAnsi16(uint8 _Value);
 			void f_SetAnsi256(uint8 _Value);
 
-			auto operator <=> (CDecodedColor const &_Right) const = default;
+			auto operator <=> (CDecodedColor const &_Right) const noexcept = default;
 
 			uint8 m_Red = 0;
 			uint8 m_Green = 0;
@@ -37,19 +37,19 @@ namespace NMib::NCommandLine
 		{
 			bool m_bEnabled = false;
 
-			auto operator <=> (CBold const &_Other) const = default;
+			auto operator <=> (CBold const &_Other) const noexcept = default;
 		};
 
 		struct CItalic
 		{
 			bool m_bEnabled = false;
 
-			auto operator <=> (CItalic const &_Other) const = default;
+			auto operator <=> (CItalic const &_Other) const noexcept = default;
 		};
 
 		struct CReset
 		{
-			auto operator <=> (CReset const &_Other) const = default;
+			auto operator <=> (CReset const &_Other) const noexcept = default;
 		};
 
 		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CBold, CItalic, CReset>;
