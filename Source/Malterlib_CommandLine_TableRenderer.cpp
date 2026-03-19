@@ -90,7 +90,7 @@ namespace NMib::NCommandLine
 			<< AnsiColor.f_Default()
 		;
 
-		auto Lines = AnsiColor.f_LineBreak(FormattedDescription, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+		auto Lines = AnsiColor.f_LineBreak(FormattedDescription, TCLimitsInt<umint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &Line : Lines)
 			mp_DescriptionWidth = fg_Max(mp_DescriptionWidth, (int32)CAnsiEncodingParse::fs_RenderedStrLen(mp_Description.f_Insert(Line.m_String)));
@@ -173,13 +173,13 @@ namespace NMib::NCommandLine
 	void CTableRenderHelper::fp_AddRowColumn(NContainer::TCVector<NContainer::TCVector<NStr::CStr>> &o_RowColumns, CStr const &_Value)
 	{
 		CStr Value = _Value.f_Replace("\t", "  ");
-		mint iColumn = o_RowColumns.f_GetLen();
+		umint iColumn = o_RowColumns.f_GetLen();
 		auto &ColumnWidth = mp_Widths[iColumn];
 		auto &ColumnRow = o_RowColumns.f_Insert();
 
 		CAnsiEncoding AnsiColor(mp_AnsiFlags);
 
-		auto Lines = AnsiColor.f_LineBreak(Value, TCLimitsInt<mint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
+		auto Lines = AnsiColor.f_LineBreak(Value, TCLimitsInt<umint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
 		for (auto &LongLine : Lines)
 			ColumnWidth = fg_Max(ColumnWidth, (uint32)CAnsiEncodingParse::fs_RenderedStrLen(ColumnRow.f_Insert(LongLine.m_String)));
@@ -217,9 +217,9 @@ namespace NMib::NCommandLine
 	{
 		mp_Rows = mp_Rows.f_Reverse();
 
-		mint LastIndex = mp_Rows.f_GetLen() - 1;
+		umint LastIndex = mp_Rows.f_GetLen() - 1;
 
-		NContainer::TCSet<mint> NewRowSeparators;
+		NContainer::TCSet<umint> NewRowSeparators;
 		for (auto &SeparatorIndex : mp_RowSeparators)
 			NewRowSeparators[LastIndex - SeparatorIndex];
 
@@ -233,8 +233,8 @@ namespace NMib::NCommandLine
 		else
 		{
 			DMibRequire(mp_Widths.f_GetLen() == _Other.mp_Widths.f_GetLen());
-			mint nColumns = mp_Widths.f_GetLen();
-			for (mint iColumn = 0; iColumn < nColumns; ++iColumn)
+			umint nColumns = mp_Widths.f_GetLen();
+			for (umint iColumn = 0; iColumn < nColumns; ++iColumn)
 			{
 				auto Max = fg_Max(mp_Widths[iColumn], _Other.mp_Widths[iColumn]);
 				mp_Widths[iColumn] = Max;
@@ -398,9 +398,9 @@ namespace NMib::NCommandLine
 		}
 		{
 			TCVector<uint32> LimitedWidths;
-			mint nColumns = mp_Widths.f_GetLen();
+			umint nColumns = mp_Widths.f_GetLen();
 			LimitedWidths.f_SetLen(nColumns);
-			for (mint iColumn = 0; iColumn < nColumns; ++iColumn)
+			for (umint iColumn = 0; iColumn < nColumns; ++iColumn)
 			{
 				uint32 MaxWidth = TCLimitsInt<uint32>::mc_Max;
 				auto pMaxWidth = mp_MaxWidths.f_FindEqual(iColumn);
@@ -421,8 +421,8 @@ namespace NMib::NCommandLine
 			while (TotalWidth >= mp_AvailableWidth)
 			{
 				uint32 HighestWidth = 0;
-				mint iHighestWidth = TCLimitsInt<mint>::mc_Max;
-				for (mint iColumn = 0; iColumn < nColumns; ++iColumn)
+				umint iHighestWidth = TCLimitsInt<umint>::mc_Max;
+				for (umint iColumn = 0; iColumn < nColumns; ++iColumn)
 				{
 					auto &Width = LimitedWidths[iColumn];
 					if (Width > HighestWidth && Width > 10)
@@ -432,7 +432,7 @@ namespace NMib::NCommandLine
 					}
 				}
 
-				if (iHighestWidth == TCLimitsInt<mint>::mc_Max)
+				if (iHighestWidth == TCLimitsInt<umint>::mc_Max)
 					break; // Failed
 
 				--LimitedWidths[iHighestWidth];
@@ -512,7 +512,7 @@ namespace NMib::NCommandLine
 				fp_Output("{}{}{}\n"_f << ((bUseBoxDrawing || bNoExtraLines) ? "" : "\n") << Description << TopLine);
 			else
 			{
-				mint iColumn = 0;
+				umint iColumn = 0;
 				CUStr Line = LineSeparator;
 				for (auto &Heading : mp_Headings)
 				{
@@ -566,9 +566,9 @@ namespace NMib::NCommandLine
 
 			for (auto &Row : LinebrokenRows)
 			{
-				mint iRow = &Row - LinebrokenRows.f_GetArray();
+				umint iRow = &Row - LinebrokenRows.f_GetArray();
 
-				mint MaxLines = 0;
+				umint MaxLines = 0;
 				for (auto &ColumnLines : Row)
 					MaxLines = fg_Max(MaxLines, ColumnLines.f_GetLen());
 
@@ -578,10 +578,10 @@ namespace NMib::NCommandLine
 				if (!bAvoidLineSeparators || bWasMultiLine || (bAvoidLineSeparators && !bWasMultiLine && MaxLines > 1) || mp_RowSeparators.f_Exists(iRow))
 					fp_Output("{}\n"_f << MiddleLine);
 
-				for (mint iLine = 0; iLine < MaxLines; ++iLine)
+				for (umint iLine = 0; iLine < MaxLines; ++iLine)
 				{
 					CUStr Line = LineSeparator;
-					mint iColumn = 0;
+					umint iColumn = 0;
 					for (auto &ColumnLines : Row)
 					{
 						auto &MaxWidth = LimitedWidths[iColumn];

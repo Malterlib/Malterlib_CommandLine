@@ -40,8 +40,8 @@ namespace NMib::NCommandLine
 
 			uint32 mp_Verbosity = 0;
 			NContainer::TCVector<NStr::CStr> mp_Headings;
-			NContainer::TCMap<mint, uint32> mp_VerboseHeadings;
-			NContainer::TCMap<NStr::CStr, mint> mp_HeadingIndices;
+			NContainer::TCMap<umint, uint32> mp_VerboseHeadings;
+			NContainer::TCMap<NStr::CStr, umint> mp_HeadingIndices;
 			NContainer::TCVector<NStr::CStr> mp_SortByColumns;
 		};
 
@@ -95,7 +95,7 @@ namespace NMib::NCommandLine
 		NContainer::TCMap<uint32, uint32> mp_MaxWidths;
 		NContainer::TCMap<uint32, uint32> mp_MinWidths;
 		NContainer::TCVector<zbool> mp_AlignRight;
-		NContainer::TCSet<mint> mp_RowSeparators;
+		NContainer::TCSet<umint> mp_RowSeparators;
 		NContainer::TCVector<NStr::CStr> mp_Description;
 		CColumnHelper *mp_pColumnsHelper = nullptr;
 		NStr::CStr mp_Prefix;

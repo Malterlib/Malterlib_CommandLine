@@ -292,9 +292,9 @@ namespace NMib::NCommandLine
 		return Ret;
 	}
 
-	mint CAnsiEncodingParse::fs_RenderedStrLen(CStr const &_String)
+	umint CAnsiEncodingParse::fs_RenderedStrLen(CStr const &_String)
 	{
-		mint Len = 0;
+		umint Len = 0;
 		fs_Parse
 			(
 				_String

@@ -42,7 +42,7 @@ namespace NMib::NCommandLine
 				return fColor(_String, CInternal::EColor_Heading1);
 			}
 		;
-		auto fCorrectedLength = [&](CStr const &_String, mint _WantedLen) -> mint
+		auto fCorrectedLength = [&](CStr const &_String, umint _WantedLen) -> umint
 			{
 				if (!bColor)
 					return _WantedLen;
@@ -59,13 +59,13 @@ namespace NMib::NCommandLine
 
 		bool bFirstSection = true;
 
-		mint Indentation = 0;
+		umint Indentation = 0;
 
-		mint MaxWidth = 120;
+		umint MaxWidth = 120;
 		if (auto Width = _CommandLineClient.f_CommandLineWidth(); Width > 0)
 			MaxWidth = fg_Max(fg_Min(Width, 200u), 50u); // Never wider than 200 chars, never less than 50
 
-		mint MaxExecutableIndent = MaxWidth / 10;
+		umint MaxExecutableIndent = MaxWidth / 10;
 
 		auto fHalfMaxWidth = [&]
 			{
@@ -108,7 +108,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fAddIndent = [&](mint _Indent)
+		auto fAddIndent = [&](umint _Indent)
 			{
 				Indentation += _Indent;
 				return fg_OnScopeExitShared
@@ -134,7 +134,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputLine = [&](CStr _Line, bool _bEndSection = false, mint _SubsequentIndent = 0, bool _bSeparateSectionOnMultiline = true)
+		auto fOutputLine = [&](CStr _Line, bool _bEndSection = false, umint _SubsequentIndent = 0, bool _bSeparateSectionOnMultiline = true)
 			{
 				TCVector<CStr> Lines = fLineBreak(fg_GetStrLineSep(_Line), _SubsequentIndent);
 
@@ -159,7 +159,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputLines = [&](CStr _Lines, bool _bEndSection = false, mint _SubsequentIndent = 0)
+		auto fOutputLines = [&](CStr _Lines, bool _bEndSection = false, umint _SubsequentIndent = 0)
 			{
 				bool bFirst = true;
 				COnScopeExitShared SubsequentIndentScope;
@@ -179,7 +179,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputSectionedText = [&](CStr _LongText, mint _SubsequentIndent = 0)
+		auto fOutputSectionedText = [&](CStr _LongText, umint _SubsequentIndent = 0)
 			{
 				if (_LongText.f_IsEmpty())
 					return;
@@ -210,7 +210,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputTableText = [&](CStr _LongText, mint _SubsequentIndent, bool _bEndSection)
+		auto fOutputTableText = [&](CStr _LongText, umint _SubsequentIndent, bool _bEndSection)
 			{
 				if (_LongText.f_IsEmpty())
 					return;
@@ -249,7 +249,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputHeading = [&](CStr const &_Heading, mint _SubsequentIndent = 2)
+		auto fOutputHeading = [&](CStr const &_Heading, umint _SubsequentIndent = 2)
 			{
 				if (fRenderLength(_Heading) == 0)
 					return COnScopeExitShared();
@@ -276,9 +276,9 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fFormatTableLine = [&](CStr const &_Left, mint &_LongestLeft, CStr const &_Right) -> CStr
+		auto fFormatTableLine = [&](CStr const &_Left, umint &_LongestLeft, CStr const &_Right) -> CStr
 			{
-				mint LeftWidth = fRenderLength(_Left);
+				umint LeftWidth = fRenderLength(_Left);
 
 				if (LeftWidth > _LongestLeft)
 					return "{}\n@Indent=3\r   {}"_f << _Left << _Right;
@@ -329,14 +329,14 @@ namespace NMib::NCommandLine
 					typename CInternal::COption const *m_pOption;
 				};
 				TCVector<CCommandEntry> OptionEntries;
-				mint LongestName = 0;
+				umint LongestName = 0;
 				for (auto &Option : _Options)
 				{
 					if (Option.m_bHidden || !Option.f_IsEnabled(_OptionSet, _bDirectCommand))
 						continue;
 					CStr Names = fGetNames(Option.m_Names, _Color);
 					auto &Entry = OptionEntries.f_Insert();
-					LongestName = fg_Max(LongestName, mint(fRenderLength(Names)));
+					LongestName = fg_Max(LongestName, umint(fRenderLength(Names)));
 					Entry.m_Names = Names;
 					Entry.m_pOption = &Option;
 				}
@@ -391,13 +391,13 @@ namespace NMib::NCommandLine
 					typename CInternal::CParameter const *m_pParameter;
 				};
 				TCVector<CCommandEntry> ParameterEntries;
-				mint LongestName = 0;
+				umint LongestName = 0;
 				for (auto &Parameter : _Parameters)
 				{
 					CStr Name = fColor(fParameterName(Parameter), CInternal::EColor_Parameter);
 
 					auto &Entry = ParameterEntries.f_Insert();
-					LongestName = fg_Max(LongestName, mint(fRenderLength(Name)));
+					LongestName = fg_Max(LongestName, umint(fRenderLength(Name)));
 					Entry.m_Name = Name;
 					Entry.m_pParameter = &Parameter;
 				}
@@ -568,7 +568,7 @@ namespace NMib::NCommandLine
 				return Entry;
 			}
 		;
-		auto fGetCommandUsage = [&](CCommandEntry const &_CommandEntry, mint &o_Indent)
+		auto fGetCommandUsage = [&](CCommandEntry const &_CommandEntry, umint &o_Indent)
 			{
 				auto &Command = *_CommandEntry.m_pCommand;
 				CStr Usage;
@@ -632,7 +632,7 @@ namespace NMib::NCommandLine
 				fOutputSectionedText(Command.m_LongDescription);
 
 				{
-					mint Indent = 0;
+					umint Indent = 0;
 					CStr Usage = fGetCommandUsage(_CommandEntry, Indent);
 					auto UsageScope = fOutputHeading("Usage");
 					fOutputLines(Usage, true, Indent);
@@ -661,7 +661,7 @@ namespace NMib::NCommandLine
 
 		if (_Params["OnlyCommands"].f_Boolean())
 		{
-			mint LongestName = 0;
+			umint LongestName = 0;
 			TCVector<CCommandEntry> CommandEntries;
 			for (auto &Section : Internal.m_Sections)
 			{
@@ -803,7 +803,7 @@ namespace NMib::NCommandLine
 					{
 						fOutputEndSection();
 
-						mint Indent = 0;
+						umint Indent = 0;
 						CStr Usage = fGetCommandUsage(fGetCommandEntry(Command), Indent);
 						fOutputLines(Usage, false, Indent);
 
@@ -878,7 +878,7 @@ namespace NMib::NCommandLine
 
 			TCMap<CStr, CCategory*> CategoryMap;
 			TCLinkedList<CCategory> Categories;
-			mint LongestName = 0;
+			umint LongestName = 0;
 
 			fOutputOptions
 				(

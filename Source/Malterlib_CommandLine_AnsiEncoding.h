@@ -44,13 +44,13 @@ namespace NMib::NCommandLine
 			void f_Format(tf_CStr &o_String) const;
 
 			NStr::CStr m_String;
-			mint m_Width = 0;
+			umint m_Width = 0;
 		};
 
 		CAnsiEncoding(EAnsiEncodingFlag _Flags);
 
 		NStr::CStr f_ReEncode(NStr::CStr const &_In) const;
-		NContainer::TCVector<CLine> f_LineBreak(NStr::CStr const &_String, mint _Length, EWordWrap _WordWrap = EWordWrap_Word) const;
+		NContainer::TCVector<CLine> f_LineBreak(NStr::CStr const &_String, umint _Length, EWordWrap _WordWrap = EWordWrap_Word) const;
 
 		NStr::CStr f_Foreground16(uint8 _Color) const;
 		NStr::CStr f_Background16(uint8 _Color) const;

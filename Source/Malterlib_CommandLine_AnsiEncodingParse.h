@@ -74,7 +74,7 @@ namespace NMib::NCommandLine
 		;
 
 		static NStr::CStr fs_StripEncoding(NStr::CStr const &_In);
-		static mint fs_RenderedStrLen(NStr::CStr const &_String);
+		static umint fs_RenderedStrLen(NStr::CStr const &_String);
 	};
 }
 

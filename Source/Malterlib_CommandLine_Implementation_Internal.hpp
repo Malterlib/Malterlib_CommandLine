@@ -255,7 +255,7 @@ namespace NMib::NCommandLine
 					if (bIsType)
 						FormatIdentifier.f_SetFormatStr("{}.({})");
 
-					mint iSet = 0;
+					umint iSet = 0;
 					FormatIdentifier << _Identifier << iSet;
 
 					for (auto &PossibleMatch : Set)
@@ -505,7 +505,7 @@ namespace NMib::NCommandLine
 
 					if (fg_Clamp(Month, 1u, 12u) != Month)
 						fReportError("Invalid month");
-					if (fg_Clamp(Day, 1u, mint(NTime::CTimeConvert::fs_GetDaysInMonth(Year, Month - 1))) != Day)
+					if (fg_Clamp(Day, 1u, umint(NTime::CTimeConvert::fs_GetDaysInMonth(Year, Month - 1))) != Day)
 						fReportError("Invalid day");
 					if (fg_Clamp(Hour, 0u, 23u) != Hour)
 						fReportError("Invalid hour");
@@ -533,7 +533,7 @@ namespace NMib::NCommandLine
 						if (bIsType)
 							FormatIdentifier.f_SetFormatStr("{}.({})");
 
-						mint iSet = 0;
+						umint iSet = 0;
 						FormatIdentifier << _Identifier << iSet;
 
 						{

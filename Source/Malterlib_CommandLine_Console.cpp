@@ -5,7 +5,7 @@
 
 namespace NMib::NCommandLine
 {
-	void fg_MalterlibConOut(ch8 const *_pStr, mint _Len)
+	void fg_MalterlibConOut(ch8 const *_pStr, umint _Len)
 	{
 		NSys::fg_ConsoleOutput(_pStr, _Len);
 	}

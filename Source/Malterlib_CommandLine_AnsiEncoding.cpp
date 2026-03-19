@@ -51,7 +51,7 @@ namespace NMib::NCommandLine
 				{
 					uint8 BestColor = 0;
 					uint32 SmallestError = TCLimitsInt<uint32>::mc_Max;
-					for (mint i = 0; i < 6; ++i)
+					for (umint i = 0; i < 6; ++i)
 					{
 						uint32 Error = fg_Abs(int32(_Value) - int32(c_CubeColors[i]));
 						Error = Error * Error;
@@ -82,7 +82,7 @@ namespace NMib::NCommandLine
 				SmallestError = fError(g_CommandLine_AnsiEncodingColor256Array[BestColor]);
 			}
 
-			for (mint i = 232; i < 256; ++i)
+			for (umint i = 232; i < 256; ++i)
 			{
 				auto &Color = g_CommandLine_AnsiEncodingColor256Array[i];
 
@@ -530,7 +530,7 @@ namespace NMib::NCommandLine
 		return Ret;
 	}
 
-	TCVector<CAnsiEncoding::CLine> CAnsiEncoding::f_LineBreak(CStr const &_String, mint _Length, EWordWrap _WordWrap) const
+	TCVector<CAnsiEncoding::CLine> CAnsiEncoding::f_LineBreak(CStr const &_String, umint _Length, EWordWrap _WordWrap) const
 	{
 		DMibRequire(_Length > 0);
 		DMibRequire((_WordWrap != EWordWrap_WordEllipsis && _WordWrap != EWordWrap_CharacterEllipsis) || _Length > 2);
@@ -545,7 +545,7 @@ namespace NMib::NCommandLine
 			TCOptional<CAnsiEncodingParse::CItalic> m_Italic;
 		};
 
-		TCRegions<mint, CProperties> PropertyRegions;
+		TCRegions<umint, CProperties> PropertyRegions;
 
 		CProperties CurrentProperties;
 
@@ -608,16 +608,16 @@ namespace NMib::NCommandLine
 		ch32 const *pParseStart = pParse;
 		ch32 const *pLastWord = nullptr;
 
-		mint Len = 0;
-		mint MaxLen = _Length;
+		umint Len = 0;
+		umint MaxLen = _Length;
 
 		TCVector<CLine> Output;
 
 		bool bWasEllipsis = false;
-		auto fOutputLine = [&](ch32 const *_pStart, mint _Len, mint _DisplayLen)
+		auto fOutputLine = [&](ch32 const *_pStart, umint _Len, umint _DisplayLen)
 			{
-				mint Position = _pStart - String.f_GetStr();
-				mint EndPos = Position + _Len;
+				umint Position = _pStart - String.f_GetStr();
+				umint EndPos = Position + _Len;
 				auto iRegion = PropertyRegions.f_GetIteratorLower(Position);
 				if (iRegion && iRegion->f_Start() < EndPos)
 				{
@@ -660,11 +660,11 @@ namespace NMib::NCommandLine
 							bSetProperties = true;
 						}
 
-						mint CurrentPosition = pParse - String.f_GetStr();
-						mint Len = pParseEnd - pParse;
-						mint EndPosition = CurrentPosition + Len;
-						mint RegionEnd = iRegion->f_End();
-						mint ToAdd;
+						umint CurrentPosition = pParse - String.f_GetStr();
+						umint Len = pParseEnd - pParse;
+						umint EndPosition = CurrentPosition + Len;
+						umint RegionEnd = iRegion->f_End();
+						umint ToAdd;
 
 						if (RegionEnd < EndPosition)
 							ToAdd = fg_Min(RegionEnd - CurrentPosition, Len);
@@ -682,9 +682,9 @@ namespace NMib::NCommandLine
 					if (bSetProperties)
 						ToOutput += f_Default();
 
-					mint OriginalLen = ToOutput.f_GetLen();
+					umint OriginalLen = ToOutput.f_GetLen();
 					fg_StrTrimRight(ToOutput);
-					mint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
+					umint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
 					Output.f_Insert({ToOutput, DisplayLen});
 				}
 				else
@@ -694,9 +694,9 @@ namespace NMib::NCommandLine
 						ToOutput = "…";
 
 					ToOutput.f_AddStr(_pStart, _Len);
-					mint OriginalLen = ToOutput.f_GetLen();
+					umint OriginalLen = ToOutput.f_GetLen();
 					fg_StrTrimRight(ToOutput);
-					mint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
+					umint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
 					Output.f_Insert({ToOutput, DisplayLen});
 				}
 
@@ -707,8 +707,8 @@ namespace NMib::NCommandLine
 		bool bLastWasNewLine = true;
 		bool bOnlyWhitespaceAfterNewLine = true;
 		auto pLastDisplayPoint = pParse;
-		mint LastWordLen = 0;
-		mint LastDisplayPointLen = 0;
+		umint LastWordLen = 0;
+		umint LastDisplayPointLen = 0;
 
 		while (*pParse)
 		{
