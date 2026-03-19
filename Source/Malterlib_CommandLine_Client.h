@@ -16,6 +16,14 @@ namespace NMib::NCommandLine
 		using CThis = TCConditional<NTraits::cIsVoid<t_CThis>, TCCommandLineClient, t_CThis>;
 		using CCommandLineSpecification = TCCommandLineSpecification<t_CCustomization>;
 
+		TCCommandLineClient(NStorage::TCSharedPointer<CCommandLineSpecification> const &_pCommandLineSpecification);
+		TCCommandLineClient(TCCommandLineClient const &_Other) = delete;
+		TCCommandLineClient(TCCommandLineClient &&_Other);
+		~TCCommandLineClient();
+
+		TCCommandLineClient &operator = (TCCommandLineClient const &_Other) = delete;
+		TCCommandLineClient &operator = (TCCommandLineClient &&_Other);
+
 		typename CCommandLineSpecification::CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params = fg_GetSys()->f_GetCommandLineArgs());
 		aint f_RunCommandLine(NContainer::TCVector<NStr::CStr> &&_CommandLine = fg_GetSys()->f_GetCommandLineArgs());
 		aint f_RunCommand(NStr::CStr &&_Command, NEncoding::CEJsonSorted &&_Params);
@@ -31,14 +39,6 @@ namespace NMib::NCommandLine
 		uint32 f_CommandLineHeight() const;
 
 		CTableRenderHelper f_TableRenderer(NStr::CStr const &_Prefix = {}) const;
-
-		TCCommandLineClient(NStorage::TCSharedPointer<CCommandLineSpecification> const &_pCommandLineSpecification);
-		~TCCommandLineClient();
-
-		TCCommandLineClient(TCCommandLineClient const &_Other) = delete;
-		TCCommandLineClient(TCCommandLineClient &&_Other);
-		TCCommandLineClient &operator =(TCCommandLineClient const &_Other) = delete;
-		TCCommandLineClient &operator =(TCCommandLineClient &&_Other);
 
 	protected:
 		struct CInternal;

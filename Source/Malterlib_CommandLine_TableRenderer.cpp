@@ -43,10 +43,10 @@ namespace NMib::NCommandLine
 				}
 				()
 				, "Description"_o= "How to output the table.\n"
-					"human-readable    - Display the table rendered with borders.\n"
-					"tab-separated     - Output the table as tab separated output suitable for scripting.\n"
-					"json              - Output the table as Json.\n"
-					"colored-json      - Output the table as syntax highlighted Json.\n"
+				"human-readable    - Display the table rendered with borders.\n"
+				"tab-separated     - Output the table as tab separated output suitable for scripting.\n"
+				"json              - Output the table as Json.\n"
+				"colored-json      - Output the table as syntax highlighted Json.\n"
 			}
 		;
 	}

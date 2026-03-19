@@ -40,7 +40,6 @@ namespace NMib::NCommandLine
 #		define DConErrOut DMibConErrOut
 #		define DColorConErrOut DMibColorConErrOut
 #	endif
-
 }
 
 #ifndef DMibPNoShortCuts
