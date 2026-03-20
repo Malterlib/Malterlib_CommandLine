@@ -70,12 +70,13 @@ namespace NMib::NCommandLine
 
 		struct CCommand
 		{
+			void f_RegisterOptions(NEncoding::CEJsonOrdered &&_Options);
+
+		private:
 			friend struct TCCommandLineSpecification;
 			friend struct CSectionCommon;
 			friend CSection;
 
-			void f_RegisterOptions(NEncoding::CEJsonOrdered &&_Options);
-		private:
 			CCommand(CInternal *_pInternal, void *_pCommand);
 			void *mp_pCommand;
 			CInternal *mp_pInternal;
@@ -83,8 +84,6 @@ namespace NMib::NCommandLine
 
 		struct CSectionCommon
 		{
-			friend struct TCCommandLineSpecification;
-			friend struct TCCommandLineSpecification;
 			void f_RegisterSectionOptions(NEncoding::CEJsonOrdered &&_Options);
 
 			CCommand f_RegisterDirectCommand
@@ -95,6 +94,9 @@ namespace NMib::NCommandLine
 			;
 
 		protected:
+			friend struct TCCommandLineSpecification;
+			friend struct TCCommandLineSpecification;
+
 			CSectionCommon(CInternal *_pInternal, void *_pSection);
 			void *mp_pSection;
 			CInternal *mp_pInternal;

@@ -80,6 +80,13 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
+	TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::CValue(NStr::CStr const &_Identifier, bool _bOptional)
+		: m_Identifier(_Identifier)
+		, m_bOptional(_bOptional)
+	{
+	}
+
+	template <typename t_CCustomization>
 	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_Parse(NEncoding::CEJsonOrdered &&_Value)
 	{
 		if (auto *pDefault = _Value.f_GetMember("Default"))
@@ -229,7 +236,13 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate(NEncoding::CEJsonSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const
+	void TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::fp_ValidateTemplate
+		(
+			NEncoding::CEJsonSorted const &_Template
+			, NStr::CStr const &_Identifier
+			, bool _bPrevIsSetOf
+		)
+		const
 	{
 		using namespace NEncoding;
 		switch (_Template.f_EType())
@@ -330,7 +343,8 @@ namespace NMib::NCommandLine
 			, NStr::CStr const &_Identifier
 			, bool _bStrict
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		using namespace NEncoding;
 		using namespace NStr;
@@ -900,7 +914,8 @@ namespace NMib::NCommandLine
 			NEncoding::CEJsonSorted const &_Template
 			, NEncoding::CEJsonSorted const &_Value
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		using namespace NEncoding;
 		using namespace NStr;
@@ -964,6 +979,14 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
+	TCCommandLineSpecification<t_CCustomization>::CInternal::COption::COption(NStr::CStr const &_Identifier, NContainer::TCVector<NStr::CStr> const &_Names, CCommandCommon *_pCommand, bool _bOptional)
+		: CValue(_Identifier, _bOptional)
+		, m_pCommand(_pCommand)
+		, m_Names(_Names)
+	{
+	}
+
+	template <typename t_CCustomization>
 	bool TCCommandLineSpecification<t_CCustomization>::CInternal::COption::f_IsEnabled(COptionSet const &_OptionSet, bool _bIsDirect) const
 	{
 		if (_OptionSet.m_Disallowed.f_FindEqual(this->m_Identifier))
@@ -1002,6 +1025,13 @@ namespace NMib::NCommandLine
 			m_bValidForDirectCommand = pValue->f_Boolean();
 
 		CValue::f_Parse(fg_Move(_Option));
+	}
+
+	template <typename t_CCustomization>
+	TCCommandLineSpecification<t_CCustomization>::CInternal::CParameter::CParameter(NStr::CStr const &_Identifier, bool _bOptional, bool _bVector)
+		: CValue(_Identifier, _bOptional)
+		, m_bVector(_bVector)
+	{
 	}
 
 	template <typename t_CCustomization>
@@ -1047,6 +1077,13 @@ namespace NMib::NCommandLine
 		}
 		if (_Name.f_FindChar('=') > 0)
 			DMibError("An option or command name cannot contain '=' as this can be used to specify the value for an option.");
+	}
+
+	template <typename t_CCustomization>
+	TCCommandLineSpecification<t_CCustomization>::CInternal::CCommandCommon::CCommandCommon(CSection *_pSection, NContainer::TCVector<NStr::CStr> const &_Names)
+		: m_pSection(_pSection)
+		, m_Names(_Names)
+	{
 	}
 
 	template <typename t_CCustomization>

@@ -39,21 +39,36 @@ namespace NMib::NCommandLine
 
 		struct CValue
 		{
-			CValue(NStr::CStr const &_Identifier, bool _bOptional)
-				: m_Identifier(_Identifier)
-				, m_bOptional(_bOptional)
-			{
-			}
+			CValue(NStr::CStr const &_Identifier, bool _bOptional);
+
 			void f_Parse(NEncoding::CEJsonOrdered &&_Option);
 			NEncoding::CEJsonSorted fp_ParseEJson(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
-			NEncoding::CEJsonSorted fp_ConvertValue(NEncoding::CEJsonSorted const &_Template, NEncoding::CEJsonSorted const &_Value, NStr::CStr const &_Identifier, bool _bStrict, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NEncoding::CEJsonSorted fp_ConvertValue
+				(
+					NEncoding::CEJsonSorted const &_Template
+					, NEncoding::CEJsonSorted const &_Value
+					, NStr::CStr const &_Identifier
+					, bool _bStrict
+					, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+				)
+				const
+			;
 			NStr::CStr fp_FormatValue(NEncoding::CEJsonSorted const &_Template, NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NStr::CStr fp_FormatType(NEncoding::CEJsonSorted const &_Template, bool _bType, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void fp_ValidateTemplate(NEncoding::CEJsonSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
 			NEncoding::CEJsonSorted f_ConvertValue(NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NEncoding::CEJsonSorted f_ConvertValue(NEncoding::CEJsonSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void f_AppendConvertValue(NEncoding::CEJsonSorted &o_Value, NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			void f_AppendConvertValue(NEncoding::CEJsonSorted &o_Value, NEncoding::CEJsonSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void f_AppendConvertValue
+				(
+					NEncoding::CEJsonSorted &o_Value
+					, NEncoding::CEJsonSorted const &_Value
+					, NStr::CStr const &_Identifier
+					, EColor _Color
+					, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+				)
+				const
+			;
 			NStr::CStr f_FormatValue(NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NStr::CStr f_FormatType(NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 
@@ -76,12 +91,8 @@ namespace NMib::NCommandLine
 
 		struct COption : public CValue
 		{
-			COption(NStr::CStr const &_Identifier, NContainer::TCVector<NStr::CStr> const &_Names, CCommandCommon *_pCommand, bool _bOptional)
-				: CValue(_Identifier, _bOptional)
-				, m_pCommand(_pCommand)
-				, m_Names(_Names)
-			{
-			}
+			COption(NStr::CStr const &_Identifier, NContainer::TCVector<NStr::CStr> const &_Names, CCommandCommon *_pCommand, bool _bOptional);
+
 			void f_ParseOption(NEncoding::CEJsonOrdered &&_Option);
 			bool f_IsEnabled(COptionSet const &_OptionSet, bool _bIsDirect) const;
 
@@ -96,11 +107,8 @@ namespace NMib::NCommandLine
 
 		struct CParameter : public CValue
 		{
-			CParameter(NStr::CStr const &_Identifier, bool _bOptional, bool _bVector)
-				: CValue(_Identifier, _bOptional)
-				, m_bVector(_bVector)
-			{
-			}
+			CParameter(NStr::CStr const &_Identifier, bool _bOptional, bool _bVector);
+
 			void f_ParseParameter(NEncoding::CEJsonOrdered &&_Parameter);
 
 			bool m_bVector;
@@ -108,11 +116,8 @@ namespace NMib::NCommandLine
 
 		struct CCommandCommon
 		{
-			CCommandCommon(CSection *_pSection, NContainer::TCVector<NStr::CStr> const &_Names)
-				: m_pSection(_pSection)
-				, m_Names(_Names)
-			{
-			}
+			CCommandCommon(CSection *_pSection, NContainer::TCVector<NStr::CStr> const &_Names);
+
 			void f_RegisterOptions(CInternal &_Internal, NEncoding::CEJsonOrdered &&_Options);
 
 			CSection * const m_pSection;
@@ -135,10 +140,7 @@ namespace NMib::NCommandLine
 			COptionSet m_SectionOptionSet;
 			COptionSet m_GlobalOptionSet;
 
-			NStorage::TCSharedPointer
-				<
-					NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>
-				>
+			NStorage::TCSharedPointer<NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>>
 				m_pDirectRunCommand
 			;
 
