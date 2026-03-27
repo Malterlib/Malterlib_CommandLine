@@ -175,6 +175,9 @@ namespace NMib::NCommandLine
 		NEncoding::CEJsonSorted f_ValidateParams(CCommand const &_Command, NEncoding::CEJsonSorted const &_Params) const;
 		void f_CheckName(NStr::CStr const &_Name);
 		static void fs_CheckValidObject(NEncoding::CEJsonOrdered const &_ToCheck, NContainer::TCSet<NStr::CStr> const &_AllowedKeys);
+		static uint32 fs_ColorRGB(EColor _Color);
+		static NStr::CStr fs_ColorCode(EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
+		static NStr::CStr fs_DullColorCode(EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
 		static NStr::CStr fs_Color(NStr::CStr const &_String, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
 
 		NContainer::TCLinkedList<CSection> m_Sections;

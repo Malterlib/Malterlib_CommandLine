@@ -277,7 +277,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Missing required command parameters: Required\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Missing required command parameters: Required\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -376,7 +376,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Missing required option: --req\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Missing required option: --req\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -538,7 +538,7 @@ namespace
 								, DMibErrorInstanceExceptionVector
 								(
 									"--choice: Could not match \"invalid\" to any member in set: [\n    \"alpha\",\n    \"beta\",\n    \"gamma\"\n]"
-									"\n\n\nTo see command syntax, run command with -?\n"
+									"\n\nTo see command syntax, run command with '-?'\n"
 									, {}
 								)
 							)
@@ -786,7 +786,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "--int", "notanumber"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("--int: Failed to parse \"notanumber\" as a integer value\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("--int: Failed to parse \"notanumber\" as a integer value\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -796,7 +796,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "--float", "notafloat"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("--float: Failed to parse \"notafloat\" as a float value\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("--float: Failed to parse \"notafloat\" as a float value\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -848,7 +848,84 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "--no-int"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("You cannot negate a non-boolean option --int with --no-\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("You cannot negate a non-boolean option --int with --no- or +\n\nTo see command syntax, run command with '-?'\n", {})
+							)
+						;
+					};
+				};
+
+				DMibTestSuite("Boolean Negation With +")
+				{
+					CEJsonSorted RunParams;
+					TCSharedPointer<CCommandLineSpecification> pSpec = fg_Construct();
+					auto Section = pSpec->f_AddSection("Test", "Test");
+					Section.f_RegisterDirectCommand
+						(
+							{
+								"Names"_o= _o["--cmd"]
+								, "Description"_o= "Test"
+								, "Options"_o=
+								{
+									"FlagOn?"_o=
+									{
+										"Names"_o= _o["--flag-on", "-f"]
+										, "Default"_o= true
+										, "Description"_o= "A flag that defaults to on"
+									}
+									, "FlagOff?"_o=
+									{
+										"Names"_o= _o["--flag-off", "-o"]
+										, "Default"_o= false
+										, "Description"_o= "A flag that defaults to off"
+									}
+									, "FlagOn2?"_o=
+									{
+										"Names"_o= _o["--flag-on2", "-g"]
+										, "Default"_o= true
+										, "Description"_o= "Another flag that defaults to on"
+									}
+									, "IntOpt?"_o=
+									{
+										"Names"_o= _o["--int", "-i"]
+										, "Default"_o= 5
+										, "Description"_o= "Integer"
+									}
+								}
+							}
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							{
+								RunParams = _Params;
+								return 0;
+							}
+						)
+					;
+					CCommandLineClient Client(pSpec);
+
+					{
+						DMibTestPath("Negate short boolean with + prefix");
+						Client.f_RunCommandLine(fg_CreateVector<CStr>("App", "--cmd", "+f"));
+						DMibExpect(RunParams["FlagOn"].f_Boolean(), ==, false);
+					};
+
+					{
+						DMibTestPath("Negate short boolean with default false using +");
+						Client.f_RunCommandLine(fg_CreateVector<CStr>("App", "--cmd", "+o"));
+						DMibExpect(RunParams["FlagOff"].f_Boolean(), ==, false);
+					};
+
+					{
+						DMibTestPath("Grouped + negation");
+						Client.f_RunCommandLine(fg_CreateVector<CStr>("App", "--cmd", "+fg"));
+						DMibExpect(RunParams["FlagOn"].f_Boolean(), ==, false);
+						DMibExpect(RunParams["FlagOn2"].f_Boolean(), ==, false);
+					};
+
+					{
+						DMibTestPath("Negate non-boolean with + throws");
+						DMibExpectException
+							(
+								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "+i"), EAnsiEncodingFlag_None)
+								, DMibErrorInstanceExceptionVector("You cannot negate a non-boolean option --int with --no- or +\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -874,6 +951,28 @@ namespace
 								(
 									"An option or command name cannot start with --no- as this is reserved for negating a boolean option."
 									" If this is what you are trying to achieve, rather use then non-negative form and set the default to true."
+								)
+							)
+						;
+					};
+
+					{
+						DMibTestPath("Name cannot start with +");
+						TCSharedPointer<CCommandLineSpecification> pSpec2 = fg_Construct();
+						auto Section2 = pSpec2->f_AddSection("Test", "Test");
+						DMibExpectException
+							(
+								Section2.f_RegisterDirectCommand
+								(
+									{
+										"Names"_o= _o["+bad"]
+										, "Description"_o= "Test"
+									}
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								)
+								, DMibErrorInstance
+								(
+									"An option or command name cannot start with + as this is reserved for negating a short boolean option."
 								)
 							)
 						;
@@ -1388,7 +1487,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App"), EAnsiEncodingFlag_None)
-								, DMibErrorInstance("No command specified")
+								, DMibErrorInstanceExceptionVector("No command specified\n\nTo list commands, run --help\n", {})
 							)
 						;
 					};
@@ -1418,7 +1517,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Missing required option: --required\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Missing required option: --required\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -1447,7 +1546,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Missing required command parameters: Required\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Missing required command parameters: Required\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -1470,8 +1569,8 @@ namespace
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "--unknown"), EAnsiEncodingFlag_None)
 								, DMibErrorInstanceExceptionVector
 								(
-									"No such option or command: --unknown. Did you mean any of the following?\n   --malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89"
-									"\n\n\nTo see command syntax, run command with -?\n"
+									"No such option or command: --unknown"
+									"\n\nTo see command syntax, run command with '-?'\n"
 									, {}
 								)
 							)
@@ -1494,7 +1593,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "unexpected"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Unexpected parameter value: unexpected\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Unexpected parameter value: unexpected\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -1524,7 +1623,7 @@ namespace
 						DMibExpectException
 							(
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd", "--val"), EAnsiEncodingFlag_None)
-								, DMibErrorInstanceExceptionVector("Missing parameter for option: --val\n\n\nTo see command syntax, run command with -?\n", {})
+								, DMibErrorInstanceExceptionVector("Missing parameter for option: --val\n\nTo see command syntax, run command with '-?'\n", {})
 							)
 						;
 					};
@@ -1556,7 +1655,7 @@ namespace
 								pSpec->f_ParseCommandLine(fg_CreateVector<CStr>("App", "--cmd1", "--cmd2"), EAnsiEncodingFlag_None)
 								, DMibErrorInstanceExceptionVector
 								(
-									"Command --cmd1 already specified. You cannot specify additional command --cmd2\n\n\nTo see command syntax, run command with -?\n"
+									"Command --cmd1 already specified. You cannot specify additional command --cmd2\n\nTo see command syntax, run command with '-?'\n"
 									, {}
 								)
 							)

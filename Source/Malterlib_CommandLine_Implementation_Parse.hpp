@@ -168,6 +168,13 @@ namespace NMib::NCommandLine
 						OptionValue = "false";
 						bNegatedOption = true;
 					}
+					else if (Parameter.f_StartsWith("+"))
+					{
+						ParsedParameter = "-" + Parameter.f_Extract(1);
+						bOptionValueSet = true;
+						OptionValue = "false";
+						bNegatedOption = true;
+					}
 					else
 					{
 						aint iParameterAssign = Parameter.f_FindChar('=');
@@ -230,7 +237,7 @@ namespace NMib::NCommandLine
 							if (_Value.m_TypeTemplate.f_IsBoolean())
 							{
 								if (bNegatedOption && !_Value.m_bCanNegate)
-									DMibError(fg_Format("Option {} cannot be negated with --no-", fColor(_Value.m_Names.f_GetFirst(), _Color)));
+									DMibError(fg_Format("Option {} cannot be negated with --no- or +", fColor(_Value.m_Names.f_GetFirst(), _Color)));
 
 								if (!bOptionValueSet)
 								{
@@ -239,7 +246,7 @@ namespace NMib::NCommandLine
 								}
 							}
 							else if (bNegatedOption)
-								DMibError(fg_Format("You cannot negate a non-boolean option {} with --no-", fColor(_Value.m_Names.f_GetFirst(), _Color)));
+								DMibError(fg_Format("You cannot negate a non-boolean option {} with --no- or +", fColor(_Value.m_Names.f_GetFirst(), _Color)));
 
 							if (_Value.m_bDisablesAllErrors)
 								bDisableAllErrors = true;
@@ -263,8 +270,16 @@ namespace NMib::NCommandLine
 									if (!_Option.m_TypeTemplate.f_IsBoolean())
 										return true;
 
-									if (_Option.m_Default.f_IsValid() && _Option.m_Default.f_Boolean())
-										return true; // Only options with defaults not set or false can be turned on
+									if (bNegatedOption)
+									{
+										if (_Option.m_Default.f_IsValid() && !_Option.m_Default.f_Boolean())
+											return true; // Only options with defaults not set or true can be turned off with +
+									}
+									else
+									{
+										if (_Option.m_Default.f_IsValid() && _Option.m_Default.f_Boolean())
+											return true; // Only options with defaults not set or false can be turned on
+									}
 
 									return false;
 								}
@@ -401,6 +416,11 @@ namespace NMib::NCommandLine
 
 								OptionValue.f_Clear();
 								bOptionValueSet = false;
+								if (bNegatedOption)
+								{
+									OptionValue = "false";
+									bOptionValueSet = true;
+								}
 							}
 
 							bFoundParam = true;
@@ -416,11 +436,11 @@ namespace NMib::NCommandLine
 							bForceFail
 							||
 							(
-								Parameter.f_StartsWith("-")
+								(Parameter.f_StartsWith("-") || Parameter.f_StartsWith("+"))
 								&& (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter)
 								&& (!pCurrentCommand || pCurrentCommand->m_bErrorOnOptionAsParameterWhenDefaultCommand)
 							)
-							|| (!Parameter.f_StartsWith("-") && !pFoundCommand && (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter))
+							|| (!Parameter.f_StartsWith("-") && !Parameter.f_StartsWith("+") && !pFoundCommand && (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter))
 						)
 					{
 						struct CFuzzyEntry
@@ -439,11 +459,56 @@ namespace NMib::NCommandLine
 
 						auto fCheckName = [&](CStr const &_Name, typename CInternal::EColor _Color)
 							{
-								fp64 Score = NStr::fg_FuzzyMatchString(_Name, Parameter);
+								auto FuzzyResult = NStr::fg_FuzzyMatchString(_Name, Parameter);
+								if (!FuzzyResult)
+									return;
 								auto &Entry = FuzzyEntries.f_Insert();
 								Entry.m_Name = _Name;
-								Entry.m_Score = Score;
-								Entry.m_ColoredName = fColor(_Name, _Color);
+								Entry.m_Score = FuzzyResult.m_Score;
+								if ((_AnsiFlags & EAnsiEncodingFlag_Color) && !FuzzyResult.m_Matches.f_IsEmpty())
+								{
+									CAnsiEncoding AnsiEncoding(_AnsiFlags);
+									auto HighlightColor = CInternal::fs_ColorCode(_Color, _AnsiFlags);
+									auto CategoryColor = CInternal::fs_DullColorCode(_Color, _AnsiFlags);
+
+									CStr Colored;
+									Colored += CategoryColor;
+									aint iPos = 0;
+									for (auto &Range : FuzzyResult.m_Matches)
+									{
+										if (Range.m_iStart > iPos)
+											Colored += _Name.f_Extract(iPos, Range.m_iStart - iPos);
+										Colored += HighlightColor;
+										Colored += _Name.f_Extract(Range.m_iStart, Range.m_iEnd - Range.m_iStart);
+										Colored += CategoryColor;
+										iPos = Range.m_iEnd;
+									}
+									if (iPos < _Name.f_GetLen())
+										Colored += _Name.f_Extract(iPos);
+									Colored += AnsiEncoding.f_Default();
+									Entry.m_ColoredName = Colored;
+								}
+								else
+									Entry.m_ColoredName = fColor(_Name, _Color);
+							}
+						;
+
+						auto fCheckOption = [&](typename CInternal::COption const &_Option, typename CInternal::EColor _Color)
+							{
+								if (_Option.m_bHidden)
+									return;
+
+								for (auto &Name : _Option.m_Names)
+								{
+									fCheckName(Name, _Color);
+									if (_Option.m_TypeTemplate.f_IsBoolean() && _Option.m_bCanNegate)
+									{
+										if (Name.f_StartsWith("--"))
+											fCheckName("--no-" + Name.f_Extract(2), _Color);
+										else if (Name.f_StartsWith("-"))
+											fCheckName("+" + Name.f_Extract(1), _Color);
+									}
+								}
 							}
 						;
 
@@ -456,22 +521,19 @@ namespace NMib::NCommandLine
 
 						if (pCurrentCommand)
 						{
-							for (auto iName = pCurrentCommand->m_OptionsByName.f_GetIterator(); iName; ++iName)
-								fCheckName(iName.f_GetKey(), CInternal::EColor_Option);
+							for (auto &Option : pCurrentCommand->m_Options)
+								fCheckOption(Option, CInternal::EColor_Option);
 
-							for (auto iName = pCurrentCommand->m_pSection->m_SectionOptionsByName.f_GetIterator(); iName; ++iName)
-								fCheckName(iName.f_GetKey(), CInternal::EColor_SectionOption);
+							for (auto &Option : pCurrentCommand->m_pSection->m_SectionOptions)
+								fCheckOption(Option, CInternal::EColor_SectionOption);
 						}
 
 						for (auto &Option : CommandLineSpec.m_GlobalOptions)
-						{
-							for (auto &Name : Option.m_Names)
-								fCheckName(Name, CInternal::EColor_GlobalOption);
-						}
+							fCheckOption(Option, CInternal::EColor_GlobalOption);
 
 						FuzzyEntries.f_Sort();
 
-						CStr Error = fg_Format("No such option or command: {}", fColor(ParsedParameter, CInternal::EColor_Error));
+						CStr Error = fg_Format("No such option or command: {}", fColor(Parameter, CInternal::EColor_Error));
 						if (!FuzzyEntries.f_IsEmpty())
 						{
 							CStr EntryNames;
@@ -490,7 +552,7 @@ namespace NMib::NCommandLine
 	#endif
 							}
 							if (!EntryNames.f_IsEmpty())
-								Error += ". Did you mean any of the following?\n{}"_f << EntryNames;
+								Error += ". Did you mean any of the following?\n\n{}"_f << EntryNames.f_TrimRight();
 						}
 
 						DMibError(Error);
@@ -584,7 +646,9 @@ namespace NMib::NCommandLine
 				ErrorCollector.f_AddError(fg_Move(Exception));
 
 			if (bFoundCommand)
-				ErrorCollector.f_AddError(fg_MakeException(DMibErrorInstance("\n\nTo see command syntax, run command with {}\n"_f << fColor("-?", CInternal::EColor_GlobalOption))));
+				ErrorCollector.f_AddError(fg_MakeException(DMibErrorInstance("\nTo see command syntax, run command with {}\n"_f << fColor("'-?'", CInternal::EColor_GlobalOption))));
+			else
+				ErrorCollector.f_AddError(fg_MakeException(DMibErrorInstance("\nTo list commands, run {}\n"_f << fColor("--help", CInternal::EColor_Command))));
 
 			std::rethrow_exception(fg_Move(ErrorCollector).f_GetException());
 		}

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Mib/Core/Core>
+#include <Mib/Graphics/Utilities>
 
 namespace NMib::NCommandLine
 {
@@ -45,38 +46,136 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::fs_Color(NStr::CStr const &_String, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags)
+	uint32 TCCommandLineSpecification<t_CCustomization>::CInternal::fs_ColorRGB(EColor _Color)
 	{
-		using namespace NStr;
+		switch (_Color)
+		{
+		case EColor_Executable: return 0x00e4e6;
+		case EColor_Command: return 0x1cb900;
+		case EColor_Parameter: return 0xb8aaff;
+		case EColor_GlobalOption: return 0xff7700;
+		case EColor_SectionOption: return 0xffa600;
+		case EColor_Option: return 0xffd700;
+		case EColor_String: return 0x009eff;
+		case EColor_Number: return 0xff0080;
+		case EColor_Constant: return 0xff8ac5;
+		case EColor_Date: return 0xff5bad;
+		case EColor_Binary: return 0x808080;
+		case EColor_Value: return 0xc0c0c0;
+		case EColor_Error: return 0xff3f1c;
+		case EColor_Default: return 0x909090;
+		case EColor_Type: return 0xb8aaff;
+		case EColor_BuiltInType: return 0xff5966;
+		case EColor_ObjectName: return 0xffa600;
+		case EColor_Heading1:
+		case EColor_None:
+		default: return 0;
+		}
+	}
+
+	template <typename t_CCustomization>
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::fs_ColorCode(EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags)
+	{
 		if (!(_AnsiFlags & EAnsiEncodingFlag_Color))
-			return _String;
+			return {};
 
 		CAnsiEncoding AnsiEncoding(_AnsiFlags);
 
-		switch (_Color)
-		{
-		case EColor_Executable: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x00, 0xe4, 0xe6) << _String << AnsiEncoding.f_Default();
-		case EColor_Command: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x1c, 0xb9, 0x00) << _String << AnsiEncoding.f_Default();
-		case EColor_Parameter: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xb8, 0xaa, 0xff) << _String << AnsiEncoding.f_Default();
-		case EColor_GlobalOption: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x77, 0x00) << _String << AnsiEncoding.f_Default();
-		case EColor_SectionOption: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0xa6, 0x00) << _String << AnsiEncoding.f_Default();
-		case EColor_Option: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0xd7, 0x00) << _String << AnsiEncoding.f_Default();
-		case EColor_String: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x00, 0x9e, 0xff) << _String << AnsiEncoding.f_Default();
-		case EColor_Number: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x00, 0x80) << _String << AnsiEncoding.f_Default();
-		case EColor_Constant: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x8a, 0xc5) << _String << AnsiEncoding.f_Default();
-		case EColor_Date: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x5b, 0xad) << _String << AnsiEncoding.f_Default();
-		case EColor_Binary: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x80, 0x80, 0x80) << _String << AnsiEncoding.f_Default();
-		case EColor_Value: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xc0, 0xc0, 0xc0) << _String << AnsiEncoding.f_Default();
-		case EColor_Error: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x3f, 0x1c) << _String << AnsiEncoding.f_Default();
-		case EColor_Heading1: return "{}{}{}"_f << AnsiEncoding.f_Bold() << _String << AnsiEncoding.f_Default();
-		case EColor_Default: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0x90, 0x90, 0x90) << _String << AnsiEncoding.f_Default();
-		case EColor_Type: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xb8, 0xaa, 0xff) << _String << AnsiEncoding.f_Default();
-		case EColor_BuiltInType: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0x59, 0x66) << _String << AnsiEncoding.f_Default();
-		case EColor_ObjectName: return "{}{}{}"_f << AnsiEncoding.f_ForegroundRGB(0xff, 0xa6, 0x00) << _String << AnsiEncoding.f_Default();
+		if (_Color == EColor_Heading1)
+			return AnsiEncoding.f_Bold();
 
-		case EColor_None:
-		default: return _String;
+		uint32 RGB = fs_ColorRGB(_Color);
+		if (!RGB)
+			return {};
+
+		return AnsiEncoding.f_ForegroundRGB(RGB);
+	}
+
+	template <typename t_CCustomization>
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::fs_DullColorCode(EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags)
+	{
+		if (!(_AnsiFlags & EAnsiEncodingFlag_Color))
+			return {};
+
+		uint32 RGB = fs_ColorRGB(_Color);
+		if (!RGB)
+			return fs_ColorCode(_Color, _AnsiFlags);
+
+		NGraphics::CColorR8G8B8 Color{.m_Color = RGB};
+		fp32 R = fp32(1.0f / 255.0f) * Color.f_Red();
+		fp32 G = fp32(1.0f / 255.0f) * Color.f_Green();
+		fp32 B = fp32(1.0f / 255.0f) * Color.f_Blue();
+
+		// Convert RGB to HSV
+		fp32 CMax = fg_Max(R, fg_Max(G, B));
+		fp32 CMin = fg_Min(R, fg_Min(G, B));
+		fp32 Delta = CMax - CMin;
+
+		fp32 H = fp32(0.0f);
+		if (Delta > fp32(0.0f))
+		{
+			if (CMax == R)
+				H = fp32(60.0f) * ((G - B) / Delta).f_Mod(fp32(6.0f));
+			else if (CMax == G)
+				H = fp32(60.0f) * ((B - R) / Delta + fp32(2.0f));
+			else
+				H = fp32(60.0f) * ((R - G) / Delta + fp32(4.0f));
+			if (H < fp32(0.0f))
+				H += fp32(360.0f);
 		}
+		fp32 S = (CMax > fp32(0.0f)) ? (Delta / CMax) : fp32(0.0f);
+		fp32 V = CMax;
+
+		// Decrease saturation, then solve for V that preserves perceived brightness
+		fp32 Y_orig = (fp32(0.299f) * R + fp32(0.587f) * G + fp32(0.114f) * B) * fp32(0.7f);
+		S *= fp32(0.7f);
+
+		// Compute RGB at V=1 to find the luminance scaling factor
+		fp32 C1 = S;
+		fp32 X1 = C1 * (fp32(1.0f) - ((H / fp32(60.0f)).f_Mod(fp32(2.0f)) - fp32(1.0f)).f_Abs());
+		fp32 M1 = fp32(1.0f) - C1;
+
+		fp32 R1, G1, B1;
+		fp32 Hs = H / fp32(60.0f);
+		if (Hs < fp32(1.0f))
+			{ R1 = C1; G1 = X1; B1 = fp32(0.0f); }
+		else if (Hs < fp32(2.0f))
+			{ R1 = X1; G1 = C1; B1 = fp32(0.0f); }
+		else if (Hs < fp32(3.0f))
+			{ R1 = fp32(0.0f); G1 = C1; B1 = X1; }
+		else if (Hs < fp32(4.0f))
+			{ R1 = fp32(0.0f); G1 = X1; B1 = C1; }
+		else if (Hs < fp32(5.0f))
+			{ R1 = X1; G1 = fp32(0.0f); B1 = C1; }
+		else
+			{ R1 = C1; G1 = fp32(0.0f); B1 = X1; }
+
+		R1 += M1;
+		G1 += M1;
+		B1 += M1;
+
+		// All RGB components scale linearly with V, so solve V to match original luminance
+		fp32 Y1 = fp32(0.299f) * R1 + fp32(0.587f) * G1 + fp32(0.114f) * B1;
+		V = ((Y1 > fp32(0.0f)) ? fg_Min(Y_orig / Y1, fp32(1.0f)) : fp32(0.0f));
+
+		fp32 Rf = fg_Clamp(R1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+		fp32 Gf = fg_Clamp(G1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+		fp32 Bf = fg_Clamp(B1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+
+		CAnsiEncoding AnsiEncoding(_AnsiFlags);
+		return AnsiEncoding.f_ForegroundRGB(Rf.f_ToIntRound(), Gf.f_ToIntRound(), Bf.f_ToIntRound());
+	}
+
+	template <typename t_CCustomization>
+	NStr::CStr TCCommandLineSpecification<t_CCustomization>::CInternal::fs_Color(NStr::CStr const &_String, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags)
+	{
+		using namespace NStr;
+		auto ColorCode = fs_ColorCode(_Color, _AnsiFlags);
+		if (ColorCode.f_IsEmpty())
+			return _String;
+
+		CAnsiEncoding AnsiEncoding(_AnsiFlags);
+		return "{}{}{}"_f << ColorCode << _String << AnsiEncoding.f_Default();
 	}
 
 	template <typename t_CCustomization>
@@ -1075,6 +1174,10 @@ namespace NMib::NCommandLine
 				)
 			;
 		}
+
+		if (_Name.f_StartsWith("+"))
+			DMibError("An option or command name cannot start with + as this is reserved for negating a short boolean option.");
+
 		if (_Name.f_FindChar('=') > 0)
 			DMibError("An option or command name cannot contain '=' as this can be used to specify the value for an option.");
 	}

@@ -326,6 +326,7 @@ namespace NMib::NCommandLine
 				struct CCommandEntry
 				{
 					CStr m_Names;
+					CStr m_NegatedNames;
 					typename CInternal::COption const *m_pOption;
 				};
 				TCVector<CCommandEntry> OptionEntries;
@@ -339,6 +340,21 @@ namespace NMib::NCommandLine
 					LongestName = fg_Max(LongestName, umint(fRenderLength(Names)));
 					Entry.m_Names = Names;
 					Entry.m_pOption = &Option;
+					if (Option.m_TypeTemplate.f_IsBoolean() && Option.m_bCanNegate && Option.m_Default.f_IsValid() && Option.m_Default.f_Boolean())
+					{
+						for (auto &Name : Option.m_Names)
+						{
+							CStr NegatedName;
+							if (Name.f_StartsWith("--"))
+								NegatedName = "--no-" + Name.f_Extract(2);
+							else if (Name.f_StartsWith("-"))
+								NegatedName = "+" + Name.f_Extract(1);
+							else
+								NegatedName = Name;
+							fg_AddStrSep(Entry.m_NegatedNames, fColor(NegatedName, _Color), ", ");
+						}
+						LongestName = fg_Max(LongestName, umint(fRenderLength(Entry.m_NegatedNames)));
+					}
 				}
 				if (OptionEntries.f_IsEmpty())
 					return;
@@ -363,9 +379,14 @@ namespace NMib::NCommandLine
 						Description = Option.m_ShortDescription;
 
 					CStr OptionLine = fFormatTableLine(OptionEntry.m_Names, LongestName, Description);
+					bool bShowNegated = !OptionEntry.m_NegatedNames.f_IsEmpty();
+
 					if (_bVerbose)
 					{
-						auto OptionScope = fOutputHeading(OptionLine, LongestName + 3);
+						fOutputLine(OptionLine, !bShowNegated, LongestName + 3);
+						if (bShowNegated)
+							fOutputLine(OptionEntry.m_NegatedNames, true, LongestName + 3);
+						auto OptionScope = fAddIndent(3);
 						fOutputSectionedText(Option.m_LongDescription);
 
 						fOutputVerboseValueSection(gc_Str<"Type:">, Option.f_FormatType(AnsiFlags));
@@ -374,7 +395,17 @@ namespace NMib::NCommandLine
 							fOutputVerboseValueSection(gc_Str<"Default:">, Option.f_FormatValue(Option.m_Default, AnsiFlags));
 					}
 					else
+					{
+						if (bShowNegated)
+							fOutputEndSection();
 						fOutputTableText(OptionLine, LongestName + 3, false);
+
+						if (bShowNegated)
+						{
+							fOutputLine(OptionEntry.m_NegatedNames, false, LongestName + 3);
+							fOutputEndSection();
+						}
+					}
 				}
 				fOutputEndSection();
 			}
@@ -478,7 +509,7 @@ namespace NMib::NCommandLine
 								if (_Option.m_Default.f_Boolean())
 								{
 									bDidOption = true;
-									OptionString = "{}={}"_f << fColor(FirstName, _Color) << fColor("false", CInternal::EColor_Constant);
+									OptionString = fColor("+" + FirstName.f_Extract(1), _Color);
 								}
 								else
 								{
