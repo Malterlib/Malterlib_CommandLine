@@ -575,7 +575,7 @@ namespace NMib::NCommandLine
 				if (MaxLines == 0)
 					continue;
 
-				if (!bAvoidLineSeparators || bWasMultiLine || (bAvoidLineSeparators && !bWasMultiLine && MaxLines > 1) || mp_RowSeparators.f_Exists(iRow))
+				if ((iRow > 0 || !bNoHeadings) && (!bAvoidLineSeparators || bWasMultiLine || (bAvoidLineSeparators && !bWasMultiLine && MaxLines > 1) || mp_RowSeparators.f_Exists(iRow)))
 					fp_Output("{}\n"_f << MiddleLine);
 
 				for (umint iLine = 0; iLine < MaxLines; ++iLine)
