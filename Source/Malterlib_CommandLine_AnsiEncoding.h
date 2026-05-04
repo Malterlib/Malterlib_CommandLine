@@ -23,6 +23,8 @@ namespace NMib::NCommandLine
 			ESyntaxColor_Number
 			, ESyntaxColor_String
 			, ESyntaxColor_Constant
+			, ESyntaxColor_Comment
+			, ESyntaxColor_MemberVariable
 		};
 
 		enum EWordWrap
