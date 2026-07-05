@@ -26,6 +26,7 @@ namespace NMib::NCommandLine
 			, ESyntaxColor_Constant
 			, ESyntaxColor_Comment
 			, ESyntaxColor_MemberVariable
+			, ESyntaxColor_Type
 		};
 
 		enum EWordWrap
