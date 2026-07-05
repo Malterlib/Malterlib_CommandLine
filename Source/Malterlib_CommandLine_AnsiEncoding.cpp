@@ -1090,6 +1090,7 @@ namespace NMib::NCommandLine
 		case ESyntaxColor_Constant: return f_ForegroundRGB(0xff, 0x8a, 0xc5);
 		case ESyntaxColor_Comment: return f_ForegroundRGB(0x89, 0x89, 0x89);
 		case ESyntaxColor_MemberVariable: return f_ForegroundRGB(0xff, 0xa6, 0x00);
+		case ESyntaxColor_Type: return f_ForegroundRGB(0xb8, 0xaa, 0xff);
 		default: return {};
 		}
 	}
