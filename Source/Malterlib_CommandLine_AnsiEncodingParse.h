@@ -86,10 +86,12 @@ namespace NMib::NCommandLine
 			CDecodedColor m_CurrentColorUnderline;
 		};
 
+		// _fOnString receives contiguous views of _In without escape sequences. The views reference
+		// _In's storage (they are not NUL terminated) and are only valid during the callback.
 		static void fs_Parse
 			(
 				NStr::CStr const &_In
-				, NFunction::TCFunction<bool (NStr::CStr const &_String)> const &_fOnString
+				, NFunction::TCFunction<bool (NStr::CStrPtr const &_String)> const &_fOnString
 				, NFunction::TCFunction<void (CPropertyChange const &_Property)> const &_fOnPropertyChange
 				, CParseState *_pParseState = nullptr
 			)

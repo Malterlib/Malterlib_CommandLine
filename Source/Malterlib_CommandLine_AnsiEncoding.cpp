@@ -649,7 +649,7 @@ namespace NMib::NCommandLine
 		CAnsiEncodingParse::fs_Parse
 			(
 				_In
-				, [&](CStr const &_String) -> bool
+				, [&](CStrPtr const &_String) -> bool
 				{
 					Ret += _String;
 
@@ -737,7 +737,7 @@ namespace NMib::NCommandLine
 		CAnsiEncodingParse::fs_Parse
 			(
 				_String
-				, [&](CUStr _String) -> bool
+				, [&](CStrPtr const &_String) -> bool
 				{
 					auto Start = String.f_GetLen();
 					String += _String;

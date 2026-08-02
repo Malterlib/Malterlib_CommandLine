@@ -3,6 +3,8 @@
 
 #include "Malterlib_CommandLine_AnsiEncodingParse.h"
 
+#include <Mib/String/Appender>
+
 namespace NMib::NCommandLine
 {
 	using namespace NStr;
@@ -31,7 +33,7 @@ namespace NMib::NCommandLine
 	void CAnsiEncodingParse::fs_Parse
 		(
 			CStr const &_In
-			, TCFunction<bool (CStr const &_String)> const &_fOnString
+			, TCFunction<bool (CStrPtr const &_String)> const &_fOnString
 			, TCFunction<void (CPropertyChange const &_Property)> const &_fPropertyChange
 			, CParseState *_pParseState
 		)
@@ -49,21 +51,13 @@ namespace NMib::NCommandLine
 		CDecodedColor &CurrentColorBG = pParseState->m_CurrentColorBG;
 		CDecodedColor &CurrentColorUnderline = pParseState->m_CurrentColorUnderline;
 
-		CStr StringBuffer;
-
-		auto fCommitBuffer = [&]
-			{
-				if (!StringBuffer.f_IsEmpty())
-				{
-					bAborted = bAborted || !_fOnString(StringBuffer);
-					StringBuffer.f_Clear();
-				}
-			}
-		;
+		// Text is emitted as views of the input string instead of accumulating into a temporary
+		// buffer. Runs are committed when an escape byte is encountered, so the property-change
+		// callbacks never have pending text to flush.
+		const ch8 *pRunStart = _In;
 
 		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor, CDecodedColor const &_UnderlineColor)
 			{
-				fCommitBuffer();
 				if (_Color != CurrentColor)
 				{
 					_fPropertyChange(CForegroundColor{_Color});
@@ -83,7 +77,6 @@ namespace NMib::NCommandLine
 		;
 		auto fSetWeight = [&](CAnsiEncoding::EWeight _Weight)
 			{
-				fCommitBuffer();
 				if (Weight != _Weight)
 				{
 					_fPropertyChange(CWeight{_Weight});
@@ -93,7 +86,6 @@ namespace NMib::NCommandLine
 		;
 		auto fSetItalic = [&](bool _bItalic)
 			{
-				fCommitBuffer();
 				if (bItalic != _bItalic)
 				{
 					_fPropertyChange(CItalic{_bItalic});
@@ -103,7 +95,6 @@ namespace NMib::NCommandLine
 		;
 		auto fSetUnderline = [&](CAnsiEncoding::EUnderline _Underline)
 			{
-				fCommitBuffer();
 				if (Underline != _Underline)
 				{
 					_fPropertyChange(CUnderline{_Underline});
@@ -113,7 +104,6 @@ namespace NMib::NCommandLine
 		;
 		auto fSetStrikeout = [&](bool _bStrikeout)
 			{
-				fCommitBuffer();
 				if (bStrikeout != _bStrikeout)
 				{
 					_fPropertyChange(CStrikeout{_bStrikeout});
@@ -123,7 +113,6 @@ namespace NMib::NCommandLine
 		;
 		auto fReset = [&]()
 			{
-				fCommitBuffer();
 				fSetWeight(CAnsiEncoding::EWeight::mc_Normal);
 				fSetItalic(false);
 				fSetUnderline(CAnsiEncoding::EUnderline::mc_None);
@@ -138,11 +127,22 @@ namespace NMib::NCommandLine
 		;
 
 		const ch8 *pParse = _In;
+
+		auto fCommitRun = [&](ch8 const *_pEnd)
+			{
+				if (_pEnd == pRunStart)
+					return;
+
+				bAborted = bAborted || !_fOnString(CStrPtr(pRunStart, _pEnd - pRunStart));
+			}
+		;
+
 		while (*pParse && !bAborted)
 		{
 			ch8 Char = *pParse;
 			if (Char == '\x1B')
 			{
+				fCommitRun(pParse);
 				++pParse;
 				if (*pParse == '[')
 				{
@@ -150,12 +150,12 @@ namespace NMib::NCommandLine
 					auto pStart = pParse;
 					while (*pStart && *pParse >= 0x30 && *pParse <= 0x3F)
 						++pParse;
-					CStr Params(pStart, pParse - pStart);
+					CStrPtr Params(pStart, pParse - pStart);
 
 					pStart = pParse;
 					while (*pStart && *pParse >= 0x20 && *pParse <= 0x2F)
 						++pParse;
-					CStr Intermediate(pStart, pParse - pStart);
+					CStrPtr Intermediate(pStart, pParse - pStart);
 
 					char Final = *pParse;
 					++pParse;
@@ -177,49 +177,107 @@ namespace NMib::NCommandLine
 							}
 							else
 							{
-								auto ParamsVector = Params.f_Split<true>(";");
+								// The parameters are walked as views of the escape bytes: ';'
+								// separates parameters (empty ones are skipped) and ':' separates
+								// sub arguments (empty ones are kept), matching the previous
+								// f_Split based parsing without temporary strings
+								ch8 const *pParamPos = Params.f_GetStr();
+								ch8 const *pParamsEnd = pParamPos + Params.f_GetLen();
+								CStrPtr Param;
 
-								for (auto iParam = ParamsVector.f_GetIterator(); iParam;)
+								auto fNextParam = [&]() -> bool
+									{
+										while (pParamPos < pParamsEnd)
+										{
+											ch8 const *pSeparator = pParamPos;
+											while (pSeparator < pParamsEnd && *pSeparator != ';')
+												++pSeparator;
+
+											if (pSeparator != pParamPos)
+											{
+												Param = CStrPtr(pParamPos, pSeparator - pParamPos);
+												pParamPos = pSeparator + 1;
+
+												return true;
+											}
+
+											pParamPos = pSeparator + 1;
+										}
+
+										return false;
+									}
+								;
+
+								constexpr umint c_MaxArguments = 16;
+								CStrPtr Arguments[c_MaxArguments];
+								umint nArguments = 0;
+
+								auto fSplitArguments = [&]()
+									{
+										nArguments = 0;
+
+										ch8 const *pPos = Param.f_GetStr();
+										ch8 const *pEnd = pPos + Param.f_GetLen();
+										for (;;)
+										{
+											ch8 const *pSeparator = pPos;
+											while (pSeparator < pEnd && *pSeparator != ':')
+												++pSeparator;
+
+											if (nArguments < c_MaxArguments)
+												Arguments[nArguments] = CStrPtr(pPos, pSeparator - pPos);
+											++nArguments;
+
+											if (pSeparator == pEnd)
+												break;
+
+											pPos = pSeparator + 1;
+										}
+									}
+								;
+
+								bool bHaveParam = fNextParam();
+								while (bHaveParam)
 								{
-									uint32 ParamNumber = iParam->f_ToInt(uint32(0), ":");
+									uint32 ParamNumber = Param.f_ToInt(uint32(0), ":");
 
-									auto Arguments = iParam->f_Split(":");
-									if (Arguments.f_GetLen() == 1 && (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58))
+									fSplitArguments();
+									if (nArguments == 1 && (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58))
 									{
 										// Special case for broken encoding for true color
-										++iParam;
-										if (iParam && *iParam == "5")
+										bHaveParam = fNextParam();
+										if (bHaveParam && Param == "5")
 										{
-											++iParam;
-											if (iParam)
+											bHaveParam = fNextParam();
+											if (bHaveParam)
 											{
 												if (ParamNumber == 38)
 												{
-													FgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+													FgColor.f_SetAnsi256(Param.f_ToInt(uint8(0)));
 													LastForeground = -1;
 												}
 												else if (ParamNumber == 48)
-													BgColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
+													BgColor.f_SetAnsi256(Param.f_ToInt(uint8(0)));
 												else
-													UnderlineColor.f_SetAnsi256(iParam->f_ToInt(uint8(0)));
-												++iParam;
+													UnderlineColor.f_SetAnsi256(Param.f_ToInt(uint8(0)));
+												bHaveParam = fNextParam();
 											}
 										}
-										else if (iParam && *iParam == "2")
+										else if (bHaveParam && Param == "2")
 										{
-											++iParam;
-											if (iParam)
+											bHaveParam = fNextParam();
+											if (bHaveParam)
 											{
-												uint8 Red = iParam->f_ToInt(uint8(0));
-												++iParam;
-												if (iParam)
+												uint8 Red = Param.f_ToInt(uint8(0));
+												bHaveParam = fNextParam();
+												if (bHaveParam)
 												{
-													uint8 Green = iParam->f_ToInt(uint8(0));
-													++iParam;
-													if (iParam)
+													uint8 Green = Param.f_ToInt(uint8(0));
+													bHaveParam = fNextParam();
+													if (bHaveParam)
 													{
-														uint8 Blue = iParam->f_ToInt(uint8(0));
-														++iParam;
+														uint8 Blue = Param.f_ToInt(uint8(0));
+														bHaveParam = fNextParam();
 														if (ParamNumber == 38)
 														{
 															FgColor.f_Set(Red, Green, Blue);
@@ -238,7 +296,7 @@ namespace NMib::NCommandLine
 
 									if (ParamNumber == 1)
 									{
-										if (Arguments.f_GetLen() > 1 && Arguments[1] == "2")
+										if (nArguments > 1 && Arguments[1] == "2")
 											fSetWeight(CAnsiEncoding::EWeight::mc_Shadowed);
 										else
 											fSetWeight(CAnsiEncoding::EWeight::mc_Bold);
@@ -260,7 +318,7 @@ namespace NMib::NCommandLine
 									else if (ParamNumber == 4)
 									{
 										auto UnderlineStyle = CAnsiEncoding::EUnderline::mc_Solid;
-										if (Arguments.f_GetLen() > 1)
+										if (nArguments > 1)
 										{
 											switch (Arguments[1].f_ToInt(uint32(0)))
 											{
@@ -289,37 +347,36 @@ namespace NMib::NCommandLine
 									}
 									else if (ParamNumber == 38 || ParamNumber == 48 || ParamNumber == 58)
 									{
-										auto iArgument = Arguments.f_GetIterator();
-										++iArgument;
+										umint iArgument = 1;
 
-										if (iArgument && *iArgument == "5")
+										if (iArgument < nArguments && Arguments[iArgument] == "5")
 										{
 											++iArgument;
-											if (iArgument)
+											if (iArgument < nArguments)
 											{
 												if (ParamNumber == 38)
 												{
-													FgColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+													FgColor.f_SetAnsi256(Arguments[iArgument].f_ToInt(uint8(0)));
 													LastForeground = -1;
 												}
 												else if (ParamNumber == 48)
-													BgColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+													BgColor.f_SetAnsi256(Arguments[iArgument].f_ToInt(uint8(0)));
 												else
-													UnderlineColor.f_SetAnsi256(iArgument->f_ToInt(uint8(0)));
+													UnderlineColor.f_SetAnsi256(Arguments[iArgument].f_ToInt(uint8(0)));
 												++iArgument;
 											}
 										}
-										else if (iArgument && *iArgument == "2")
+										else if (iArgument < nArguments && Arguments[iArgument] == "2")
 										{
 											++iArgument;
-											if (iArgument.f_GetLen() >= 3)
+											if (nArguments - iArgument >= 3)
 											{
 												// A length of exactly 3 means the colour space id slot was omitted
-												if (iArgument.f_GetLen() >= 4)
+												if (nArguments - iArgument >= 4)
 													++iArgument;
-												auto Red = iArgument->f_ToInt(uint8(0));
-												auto Green = (++iArgument)->f_ToInt(uint8(0));
-												auto Blue = (++iArgument)->f_ToInt(uint8(0));
+												auto Red = Arguments[iArgument].f_ToInt(uint8(0));
+												auto Green = Arguments[++iArgument].f_ToInt(uint8(0));
+												auto Blue = Arguments[++iArgument].f_ToInt(uint8(0));
 												if (ParamNumber == 38)
 												{
 													FgColor.f_Set(Red, Green, Blue);
@@ -331,15 +388,15 @@ namespace NMib::NCommandLine
 													UnderlineColor.f_Set(Red, Green, Blue);
 											}
 										}
-										else if (iArgument && *iArgument == "3")
+										else if (iArgument < nArguments && Arguments[iArgument] == "3")
 										{
 											++iArgument;
-											if (iArgument.f_GetLen() >= 5)
+											if (nArguments - iArgument >= 5)
 											{
-												fp64 Scale = (++iArgument)->f_ToInt(uint8(0));
-												auto CompC = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
-												auto CompM = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
-												auto CompY = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												fp64 Scale = Arguments[++iArgument].f_ToInt(uint8(0));
+												auto CompC = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
+												auto CompM = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
+												auto CompY = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
 												uint8 Red = ((fp64(1.0) - CompC) * 255.0).f_ToInt();
 												uint8 Green = ((fp64(1.0) - CompM) * 255.0).f_ToInt();
 												uint8 Blue = ((fp64(1.0) - CompY) * 255.0).f_ToInt();
@@ -354,16 +411,16 @@ namespace NMib::NCommandLine
 													UnderlineColor.f_Set(Red, Green, Blue);
 											}
 										}
-										else if (iArgument && *iArgument == "4")
+										else if (iArgument < nArguments && Arguments[iArgument] == "4")
 										{
 											++iArgument;
-											if (iArgument.f_GetLen() >= 6)
+											if (nArguments - iArgument >= 6)
 											{
-												fp64 Scale = (++iArgument)->f_ToInt(uint8(0));
-												auto CompC = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
-												auto CompM = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
-												auto CompY = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
-												auto CompK = fp64((++iArgument)->f_ToInt(uint8(0))) / Scale;
+												fp64 Scale = Arguments[++iArgument].f_ToInt(uint8(0));
+												auto CompC = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
+												auto CompM = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
+												auto CompY = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
+												auto CompK = fp64(Arguments[++iArgument].f_ToInt(uint8(0))) / Scale;
 												uint8 Red = ((fp64(1.0) - fg_Min(CompC + CompK, fp64(1.0))) * 255.0).f_ToInt();
 												uint8 Green = ((fp64(1.0) - fg_Min(CompM + CompK, fp64(1.0))) * 255.0).f_ToInt();
 												uint8 Blue = ((fp64(1.0) - fg_Min(CompY + CompK, fp64(1.0))) * 255.0).f_ToInt();
@@ -424,7 +481,7 @@ namespace NMib::NCommandLine
 									case 107: BgColor.f_SetAnsi16(15); break;
 									}
 
-									++iParam;
+									bHaveParam = fNextParam();
 								}
 
 								fSetColor(FgColor, BgColor, UnderlineColor);
@@ -433,34 +490,36 @@ namespace NMib::NCommandLine
 						}
 					}
 				}
+				pRunStart = pParse;
 				continue;
 			}
-			else
-				StringBuffer.f_AddChar(Char);
 
 			++pParse;
 		}
 
-		fCommitBuffer();
+		fCommitRun(pParse);
 	}
 
 	CStr CAnsiEncodingParse::fs_StripEncoding(CStr const &_In)
 	{
 		CStr Ret;
+		{
+			CStr::CAppender Appender(Ret);
 
-		fs_Parse
-			(
-				_In
-				, [&](CStr const &_String) -> bool
-				{
-					Ret += _String;
-					return true;
-				}
-				, [&](CPropertyChange const &_Change)
-				{
-				}
-			)
-		;
+			fs_Parse
+				(
+					_In
+					, [&](CStrPtr const &_String) -> bool
+					{
+						Appender += _String;
+						return true;
+					}
+					, [&](CPropertyChange const &_Change)
+					{
+					}
+				)
+			;
+		}
 		return Ret;
 	}
 
@@ -470,7 +529,7 @@ namespace NMib::NCommandLine
 		fs_Parse
 			(
 				_String
-				, [&](CStr const &_String) -> bool
+				, [&](CStrPtr const &_String) -> bool
 				{
 					for (auto iParse = _String.f_GetUnicodeIterator(); iParse; ++iParse)
 					{
