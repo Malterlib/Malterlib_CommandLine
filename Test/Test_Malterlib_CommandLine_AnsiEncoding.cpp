@@ -16,6 +16,107 @@ namespace NMib::NCommandLine
 	public:
 		void f_DoTests()
 		{
+			DMibTestSuite("LineBreakParsed")
+			{
+				CAnsiEncodingParse::CParsedText Parsed;
+
+				{
+					DMibTestPath("Plain");
+
+					// Plain text: one line, one run, no properties; the run views the source string
+					CAnsiEncodingParse::fs_LineBreak("Hello", 10, CAnsiEncoding::EWordWrap_Word, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 1);
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 5);
+					DMibExpect(Parsed.m_Lines[0].m_nRuns, ==, 1);
+					DMibExpect(Parsed.m_Runs[0].m_Text, ==, CStr("Hello"));
+					DMibExpect(Parsed.m_Runs[0].m_Properties == CAnsiEncodingParse::CActiveProperties{}, ==, true);
+					DMibExpect(Parsed.m_Source, ==, CStr("Hello"));
+					DMibExpect(Parsed.m_Runs[0].m_Text.f_GetStr() == Parsed.m_Source.f_GetStr(), ==, true);
+				}
+
+				{
+					DMibTestPath("Wrapped");
+
+					// Word wrap produces one run per line for plain text
+					CAnsiEncodingParse::fs_LineBreak("Test Testing", 7, CAnsiEncoding::EWordWrap_Word, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 2);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[0].m_iFirstRun].m_Text, ==, CStr("Test"));
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 4);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[1].m_iFirstRun].m_Text, ==, CStr("Testing"));
+					DMibExpect(Parsed.m_Lines[1].m_Width, ==, 7);
+				}
+
+				{
+					DMibTestPath("Styled");
+
+					// Styled text becomes separate runs carrying the active properties, with the
+					// escape sequences stripped from the run text
+					CAnsiEncodingParse::fs_LineBreak("A\x1B[1m\x1B[38;2;255;0;0mRed\x1B[0mB", 20, CAnsiEncoding::EWordWrap_Word, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 1);
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 5);
+					DMibExpect(Parsed.m_Lines[0].m_nRuns, ==, 3);
+					DMibExpect(Parsed.m_Runs[0].m_Text, ==, CStr("A"));
+					DMibExpect(Parsed.m_Runs[0].m_Properties == CAnsiEncodingParse::CActiveProperties{}, ==, true);
+					DMibExpect(Parsed.m_Runs[1].m_Text, ==, CStr("Red"));
+					DMibExpect(Parsed.m_Runs[1].m_Properties.m_Weight ? true : false, ==, true);
+					DMibExpect(Parsed.m_Runs[1].m_Properties.m_Weight && Parsed.m_Runs[1].m_Properties.m_Weight->m_Weight == CAnsiEncoding::EWeight::mc_Bold, ==, true);
+					DMibExpect(Parsed.m_Runs[1].m_Properties.m_ForegroundColor ? true : false, ==, true);
+					DMibExpect(Parsed.m_Runs[1].m_Properties.m_ForegroundColor && Parsed.m_Runs[1].m_Properties.m_ForegroundColor->m_Red == 255, ==, true);
+					DMibExpect(Parsed.m_Runs[2].m_Text, ==, CStr("B"));
+					DMibExpect(Parsed.m_Runs[2].m_Properties == CAnsiEncodingParse::CActiveProperties{}, ==, true);
+
+					// The source is the stripped text and the styled runs view into it
+					DMibExpect(Parsed.m_Source, ==, CStr("ARedB"));
+					DMibExpect(Parsed.m_Runs[1].m_Text.f_GetStr() == Parsed.m_Source.f_GetStr() + 1, ==, true);
+				}
+
+				{
+					DMibTestPath("Ellipsis");
+
+					// The trailing ellipsis is a run of its own viewing constant storage
+					CAnsiEncodingParse::fs_LineBreak("Test Testing TestTestTestTest 22", 10, CAnsiEncoding::EWordWrap_Ellipsis, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 1);
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 10);
+					DMibExpect(Parsed.m_Lines[0].m_nRuns, ==, 2);
+					DMibExpect(Parsed.m_Runs[0].m_Text, ==, CStr("Test Test"));
+					DMibExpect(Parsed.m_Runs[1].m_Text, ==, CStr("…"));
+				}
+
+				{
+					DMibTestPath("WordEllipsis");
+
+					// Continuation lines lead with an ellipsis run before the source view
+					CAnsiEncodingParse::fs_LineBreak("TestTestTestTest", 10, CAnsiEncoding::EWordWrap_WordEllipsis, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 2);
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 10);
+					DMibExpect(Parsed.m_Lines[0].m_nRuns, ==, 2);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[0].m_iFirstRun].m_Text, ==, CStr("TestTestT"));
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[0].m_iFirstRun + 1].m_Text, ==, CStr("…"));
+					DMibExpect(Parsed.m_Lines[1].m_Width, ==, 8);
+					DMibExpect(Parsed.m_Lines[1].m_nRuns, ==, 2);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[1].m_iFirstRun].m_Text, ==, CStr("…"));
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[1].m_iFirstRun + 1].m_Text, ==, CStr("estTest"));
+				}
+
+				{
+					DMibTestPath("CJK");
+
+					// CJK text keeps one cell per codepoint in the parsed widths as well
+					CAnsiEncodingParse::fs_LineBreak("日本語のテキスト", 4, CAnsiEncoding::EWordWrap_Character, Parsed);
+
+					DMibExpect(Parsed.m_Lines.f_GetLen(), ==, 2);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[0].m_iFirstRun].m_Text, ==, CStr("日本語の"));
+					DMibExpect(Parsed.m_Lines[0].m_Width, ==, 4);
+					DMibExpect(Parsed.m_Runs[Parsed.m_Lines[1].m_iFirstRun].m_Text, ==, CStr("テキスト"));
+					DMibExpect(Parsed.m_Lines[1].m_Width, ==, 4);
+				}
+			};
+
 			DMibTestSuite("LineBreak")
 			{
 				CAnsiEncoding AnsiEncoding(EAnsiEncodingFlag_Color | EAnsiEncodingFlag_BoxDrawing | EAnsiEncodingFlag_Color24Bit);

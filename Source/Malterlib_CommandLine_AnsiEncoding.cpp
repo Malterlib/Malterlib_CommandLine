@@ -781,6 +781,21 @@ namespace NMib::NCommandLine
 			CAnsiEncodingParse::CActiveProperties m_Properties;
 		};
 
+		// UTF-8 ellipsis in constant storage so parsed runs can view it without owning text
+		constexpr ch8 gc_pLineBreakEllipsis[] = "…";
+
+		// The characters fg_StrTrimRight removes, matched here for trimming through views
+		bool fg_LineBreakIsTrimmed(ch8 _Char)
+		{
+			for (ch8 TrimChar : gc_WhiteSpaceChars)
+			{
+				if (TrimChar && _Char == TrimChar)
+					return true;
+			}
+
+			return false;
+		}
+
 		// First phase of line breaking: strips escape sequences and records the active properties
 		// at each stripped-string byte offset where they change. Plain input produces no property
 		// points, and its stripped string shares the input's storage, so this phase allocates
@@ -1168,6 +1183,113 @@ namespace NMib::NCommandLine
 					auto &LastOutput = Output.f_GetLast();
 					LastOutput.m_String += "…";
 					LastOutput.m_Width += _WidthDelta;
+				}
+			)
+		;
+	}
+
+	// Defined here so the parsed and string producing line breakers share one implementation
+	void CAnsiEncodingParse::fs_LineBreak(CStr const &_String, umint _Length, CAnsiEncoding::EWordWrap _WordWrap, CParsedText &o_Text)
+	{
+		DMibRequire(_Length > 0);
+		DMibRequire((_WordWrap != CAnsiEncoding::EWordWrap_WordEllipsis && _WordWrap != CAnsiEncoding::EWordWrap_CharacterEllipsis) || _Length > 2);
+
+		TCVector<CLineBreakPropertyPoint> PropertyPoints;
+		{
+			// The source is stored before any views are made so they point at its final buffer
+			// (short strings live inline in the string object)
+			CStr Stripped;
+			fg_LineBreakParse(_String, Stripped, PropertyPoints);
+			o_Text.m_Source = fg_Move(Stripped);
+		}
+
+		ch8 const *pStrippedBase = o_Text.m_Source.f_GetStr();
+
+		o_Text.m_Runs.f_ClearNoTrim();
+		o_Text.m_Lines.f_ClearNoTrim();
+
+		umint iNextPoint = 0;
+		CActiveProperties ActiveProperties;
+
+		// Ellipses cannot be spliced into the source views, so they are runs of their own viewing
+		// constant storage
+		auto fEllipsisView = []() -> CStrPtr
+			{
+				return CStrPtr(gc_pLineBreakEllipsis, sizeof(gc_pLineBreakEllipsis) - 1);
+			}
+		;
+
+		fg_LineBreakWalk
+			(
+				o_Text.m_Source
+				, _Length
+				, _WordWrap
+				, [&](uch8 const *_pStart, umint _nBytes, umint _DisplayLen, bool _bLeadingEllipsis)
+				{
+					umint Position = umint((ch8 const *)_pStart - pStrippedBase);
+					umint EndPos = Position + _nBytes;
+
+					while (iNextPoint < PropertyPoints.f_GetLen() && PropertyPoints[iNextPoint].m_Offset <= Position)
+					{
+						ActiveProperties = PropertyPoints[iNextPoint].m_Properties;
+						++iNextPoint;
+					}
+
+					umint iFirstRun = o_Text.m_Runs.f_GetLen();
+
+					if (_bLeadingEllipsis)
+						o_Text.m_Runs.f_InsertLast({fEllipsisView(), {}});
+
+					umint ChunkPos = Position;
+					while (ChunkPos < EndPos)
+					{
+						umint ChunkEnd = EndPos;
+						if (iNextPoint < PropertyPoints.f_GetLen())
+							ChunkEnd = fg_Min(EndPos, PropertyPoints[iNextPoint].m_Offset);
+
+						o_Text.m_Runs.f_InsertLast({CStrPtr(pStrippedBase + ChunkPos, ChunkEnd - ChunkPos), ActiveProperties});
+
+						ChunkPos = ChunkEnd;
+						if (ChunkPos < EndPos)
+						{
+							ActiveProperties = PropertyPoints[iNextPoint].m_Properties;
+							++iNextPoint;
+						}
+					}
+
+					// Trailing whitespace is trimmed when the final run is unstyled, matching the
+					// string form where an escape suffix otherwise separates the whitespace from
+					// the line end
+					umint DisplayLen = _DisplayLen;
+					if (o_Text.m_Runs.f_GetLen() > iFirstRun)
+					{
+						auto &LastRun = o_Text.m_Runs.f_GetLast();
+						if (LastRun.m_Properties == CActiveProperties{})
+						{
+							ch8 const *pText = LastRun.m_Text.f_GetStr();
+							umint TrimmedLen = LastRun.m_Text.f_GetLen();
+							while (TrimmedLen && fg_LineBreakIsTrimmed(pText[TrimmedLen - 1]))
+								--TrimmedLen;
+
+							DisplayLen -= LastRun.m_Text.f_GetLen() - TrimmedLen;
+							LastRun.m_Text = CStrPtr(pText, TrimmedLen);
+						}
+					}
+
+					o_Text.m_Lines.f_InsertLast({iFirstRun, o_Text.m_Runs.f_GetLen() - iFirstRun, DisplayLen});
+				}
+				, [&](umint _WidthDelta)
+				{
+					// The appended ellipsis continues the properties of the run it follows
+					auto &LastLine = o_Text.m_Lines.f_GetLast();
+
+					CActiveProperties Properties;
+					if (LastLine.m_nRuns)
+						Properties = o_Text.m_Runs.f_GetLast().m_Properties;
+
+					o_Text.m_Runs.f_InsertLast({fEllipsisView(), fg_Move(Properties)});
+					++LastLine.m_nRuns;
+					LastLine.m_Width += _WidthDelta;
 				}
 			)
 		;

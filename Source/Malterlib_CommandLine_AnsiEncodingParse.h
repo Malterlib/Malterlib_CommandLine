@@ -88,6 +88,28 @@ namespace NMib::NCommandLine
 			NStorage::TCOptional<CStrikeout> m_Strikeout;
 		};
 
+		// Pre-parsed, line-broken text: runs are pooled flat and lines reference ranges of them.
+		// Run text is plain (no escape sequences), so rendering it needs no ANSI parsing.
+		struct CParsedRun
+		{
+			NStr::CStrPtr m_Text; // View into CParsedText::m_Source (ellipsis runs view constant storage)
+			CActiveProperties m_Properties;
+		};
+
+		struct CParsedLine
+		{
+			umint m_iFirstRun = 0;
+			umint m_nRuns = 0;
+			umint m_Width = 0; // Cells
+		};
+
+		struct CParsedText
+		{
+			NStr::CStr m_Source; // Stripped source text the run views point into
+			NContainer::TCVector<CParsedRun> m_Runs;
+			NContainer::TCVector<CParsedLine> m_Lines;
+		};
+
 		struct CParseState
 		{
 			CAnsiEncoding::EWeight m_Weight = CAnsiEncoding::EWeight::mc_Normal;
@@ -114,6 +136,20 @@ namespace NMib::NCommandLine
 
 		static NStr::CStr fs_StripEncoding(NStr::CStr const &_In);
 		static umint fs_RenderedStrLen(NStr::CStr const &_String);
+
+		// Line breaks _String like CAnsiEncoding::f_LineBreak but emits pre-parsed runs instead of
+		// strings with re-encoded escape sequences, so the text is parsed exactly once between
+		// layout and rendering; o_Text is cleared without releasing its buffers. The run views
+		// stay valid while o_Text.m_Source keeps its storage: reassigning it (including a later
+		// fs_LineBreak into the same o_Text) invalidates them
+		static void fs_LineBreak
+			(
+				NStr::CStr const &_String
+				, umint _Length
+				, CAnsiEncoding::EWordWrap _WordWrap
+				, CParsedText &o_Text
+			)
+		;
 	};
 }
 
