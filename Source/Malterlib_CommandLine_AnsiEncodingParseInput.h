@@ -33,8 +33,8 @@ namespace NMib::NCommandLine
 		void fp_EmitKey(CKeyEvent &&_KeyEvent);
 		void fp_EmitControl(ch8 _Char);
 		bool fp_ParseCsi(ch8 const *&_pParse, ch8 const *_pEnd);
-		void fp_DispatchCsi(NStr::CStr const &_Params, char _Final);
-		void fp_DispatchCsiMouse(NStr::CStr const &_Params, char _Final);
+		void fp_DispatchCsi(NStr::CStrPtr const &_Params, char _Final);
+		void fp_DispatchCsiMouse(NStr::CStrPtr const &_Params, char _Final);
 
 		CAnsiEncodingParseInputOptions mp_Options;
 		NStr::CStr mp_InputBuffer;

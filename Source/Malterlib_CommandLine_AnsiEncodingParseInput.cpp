@@ -66,13 +66,33 @@ namespace NMib::NCommandLine
 			}
 		}
 
-		int32 fg_FirstSubParam(CStr const &_Param, int32 _Default)
+		// Splits _Param into separator delimited views of the input bytes (empty pieces are kept,
+		// matching the previous split based parsing); at most t_MaxPieces are stored while the full
+		// count is returned
+		template <umint t_MaxPieces>
+		umint fg_SplitPieces(CStrPtr const &_Param, ch8 _Separator, CStrPtr (&o_Pieces)[t_MaxPieces])
 		{
-			auto SubParams = _Param.f_Split(":");
-			if (!SubParams.f_GetLen())
-				return _Default;
+			umint nPieces = 0;
 
-			return SubParams[0].f_ToInt(_Default);
+			ch8 const *pPos = _Param.f_GetStr();
+			ch8 const *pEnd = pPos + _Param.f_GetLen();
+			for (;;)
+			{
+				ch8 const *pSeparator = pPos;
+				while (pSeparator < pEnd && *pSeparator != _Separator)
+					++pSeparator;
+
+				if (nPieces < t_MaxPieces)
+					o_Pieces[nPieces] = CStrPtr(pPos, pSeparator - pPos);
+				++nPieces;
+
+				if (pSeparator == pEnd)
+					break;
+
+				pPos = pSeparator + 1;
+			}
+
+			return nPieces;
 		}
 	}
 
@@ -139,11 +159,12 @@ namespace NMib::NCommandLine
 		fp_EmitKey(fg_Move(Event));
 	}
 
-	void CAnsiEncodingParseInput::fp_DispatchCsiMouse(CStr const &_Params, char _Final)
+	void CAnsiEncodingParseInput::fp_DispatchCsiMouse(CStrPtr const &_Params, char _Final)
 	{
 		// SGR mouse report: CSI < Btn ; X ; Y M (press/move) or m (release)
-		auto Params = CStr(_Params.f_GetStr() + 1, _Params.f_GetLen() - 1).f_Split(";");
-		if (Params.f_GetLen() < 3)
+		CStrPtr Params[3];
+		umint nParams = fg_SplitPieces(CStrPtr(_Params.f_GetStr() + 1, _Params.f_GetLen() - 1), ';', Params);
+		if (nParams < 3)
 			return;
 
 		int32 ButtonBits = Params[0].f_ToInt(0);
@@ -199,7 +220,7 @@ namespace NMib::NCommandLine
 			mp_Options.m_fOnMouseEvent(fg_Move(Event));
 	}
 
-	void CAnsiEncodingParseInput::fp_DispatchCsi(CStr const &_Params, char _Final)
+	void CAnsiEncodingParseInput::fp_DispatchCsi(CStrPtr const &_Params, char _Final)
 	{
 		if (_Params.f_StartsWith("<"))
 		{
@@ -209,13 +230,15 @@ namespace NMib::NCommandLine
 			return;
 		}
 
-		auto Params = _Params.f_Split(";");
-		auto fGetParam = [&Params](umint _iParam, int32 _Default) -> int32
+		constexpr umint c_MaxParams = 8;
+		CStrPtr Params[c_MaxParams];
+		umint nParams = fg_SplitPieces(_Params, ';', Params);
+		auto fGetParam = [&](umint _iParam, int32 _Default) -> int32
 			{
-				if (_iParam >= Params.f_GetLen())
+				if (_iParam >= nParams || _iParam >= c_MaxParams)
 					return _Default;
 
-				return fg_FirstSubParam(Params[_iParam], _Default);
+				return Params[_iParam].f_ToInt(_Default, ":");
 			}
 		;
 
@@ -228,10 +251,11 @@ namespace NMib::NCommandLine
 				Event.m_ScanCode = ch32(fGetParam(0, 0));
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
 
-				if (Params.f_GetLen() >= 2)
+				if (nParams >= 2)
 				{
-					auto ModifierParts = Params[1].f_Split(":");
-					if (ModifierParts.f_GetLen() >= 2)
+					CStrPtr ModifierParts[2];
+					umint nModifierParts = fg_SplitPieces(Params[1], ':', ModifierParts);
+					if (nModifierParts >= 2)
 					{
 						switch (ModifierParts[1].f_ToInt(1))
 						{
@@ -249,10 +273,23 @@ namespace NMib::NCommandLine
 					}
 				}
 
-				if (Params.f_GetLen() >= 3)
+				if (nParams >= 3)
 				{
-					for (auto &Codepoint : Params[2].f_Split(":"))
-						Event.m_Text += fg_CharToString(ch32(Codepoint.f_ToInt(0)));
+					ch8 const *pPos = Params[2].f_GetStr();
+					ch8 const *pEnd = pPos + Params[2].f_GetLen();
+					for (;;)
+					{
+						ch8 const *pSeparator = pPos;
+						while (pSeparator < pEnd && *pSeparator != ':')
+							++pSeparator;
+
+						Event.m_Text += fg_CharToString(ch32(CStrPtr(pPos, pSeparator - pPos).f_ToInt(0)));
+
+						if (pSeparator == pEnd)
+							break;
+
+						pPos = pSeparator + 1;
+					}
 				}
 				else if
 				(
@@ -347,7 +384,7 @@ namespace NMib::NCommandLine
 		ch8 const *pParamsStart = pParse;
 		while (pParse < _pEnd && *pParse >= 0x30 && *pParse <= 0x3F)
 			++pParse;
-		CStr ParamsStr(pParamsStart, pParse - pParamsStart);
+		CStrPtr ParamsStr(pParamsStart, pParse - pParamsStart);
 
 		while (pParse < _pEnd && *pParse >= 0x20 && *pParse <= 0x2F)
 			++pParse;
@@ -522,8 +559,7 @@ namespace NMib::NCommandLine
 						ch32 Character = ch32(Lead);
 						if (SequenceLen > 1)
 						{
-							CStr Sequence(pSequence, SequenceLen);
-							if (auto iSequence = Sequence.f_GetUnicodeIterator())
+							if (auto iSequence = fg_GetUnicodeIterator(pSequence, SequenceLen))
 								Character = *iSequence;
 						}
 
@@ -584,9 +620,9 @@ namespace NMib::NCommandLine
 				}
 			}
 
-			CStr Run(pRunStart, pParse - pRunStart);
-			for (ch32 Codepoint : Run.f_GetUnicodeIterator())
+			for (auto iRun = fg_GetUnicodeIterator(pRunStart, umint(pParse - pRunStart)); iRun; ++iRun)
 			{
+				ch32 Codepoint = *iRun;
 				CKeyEvent Event;
 				Event.m_ScanCode = Codepoint;
 				Event.m_Text = fg_CharToString(Codepoint);
