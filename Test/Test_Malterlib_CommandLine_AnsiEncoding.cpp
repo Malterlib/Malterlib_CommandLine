@@ -21,6 +21,31 @@ namespace NMib::NCommandLine
 				CAnsiEncoding AnsiEncoding(EAnsiEncodingFlag_Color | EAnsiEncodingFlag_BoxDrawing | EAnsiEncodingFlag_Color24Bit);
 
 				DMibExpect(AnsiEncoding.f_LineBreak("\n\nTest\n", 10), ==, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"", 0}}));
+
+				// Multi byte UTF-8: every codepoint is one cell, so CJK text breaks per codepoint
+				DMibExpect
+					(
+						AnsiEncoding.f_LineBreak("中文字符", 10)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"中文字符", 4}})
+					)
+				;
+				DMibExpect
+					(
+						AnsiEncoding.f_LineBreak("日本語のテキスト", 4, CAnsiEncoding::EWordWrap_Character)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"日本語の", 4}, {"テキスト", 4}})
+					)
+				;
+
+				// Combining characters attach to the preceding cell and do not add to the width
+				DMibExpect
+					(
+						AnsiEncoding.f_LineBreak("xe\u0301y", 10)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"xe\u0301y", 3}})
+					)
+				;
 				DMibExpect
 					(
 						AnsiEncoding.f_LineBreak

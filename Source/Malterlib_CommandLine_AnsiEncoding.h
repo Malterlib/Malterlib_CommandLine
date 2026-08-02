@@ -111,6 +111,10 @@ namespace NMib::NCommandLine
 		NStr::CStr f_ReEncode(NStr::CStr const &_In) const;
 		NContainer::TCVector<CLine> f_LineBreak(NStr::CStr const &_String, umint _Length, EWordWrap _WordWrap = EWordWrap_Word) const;
 
+		// Fills o_Lines instead of returning a new vector so callers can reuse its capacity across
+		// calls; o_Lines is cleared without releasing its buffer
+		void f_LineBreak(NStr::CStr const &_String, umint _Length, EWordWrap _WordWrap, NContainer::TCVector<CLine> &o_Lines) const;
+
 		NStr::CStr f_Foreground16(uint8 _Color) const;
 		NStr::CStr f_Background16(uint8 _Color) const;
 		NStr::CStr f_Foreground256(uint8 _Color) const;

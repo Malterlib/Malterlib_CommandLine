@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Mib/Function/Function>
+#include <Mib/Storage/Optional>
 #include <Mib/Storage/Variant>
 #include <Mib/Storage/Tuple>
 #include <Mib/CommandLine/AnsiEncoding>
@@ -72,6 +73,20 @@ namespace NMib::NCommandLine
 		};
 
 		using CPropertyChange = NStorage::TCVariant<CForegroundColor, CBackgroundColor, CUnderlineColor, CWeight, CUnderline, CItalic, CStrikeout, CReset>;
+
+		// The active properties at a point in a parsed stream; unset values are the defaults
+		struct CActiveProperties
+		{
+			auto operator <=> (CActiveProperties const &_Right) const noexcept = default;
+
+			NStorage::TCOptional<CBackgroundColor> m_BackgroundColor;
+			NStorage::TCOptional<CForegroundColor> m_ForegroundColor;
+			NStorage::TCOptional<CUnderlineColor> m_UnderlineColor;
+			NStorage::TCOptional<CWeight> m_Weight;
+			NStorage::TCOptional<CUnderline> m_Underline;
+			NStorage::TCOptional<CItalic> m_Italic;
+			NStorage::TCOptional<CStrikeout> m_Strikeout;
+		};
 
 		struct CParseState
 		{

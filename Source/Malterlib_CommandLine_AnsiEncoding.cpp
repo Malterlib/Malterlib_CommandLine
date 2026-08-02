@@ -712,218 +712,447 @@ namespace NMib::NCommandLine
 
 	TCVector<CAnsiEncoding::CLine> CAnsiEncoding::f_LineBreak(CStr const &_String, umint _Length, EWordWrap _WordWrap) const
 	{
+		TCVector<CLine> Output;
+		f_LineBreak(_String, _Length, _WordWrap, Output);
+
+		return Output;
+	}
+
+	namespace
+	{
+		// Decodes the UTF-8 codepoint at _pParse and advances past it. The buffer is NUL
+		// terminated; invalid or truncated sequences decode as their first byte so every input
+		// byte round-trips unchanged into the output lines.
+		ch32 fg_DecodeUTF8Char(uch8 const *&_pParse)
+		{
+			uch8 First = *_pParse;
+			++_pParse;
+
+			if (First < 0x80)
+				return First;
+
+			umint nContinuations;
+			ch32 Char;
+			if ((First & 0xE0) == 0xC0)
+			{
+				nContinuations = 1;
+				Char = First & 0x1F;
+			}
+			else if ((First & 0xF0) == 0xE0)
+			{
+				nContinuations = 2;
+				Char = First & 0x0F;
+			}
+			else if ((First & 0xF8) == 0xF0)
+			{
+				nContinuations = 3;
+				Char = First & 0x07;
+			}
+			else
+				return First;
+
+			uch8 const *pCheck = _pParse;
+			for (umint iContinuation = 0; iContinuation < nContinuations; ++iContinuation)
+			{
+				uch8 Byte = *pCheck;
+				if ((Byte & 0xC0) != 0x80)
+					return First;
+
+				Char = (Char << 6) | (Byte & 0x3F);
+				++pCheck;
+			}
+
+			_pParse = pCheck;
+
+			return Char;
+		}
+
+		ch32 fg_PeekUTF8Char(uch8 const *_pParse)
+		{
+			return fg_DecodeUTF8Char(_pParse);
+		}
+	}
+
+	namespace
+	{
+		struct CLineBreakPropertyPoint
+		{
+			umint m_Offset;
+			CAnsiEncodingParse::CActiveProperties m_Properties;
+		};
+
+		// First phase of line breaking: strips escape sequences and records the active properties
+		// at each stripped-string byte offset where they change. Plain input produces no property
+		// points, and its stripped string shares the input's storage, so this phase allocates
+		// nothing for text without escape sequences.
+		void fg_LineBreakParse(CStr const &_String, CStr &o_Stripped, TCVector<CLineBreakPropertyPoint> &o_Points)
+		{
+			CAnsiEncodingParse::CActiveProperties CurrentProperties;
+
+			CAnsiEncodingParse::fs_Parse
+				(
+					_String
+					, [&](CStrPtr const &_Text) -> bool
+					{
+						// A run covering the whole input means there were no escape sequences;
+						// share the input's storage instead of copying the bytes
+						if
+						(
+							o_Stripped.f_IsEmpty()
+							&& _Text.f_GetStr() == _String.f_GetStr()
+							&& _Text.f_GetLen() == _String.f_GetLen()
+						)
+						{
+							o_Stripped = _String;
+						}
+						else
+							o_Stripped += _Text;
+
+						return true;
+					}
+					, [&](CAnsiEncodingParse::CPropertyChange const &_Change)
+					{
+						_Change.f_Visit
+							(
+								[&]<typename tf_CType>(tf_CType const &_Change)
+								{
+									if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CReset>)
+									{
+										CurrentProperties.m_BackgroundColor.f_Clear();
+										CurrentProperties.m_ForegroundColor.f_Clear();
+										CurrentProperties.m_UnderlineColor.f_Clear();
+										CurrentProperties.m_Weight.f_Clear();
+										CurrentProperties.m_Underline.f_Clear();
+										CurrentProperties.m_Italic.f_Clear();
+										CurrentProperties.m_Strikeout.f_Clear();
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CWeight>)
+									{
+										auto Weight = _Change.m_Weight;
+										if (Weight == CAnsiEncoding::EWeight::mc_Normal)
+											CurrentProperties.m_Weight.f_Clear();
+										else
+											CurrentProperties.m_Weight = {Weight};
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderline>)
+									{
+										auto Underline = _Change.m_Underline;
+										if (Underline == CAnsiEncoding::EUnderline::mc_None)
+											CurrentProperties.m_Underline.f_Clear();
+										else
+											CurrentProperties.m_Underline = {Underline};
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CItalic>)
+									{
+										if (_Change.m_bEnabled)
+											CurrentProperties.m_Italic = {true};
+										else
+											CurrentProperties.m_Italic.f_Clear();
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CStrikeout>)
+									{
+										if (_Change.m_bEnabled)
+											CurrentProperties.m_Strikeout = {true};
+										else
+											CurrentProperties.m_Strikeout.f_Clear();
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CForegroundColor>)
+									{
+										auto &Color = _Change;
+										if (Color.m_bEnabled)
+											CurrentProperties.m_ForegroundColor = Color;
+										else
+											CurrentProperties.m_ForegroundColor.f_Clear();
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CBackgroundColor>)
+									{
+										auto &Color = _Change;
+										if (Color.m_bEnabled)
+											CurrentProperties.m_BackgroundColor = Color;
+										else
+											CurrentProperties.m_BackgroundColor.f_Clear();
+									}
+									else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderlineColor>)
+									{
+										auto &Color = _Change;
+										if (Color.m_bEnabled)
+											CurrentProperties.m_UnderlineColor = Color;
+										else
+											CurrentProperties.m_UnderlineColor.f_Clear();
+									}
+									else
+										static_assert(false);
+
+									umint Offset = o_Stripped.f_GetLen();
+									if (!o_Points.f_IsEmpty() && o_Points.f_GetLast().m_Offset == Offset)
+										o_Points.f_GetLast().m_Properties = CurrentProperties;
+									else
+										o_Points.f_InsertLast({Offset, CurrentProperties});
+								}
+							)
+						;
+					}
+				)
+			;
+		}
+
+		// Second phase: the wrap state machine over the stripped UTF-8 bytes. Lines are reported
+		// front to back through _fOutputLine(pStart, nBytes, DisplayLen, bLeadingEllipsis), and
+		// _fAppendEllipsis(WidthDelta) appends a trailing "…" to the most recently output line.
+		template <typename t_FOutputLine, typename t_FAppendEllipsis>
+		void fg_LineBreakWalk
+			(
+				CStr const &_Stripped
+				, umint _Length
+				, CAnsiEncoding::EWordWrap _WordWrap
+				, t_FOutputLine &&_fOutputLine
+				, t_FAppendEllipsis &&_fAppendEllipsis
+			)
+		{
+			ch8 const *pStrippedBase = _Stripped.f_GetStr();
+			uch8 const *pParse = (uch8 const *)pStrippedBase;
+			uch8 const *pParseStart = pParse;
+			uch8 const *pLastWord = nullptr;
+
+			umint Len = 0;
+			umint MaxLen = _Length;
+
+			bool bWasEllipsis = false;
+			auto fOutputLine = [&](uch8 const *_pStart, umint _nBytes, umint _DisplayLen)
+				{
+					_fOutputLine(_pStart, _nBytes, _DisplayLen, bWasEllipsis);
+					bWasEllipsis = false;
+				}
+			;
+
+			bool bLastWasNewLine = true;
+			bool bOnlyWhitespaceAfterNewLine = true;
+			auto pLastDisplayPoint = pParse;
+			umint LastWordLen = 0;
+			umint LastDisplayPointLen = 0;
+
+			while (*pParse)
+			{
+				ch32 Char = fg_DecodeUTF8Char(pParse);
+				if (Char == '\r' || Char == '\n')
+				{
+					fOutputLine(pParseStart, (pParse - pParseStart) - 1, Len);
+
+					if (Char == '\r' && *pParse == '\n')
+						++pParse;
+
+					bLastWasNewLine = true;
+					pParseStart = pParse;
+					pLastWord = nullptr;
+					bOnlyWhitespaceAfterNewLine = true;
+					Len = 0;
+					continue;
+				}
+				else
+				{
+					bLastWasNewLine = false;
+					if (!fg_CharIsWhiteSpaceNoLines(Char))
+						bOnlyWhitespaceAfterNewLine = false;
+				}
+
+				++Len;
+				while (fg_CharIsCombining(Char))
+				{
+					if (!*pParse)
+					{
+						Char = 0;
+						break;
+					}
+					Char = fg_DecodeUTF8Char(pParse);
+				}
+
+				if (Len == MaxLen && *pParse)
+				{
+					if ((_WordWrap == CAnsiEncoding::EWordWrap_Word || _WordWrap == CAnsiEncoding::EWordWrap_WordEllipsis) && pLastWord)
+					{
+						if (pLastWord - pParseStart)
+						{
+							fOutputLine(pParseStart, pLastWord - pParseStart, LastWordLen);
+							pParseStart = pLastWord;
+						}
+						else
+						{
+							fOutputLine(pParseStart, pParse - pParseStart, Len);
+							pParseStart = pParse;
+						}
+						while (fg_CharIsWhiteSpaceNoLines(fg_PeekUTF8Char(pParseStart)))
+							fg_DecodeUTF8Char(pParseStart);
+						pParse = pParseStart;
+					}
+					else
+					{
+						if (_WordWrap == CAnsiEncoding::EWordWrap_WordEllipsis || _WordWrap == CAnsiEncoding::EWordWrap_CharacterEllipsis)
+						{
+							fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen);
+							if (!fg_CharIsWhiteSpaceNoLines(fg_PeekUTF8Char(pLastDisplayPoint)))
+							{
+								_fAppendEllipsis(1);
+								bWasEllipsis = true;
+								pParse = pParseStart = pLastDisplayPoint;
+							}
+							else
+							{
+								pParse = pLastDisplayPoint;
+								while (fg_CharIsWhiteSpaceNoLines(fg_PeekUTF8Char(pParse)))
+									fg_DecodeUTF8Char(pParse);
+								pParseStart = pParse;
+							}
+						}
+						else if (_WordWrap == CAnsiEncoding::EWordWrap_None)
+							fOutputLine(pParseStart, pParse - pParseStart, Len);
+						else if (_WordWrap == CAnsiEncoding::EWordWrap_Ellipsis)
+						{
+							fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen + 1);
+							_fAppendEllipsis(0);
+						}
+						else
+						{
+							fOutputLine(pParseStart, pParse - pParseStart, Len);
+							pParseStart = pParse;
+						}
+
+						if (_WordWrap == CAnsiEncoding::EWordWrap_None || _WordWrap == CAnsiEncoding::EWordWrap_Ellipsis)
+						{
+							fg_ParseToEndOfLine(pParse);
+							if (fg_CharIsNewLine(*pParse))
+							{
+								bLastWasNewLine = true;
+								bOnlyWhitespaceAfterNewLine = true;
+							}
+							fg_ParseEndOfLine(pParse);
+							pParseStart = pParse;
+						}
+					}
+
+					pLastWord = nullptr;
+					if (bWasEllipsis)
+						Len = 1;
+					else
+						Len = 0;
+				}
+
+				if (fg_CharIsWhiteSpaceNoLines(Char) && !bOnlyWhitespaceAfterNewLine)
+				{
+					pLastWord = pParse;
+					LastWordLen = Len;
+				}
+				pLastDisplayPoint = pParse;
+				LastDisplayPointLen = Len;
+			}
+
+			if (pParseStart != pParse || bLastWasNewLine)
+				fOutputLine(pParseStart, pParse - pParseStart, Len);
+		}
+	}
+
+	void CAnsiEncoding::f_LineBreak(CStr const &_String, umint _Length, EWordWrap _WordWrap, TCVector<CLine> &o_Lines) const
+	{
 		DMibRequire(_Length > 0);
 		DMibRequire((_WordWrap != EWordWrap_WordEllipsis && _WordWrap != EWordWrap_CharacterEllipsis) || _Length > 2);
 
-		struct CProperties
-		{
-			auto operator <=> (CProperties const &_Right) const noexcept = default;
+		CStr Stripped;
+		TCVector<CLineBreakPropertyPoint> PropertyPoints;
+		fg_LineBreakParse(_String, Stripped, PropertyPoints);
 
-			TCOptional<CAnsiEncodingParse::CBackgroundColor> m_BackgroundColor;
-			TCOptional<CAnsiEncodingParse::CForegroundColor> m_ForegroundColor;
-			TCOptional<CAnsiEncodingParse::CUnderlineColor> m_UnderlineColor;
-			TCOptional<CAnsiEncodingParse::CWeight> m_Weight;
-			TCOptional<CAnsiEncodingParse::CUnderline> m_Underline;
-			TCOptional<CAnsiEncodingParse::CItalic> m_Italic;
-			TCOptional<CAnsiEncodingParse::CStrikeout> m_Strikeout;
-		};
+		ch8 const *pStrippedBase = Stripped.f_GetStr();
 
-		TCRegions<umint, CProperties> PropertyRegions;
+		TCVector<CLine> &Output = o_Lines;
+		Output.f_ClearNoTrim();
 
-		CProperties CurrentProperties;
+		// Lines are output front to back, so one forward cursor over the property points tracks
+		// the properties active at each line start
+		umint iNextPoint = 0;
+		CAnsiEncodingParse::CActiveProperties ActiveProperties;
 
-		CUStr String;
-
-		CAnsiEncodingParse::fs_Parse
+		fg_LineBreakWalk
 			(
-				_String
-				, [&](CStrPtr const &_String) -> bool
+				Stripped
+				, _Length
+				, _WordWrap
+				, [&](uch8 const *_pStart, umint _nBytes, umint _DisplayLen, bool _bLeadingEllipsis)
 				{
-					auto Start = String.f_GetLen();
-					String += _String;
-					PropertyRegions.f_MakeRegion
-						(
-							Start
-							, String.f_GetLen()
-							, [&](CProperties &o_Properties)
-							{
-								o_Properties = CurrentProperties;
-							}
-						)
-					;
+					umint Position = umint((ch8 const *)_pStart - pStrippedBase);
+					umint EndPos = Position + _nBytes;
 
-					return true;
-				}
-				, [&](CAnsiEncodingParse::CPropertyChange const &_Change)
-				{
-					_Change.f_Visit
-						(
-							[&]<typename tf_CType>(tf_CType const &_Change)
-							{
-								if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CReset>)
-								{
-									CurrentProperties.m_BackgroundColor.f_Clear();
-									CurrentProperties.m_ForegroundColor.f_Clear();
-									CurrentProperties.m_UnderlineColor.f_Clear();
-									CurrentProperties.m_Weight.f_Clear();
-									CurrentProperties.m_Underline.f_Clear();
-									CurrentProperties.m_Italic.f_Clear();
-									CurrentProperties.m_Strikeout.f_Clear();
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CWeight>)
-								{
-									auto Weight = _Change.m_Weight;
-									if (Weight == CAnsiEncoding::EWeight::mc_Normal)
-										CurrentProperties.m_Weight.f_Clear();
-									else
-										CurrentProperties.m_Weight = {Weight};
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderline>)
-								{
-									auto Underline = _Change.m_Underline;
-									if (Underline == CAnsiEncoding::EUnderline::mc_None)
-										CurrentProperties.m_Underline.f_Clear();
-									else
-										CurrentProperties.m_Underline = {Underline};
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CItalic>)
-								{
-									if (_Change.m_bEnabled)
-										CurrentProperties.m_Italic = {true};
-									else
-										CurrentProperties.m_Italic.f_Clear();
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CStrikeout>)
-								{
-									if (_Change.m_bEnabled)
-										CurrentProperties.m_Strikeout = {true};
-									else
-										CurrentProperties.m_Strikeout.f_Clear();
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CForegroundColor>)
-								{
-									auto &Color = _Change;
-									if (Color.m_bEnabled)
-										CurrentProperties.m_ForegroundColor = Color;
-									else
-										CurrentProperties.m_ForegroundColor.f_Clear();
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CBackgroundColor>)
-								{
-									auto &Color = _Change;
-									if (Color.m_bEnabled)
-										CurrentProperties.m_BackgroundColor= Color;
-									else
-										CurrentProperties.m_BackgroundColor.f_Clear();
-								}
-								else if constexpr (NTraits::cIsSame<tf_CType, CAnsiEncodingParse::CUnderlineColor>)
-								{
-									auto &Color = _Change;
-									if (Color.m_bEnabled)
-										CurrentProperties.m_UnderlineColor = Color;
-									else
-										CurrentProperties.m_UnderlineColor.f_Clear();
-								}
-								else
-									static_assert(false);
-							}
-						)
-					;
-				}
-			)
-		;
+					while (iNextPoint < PropertyPoints.f_GetLen() && PropertyPoints[iNextPoint].m_Offset <= Position)
+					{
+						ActiveProperties = PropertyPoints[iNextPoint].m_Properties;
+						++iNextPoint;
+					}
 
-		ch32 const *pParse = String;
-		ch32 const *pParseStart = pParse;
-		ch32 const *pLastWord = nullptr;
-
-		umint Len = 0;
-		umint MaxLen = _Length;
-
-		TCVector<CLine> Output;
-
-		bool bWasEllipsis = false;
-		auto fOutputLine = [&](ch32 const *_pStart, umint _Len, umint _DisplayLen)
-			{
-				umint Position = _pStart - String.f_GetStr();
-				umint EndPos = Position + _Len;
-				auto iRegion = PropertyRegions.f_GetIteratorLower(Position);
-				if (iRegion && iRegion->f_Start() < EndPos)
-				{
 					CStr ToOutput;
-					if (bWasEllipsis)
+					if (_bLeadingEllipsis)
 						ToOutput = "…";
 
-					ch32 const *pParseEnd = _pStart + _Len;
 					bool bSetProperties = false;
-					for (ch32 const *pParse = _pStart; pParse < pParseEnd;)
+					umint ChunkPos = Position;
+					while (ChunkPos < EndPos)
 					{
-						auto &Properties = iRegion->f_Data();
 						if (bSetProperties)
 						{
 							ToOutput += f_Default();
 							bSetProperties = false;
 						}
 
-						if (Properties.m_Weight)
+						if (ActiveProperties.m_Weight)
 						{
-							ToOutput += f_Weight(Properties.m_Weight->m_Weight);
+							ToOutput += f_Weight(ActiveProperties.m_Weight->m_Weight);
 							bSetProperties = true;
 						}
 
-						if (Properties.m_Underline)
+						if (ActiveProperties.m_Underline)
 						{
-							ToOutput += f_Underline(Properties.m_Underline->m_Underline);
+							ToOutput += f_Underline(ActiveProperties.m_Underline->m_Underline);
 							bSetProperties = true;
 						}
 
-						if (Properties.m_Italic && Properties.m_Italic->m_bEnabled)
+						if (ActiveProperties.m_Italic && ActiveProperties.m_Italic->m_bEnabled)
 						{
 							ToOutput += f_Italic();
 							bSetProperties = true;
 						}
 
-						if (Properties.m_Strikeout && Properties.m_Strikeout->m_bEnabled)
+						if (ActiveProperties.m_Strikeout && ActiveProperties.m_Strikeout->m_bEnabled)
 						{
 							ToOutput += f_Strikeout();
 							bSetProperties = true;
 						}
 
-						if (Properties.m_BackgroundColor && Properties.m_BackgroundColor->m_bEnabled)
+						if (ActiveProperties.m_BackgroundColor && ActiveProperties.m_BackgroundColor->m_bEnabled)
 						{
-							ToOutput += f_BackgroundRGBFormat(Properties.m_BackgroundColor->m_Red, Properties.m_BackgroundColor->m_Green, Properties.m_BackgroundColor->m_Blue);
+							ToOutput += f_BackgroundRGBFormat(ActiveProperties.m_BackgroundColor->m_Red, ActiveProperties.m_BackgroundColor->m_Green, ActiveProperties.m_BackgroundColor->m_Blue);
 							bSetProperties = true;
 						}
 
-						if (Properties.m_ForegroundColor && Properties.m_ForegroundColor->m_bEnabled)
+						if (ActiveProperties.m_ForegroundColor && ActiveProperties.m_ForegroundColor->m_bEnabled)
 						{
-							ToOutput += f_ForegroundRGBFormat(Properties.m_ForegroundColor->m_Red, Properties.m_ForegroundColor->m_Green, Properties.m_ForegroundColor->m_Blue);
+							ToOutput += f_ForegroundRGBFormat(ActiveProperties.m_ForegroundColor->m_Red, ActiveProperties.m_ForegroundColor->m_Green, ActiveProperties.m_ForegroundColor->m_Blue);
 							bSetProperties = true;
 						}
 
-						if (Properties.m_UnderlineColor && Properties.m_UnderlineColor->m_bEnabled)
+						if (ActiveProperties.m_UnderlineColor && ActiveProperties.m_UnderlineColor->m_bEnabled)
 						{
-							ToOutput += f_UnderlineRGBFormat(Properties.m_UnderlineColor->m_Red, Properties.m_UnderlineColor->m_Green, Properties.m_UnderlineColor->m_Blue);
+							ToOutput += f_UnderlineRGBFormat(ActiveProperties.m_UnderlineColor->m_Red, ActiveProperties.m_UnderlineColor->m_Green, ActiveProperties.m_UnderlineColor->m_Blue);
 							bSetProperties = true;
 						}
 
-						umint CurrentPosition = pParse - String.f_GetStr();
-						umint Len = pParseEnd - pParse;
-						umint EndPosition = CurrentPosition + Len;
-						umint RegionEnd = iRegion->f_End();
-						umint ToAdd;
+						umint ChunkEnd = EndPos;
+						if (iNextPoint < PropertyPoints.f_GetLen())
+							ChunkEnd = fg_Min(EndPos, PropertyPoints[iNextPoint].m_Offset);
 
-						if (RegionEnd < EndPosition)
-							ToAdd = fg_Min(RegionEnd - CurrentPosition, Len);
-						else
-							ToAdd = Len;
+						ToOutput.f_AddStr(pStrippedBase + ChunkPos, ChunkEnd - ChunkPos);
+						ChunkPos = ChunkEnd;
 
-						ToOutput.f_AddStr(pParse, ToAdd);
-						pParse += ToAdd;
-
-						CurrentPosition += ToAdd;
-						if (CurrentPosition == RegionEnd)
-							++iRegion;
+						if (ChunkPos < EndPos)
+						{
+							ActiveProperties = PropertyPoints[iNextPoint].m_Properties;
+							++iNextPoint;
+						}
 					}
 
 					if (bSetProperties)
@@ -932,150 +1161,16 @@ namespace NMib::NCommandLine
 					umint OriginalLen = ToOutput.f_GetLen();
 					fg_StrTrimRight(ToOutput);
 					umint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
-					Output.f_Insert({ToOutput, DisplayLen});
+					Output.f_Insert({fg_Move(ToOutput), DisplayLen});
 				}
-				else
+				, [&](umint _WidthDelta)
 				{
-					CUStr ToOutput;
-					if (bWasEllipsis)
-						ToOutput = "…";
-
-					ToOutput.f_AddStr(_pStart, _Len);
-					umint OriginalLen = ToOutput.f_GetLen();
-					fg_StrTrimRight(ToOutput);
-					umint DisplayLen = _DisplayLen - (OriginalLen - ToOutput.f_GetLen());
-					Output.f_Insert({ToOutput, DisplayLen});
+					auto &LastOutput = Output.f_GetLast();
+					LastOutput.m_String += "…";
+					LastOutput.m_Width += _WidthDelta;
 				}
-
-				bWasEllipsis = false;
-			}
+			)
 		;
-
-		bool bLastWasNewLine = true;
-		bool bOnlyWhitespaceAfterNewLine = true;
-		auto pLastDisplayPoint = pParse;
-		umint LastWordLen = 0;
-		umint LastDisplayPointLen = 0;
-
-		while (*pParse)
-		{
-			ch32 Char = *pParse;
-			++pParse;
-			if (Char == '\r' || Char == '\n')
-			{
-				fOutputLine(pParseStart, (pParse - pParseStart) - 1, Len);
-
-				if (Char == '\r' && *pParse == '\n')
-					++pParse;
-
-				bLastWasNewLine = true;
-				pParseStart = pParse;
-				pLastWord = nullptr;
-				bOnlyWhitespaceAfterNewLine = true;
-				Len = 0;
-				continue;
-			}
-			else
-			{
-				bLastWasNewLine = false;
-				if (!fg_CharIsWhiteSpaceNoLines(Char))
-					bOnlyWhitespaceAfterNewLine = false;
-			}
-
-			++Len;
-			while (fg_CharIsCombining(Char))
-			{
-				Char = *pParse;
-				if (!Char)
-					break;
-				++pParse;
-			}
-
-			if (Len == MaxLen && *pParse)
-			{
-				if ((_WordWrap == EWordWrap_Word || _WordWrap == EWordWrap_WordEllipsis) && pLastWord)
-				{
-					if (pLastWord - pParseStart)
-					{
-						fOutputLine(pParseStart, pLastWord - pParseStart, LastWordLen);
-						pParseStart = pLastWord;
-					}
-					else
-					{
-						fOutputLine(pParseStart, pParse - pParseStart, Len);
-						pParseStart = pParse;
-					}
-					while (fg_CharIsWhiteSpaceNoLines(*pParseStart))
-						++pParseStart;
-					pParse = pParseStart;
-				}
-				else
-				{
-					if (_WordWrap == EWordWrap_WordEllipsis || _WordWrap == EWordWrap_CharacterEllipsis)
-					{
-						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen);
-						if (!fg_CharIsWhiteSpaceNoLines(*pLastDisplayPoint))
-						{
-							auto &LastOutput = Output.f_GetLast();
-							LastOutput.m_String += "…";
-							LastOutput.m_Width += 1;
-							bWasEllipsis = true;
-							pParse = pParseStart = pLastDisplayPoint;
-						}
-						else
-						{
-							pParse = pLastDisplayPoint;
-							while (fg_CharIsWhiteSpaceNoLines(*pParse))
-								++pParse;
-							pParseStart = pParse;
-						}
-					}
-					else if (_WordWrap == EWordWrap_None)
-						fOutputLine(pParseStart, pParse - pParseStart, Len);
-					else if (_WordWrap == EWordWrap_Ellipsis)
-					{
-						fOutputLine(pParseStart, pLastDisplayPoint - pParseStart, LastDisplayPointLen + 1);
-						Output.f_GetLast().m_String += "…";
-					}
-					else
-					{
-						fOutputLine(pParseStart, pParse - pParseStart, Len);
-						pParseStart = pParse;
-					}
-
-					if (_WordWrap == EWordWrap_None || _WordWrap == EWordWrap_Ellipsis)
-					{
-						fg_ParseToEndOfLine(pParse);
-						if (fg_CharIsNewLine(*pParse))
-						{
-							bLastWasNewLine = true;
-							bOnlyWhitespaceAfterNewLine = true;
-						}
-						fg_ParseEndOfLine(pParse);
-						pParseStart = pParse;
-					}
-				}
-
-				pLastWord = nullptr;
-				if (bWasEllipsis)
-					Len = 1;
-				else
-					Len = 0;
-			}
-
-			if (fg_CharIsWhiteSpaceNoLines(Char) && !bOnlyWhitespaceAfterNewLine)
-			{
-				pLastWord = pParse;
-				LastWordLen = Len;
-			}
-			pLastDisplayPoint = pParse;
-			LastDisplayPointLen = Len;
-		}
-
-		if (pParseStart != pParse || bLastWasNewLine)
-			fOutputLine(pParseStart, pParse - pParseStart, Len);
-
-		return Output;
 	}
 
 	CStr CAnsiEncoding::f_SyntaxColor(ESyntaxColor _Color) const
