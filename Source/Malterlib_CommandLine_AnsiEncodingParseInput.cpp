@@ -249,6 +249,19 @@ namespace NMib::NCommandLine
 			return;
 		}
 
+		if (_Params.f_StartsWith("?"))
+		{
+			// Reply to the comprehensive keyboard support query: CSI ? flags u
+			if (_Final == 'u' && mp_Options.m_fOnComprehensiveKeySupport)
+			{
+				CStrPtr Flags(_Params.f_GetStr() + 1, _Params.f_GetLen() - 1);
+
+				mp_Options.m_fOnComprehensiveKeySupport(uint8(Flags.f_ToInt(0)));
+			}
+
+			return;
+		}
+
 		constexpr umint c_MaxParams = 8;
 		CStrPtr Params[c_MaxParams];
 		umint nParams = fg_SplitPieces(_Params, ';', Params);
@@ -292,14 +305,23 @@ namespace NMib::NCommandLine
 		{
 			case 'u':
 			{
-				// kitty comprehensive key: CSI unicode[:shifted[:base]] ; modifiers[:event] ; text u
+				// CSI unicode[:shifted[:base]] ; modifiers[:event] ; text [; report-id] u
 				CKeyEvent Event;
 				Event.m_ScanCode = ch32(fGetParam(0, 0));
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+				Event.m_HandlingReportID = uint16(fGetParam(3, 0));
+
+				// The handling extension maps legacy-only keys from U+F500 in EKey order: Insert through End, then F1 through F12.
+				if (Event.m_ScanCode >= 0xF500 && Event.m_ScanCode <= 0xF515)
+				{
+					ch32 Offset = Event.m_ScanCode - 0xF500;
+					Event.m_ScanCode = Offset < 10 ? ch32(EKey::mc_Insert) + Offset : ch32(EKey::mc_F1) + (Offset - 10);
+				}
 
 				fDecodeEventType(Event);
 
-				if (nParams >= 3)
+				// An empty text field before a report id counts as absent; text must be synthesized.
+				if (nParams >= 3 && !Params[2].f_IsEmpty())
 				{
 					ch8 const *pPos = Params[2].f_GetStr();
 					ch8 const *pEnd = pPos + Params[2].f_GetLen();

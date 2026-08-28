@@ -72,6 +72,7 @@ namespace NMib::NCommandLine
 		ch32 m_ScanCode = 0;
 		EKeyModifier m_Modifiers = EKeyModifier::mc_None;
 		EKeyEventType m_EventType = EKeyEventType::mc_Press;
+		uint16 m_HandlingReportID = 0; // Nonzero while the terminal awaits a handling report for a deferred keybinding.
 
 		bool f_Is(EKey _Key) const;
 		bool f_Is(EKey _Key, EKeyModifier _Modifiers) const;

@@ -13,6 +13,8 @@ namespace NMib::NCommandLine
 	{
 		NFunction::TCFunctionMovable<void (CKeyEvent &&_KeyEvent)> m_fOnKeyEvent;
 		NFunction::TCFunctionMovable<void (CTerminalMouseEvent &&_MouseEvent)> m_fOnMouseEvent;
+
+		NFunction::TCFunctionMovable<void (uint8 _Flags)> m_fOnComprehensiveKeySupport; // Active keyboard protocol flags from CSI ? flags u; unsupported terminals never reply.
 	};
 
 	// Decodes raw terminal input (legacy escape sequences, the kitty comprehensive keyboard protocol

@@ -453,6 +453,19 @@ namespace NMib::NCommandLine
 		return gc_Str<"\x1B[<u">;
 	}
 
+	// Supported terminals reply with CSI ? flags u; unsupported terminals stay silent.
+	// Push mc_ReportKeyEventHandling and check the reply retains it to detect handling-report support.
+	NStr::CStr const &CAnsiEncoding::f_QueryComprehensiveKeyHandling() const
+	{
+		return gc_Str<"\x1B[?u">;
+	}
+
+	// An unhandled report runs the terminal's deferred keybinding; a handled report discards it.
+	NStr::CFStr24 CAnsiEncoding::f_ReportKeyEventHandled(uint16 _ID, bool _bHandled) const
+	{
+		return NStr::CFStr24::CFormat("\x1B[?{};{}u") << _ID << (_bHandled ? 1 : 0);
+	}
+
 	NStr::CStr const &CAnsiEncoding::f_MoveUpperLeft() const
 	{
 		return gc_UpperLeft;
