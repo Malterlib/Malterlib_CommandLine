@@ -185,7 +185,26 @@ namespace NMib::NCommandLine
 		if (ButtonBits & 0x40)
 		{
 			Event.m_EventType = EMouseEventType::mc_Wheel;
-			Event.m_WheelDelta = (ButtonBits & 0x01) ? -1.0 : 1.0;
+
+			// Wheel buttons: 64 up, 65 down, 66 left, 67 right
+			switch (ButtonBits & 0x03)
+			{
+				case 0:
+					Event.m_WheelDelta = 1.0;
+					break;
+
+				case 1:
+					Event.m_WheelDelta = -1.0;
+					break;
+
+				case 2:
+					Event.m_WheelDeltaX = 1.0;
+					break;
+
+				case 3:
+					Event.m_WheelDeltaX = -1.0;
+					break;
+			}
 		}
 		else
 		{
