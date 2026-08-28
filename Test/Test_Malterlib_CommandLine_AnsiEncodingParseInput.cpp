@@ -219,6 +219,30 @@ struct CAnsiEncodingParseInput_Tests : public NMib::NTest::CTest
 				DMibExpect(Collector.m_KeyEvents[0].f_Is(EKey::mc_F1), ==, true);
 			}
 
+			{
+				DMibTestPath("Text Synthesis");
+
+				// Without associated text the codepoint is the text for plain strokes only:
+				// a chord like ctrl+t types nothing
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[116;1u\x1B[116;5u");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 2);
+				DMibExpect(Collector.m_KeyEvents[0].m_Text, ==, NStr::CStr("t"));
+				DMibExpect(Collector.m_KeyEvents[1].m_Text, ==, NStr::CStr());
+			}
+
+			{
+				DMibTestPath("Super Modifier");
+
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[122;9u");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 1);
+				DMibExpect(Collector.m_KeyEvents[0].m_ScanCode, ==, ch32('z'));
+				DMibExpect(Collector.m_KeyEvents[0].m_Modifiers == EKeyModifier::mc_Super, ==, true);
+			}
+
 			co_return {};
 		};
 

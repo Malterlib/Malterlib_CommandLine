@@ -320,13 +320,29 @@ namespace NMib::NCommandLine
 				}
 				else if
 				(
-					Event.m_ScanCode >= 0x20
+					Event.m_EventType != EKeyEventType::mc_Release
+					&& Event.m_ScanCode >= 0x20
 					&& Event.m_ScanCode != ch32(EKey::mc_Backspace)
 					&& (Event.m_ScanCode < 57344 || Event.m_ScanCode > 63743) // Kitty functional key range
+					&& !fg_IsSet(Event.m_Modifiers, (EKeyModifier::mc_Ctrl | EKeyModifier::mc_Super | EKeyModifier::mc_Hyper | EKeyModifier::mc_Meta))
 				)
 				{
-					// Without the optional associated text parameter the codepoint itself is the text
-					Event.m_Text = fg_CharToString(Event.m_ScanCode);
+					// Without the optional associated text parameter the codepoint itself is the
+					// text — but only for unmodified (or shift/alt) strokes, and only for a press or
+					// repeat: a chord like ctrl+t does not type a 't', and a release types nothing.
+					// A shifted stroke types its shifted variant: the one the terminal reported in
+					// the key's second subfield, or the upper case letter when it reported none
+					ch32 TextCode = Event.m_ScanCode;
+					if (fg_IsSet(Event.m_Modifiers, EKeyModifier::mc_Shift))
+					{
+						CStrPtr KeyParts[3];
+						umint nKeyParts = fg_SplitPieces(Params[0], ':', KeyParts);
+						if (nKeyParts >= 2 && !KeyParts[1].f_IsEmpty())
+							TextCode = ch32(KeyParts[1].f_ToInt(0));
+						else if (TextCode >= 'a' && TextCode <= 'z')
+							TextCode = TextCode - 'a' + 'A';
+					}
+					Event.m_Text = fg_CharToString(TextCode);
 				}
 
 				fp_EmitKey(fg_Move(Event));
