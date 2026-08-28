@@ -73,6 +73,10 @@ namespace NMib::NCommandLine
 		EKeyModifier m_Modifiers = EKeyModifier::mc_None;
 		EKeyEventType m_EventType = EKeyEventType::mc_Press;
 
+		// Nonzero when the terminal deferred one of its own keybindings on this event and awaits
+		// a handled report (CSI ? id ; handled u) to decide whether to run it
+		uint16 m_HandlingReportID = 0;
+
 		bool f_Is(EKey _Key) const;
 		bool f_Is(EKey _Key, EKeyModifier _Modifiers) const;
 

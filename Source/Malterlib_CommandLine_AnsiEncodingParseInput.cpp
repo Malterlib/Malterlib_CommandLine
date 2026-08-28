@@ -249,6 +249,19 @@ namespace NMib::NCommandLine
 			return;
 		}
 
+		if (_Params.f_StartsWith("?"))
+		{
+			// Reply to the comprehensive keyboard support query: CSI ? flags u
+			if (_Final == 'u' && mp_Options.m_fOnComprehensiveKeySupport)
+			{
+				CStrPtr Flags(_Params.f_GetStr() + 1, _Params.f_GetLen() - 1);
+
+				mp_Options.m_fOnComprehensiveKeySupport(uint8(Flags.f_ToInt(0)));
+			}
+
+			return;
+		}
+
 		constexpr umint c_MaxParams = 8;
 		CStrPtr Params[c_MaxParams];
 		umint nParams = fg_SplitPieces(_Params, ';', Params);
@@ -293,10 +306,22 @@ namespace NMib::NCommandLine
 		{
 			case 'u':
 			{
-				// kitty comprehensive key: CSI unicode[:shifted[:base]] ; modifiers[:event] ; text u
+				// kitty comprehensive key: CSI unicode[:shifted[:base]] ; modifiers[:event] ; text
+				// [; report-id] u — the fourth parameter is the key event handling report id
+				// extension
 				CKeyEvent Event;
 				Event.m_ScanCode = ch32(fGetParam(0, 0));
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+				Event.m_HandlingReportID = uint16(fGetParam(3, 0));
+
+				// With the handling report extension active the functional keys that only have
+				// legacy sequences arrive in the extension's Private Use Area block: Insert
+				// through End, then F1 through F12, in EKey order
+				if (Event.m_ScanCode >= 0xF500 && Event.m_ScanCode <= 0xF515)
+				{
+					ch32 Offset = Event.m_ScanCode - 0xF500;
+					Event.m_ScanCode = Offset < 10 ? ch32(EKey::mc_Insert) + Offset : ch32(EKey::mc_F1) + (Offset - 10);
+				}
 
 				fDecodeEventType(Event);
 

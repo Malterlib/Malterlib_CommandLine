@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include <Mib/Core/Core>
+#include <Mib/CommandLine/AnsiEncoding>
 #include <Mib/CommandLine/AnsiEncodingParseInput>
 
 using namespace NMib;
@@ -26,6 +27,10 @@ namespace
 							{
 								m_MouseEvents.f_InsertLast(fg_Move(_MouseEvent));
 							}
+							, .m_fOnComprehensiveKeySupport = [this](uint8 _Flags)
+							{
+								m_SupportReplies.f_InsertLast(_Flags);
+							}
 						}
 				)
 		{
@@ -34,6 +39,7 @@ namespace
 		CAnsiEncodingParseInput m_Parser;
 		TCVector<CKeyEvent> m_KeyEvents;
 		TCVector<CTerminalMouseEvent> m_MouseEvents;
+		TCVector<uint8> m_SupportReplies;
 	};
 }
 
@@ -241,6 +247,58 @@ struct CAnsiEncodingParseInput_Tests : public NMib::NTest::CTest
 				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 1);
 				DMibExpect(Collector.m_KeyEvents[0].m_ScanCode, ==, ch32('z'));
 				DMibExpect(Collector.m_KeyEvents[0].m_Modifiers == EKeyModifier::mc_Super, ==, true);
+			}
+
+			{
+				DMibTestPath("Handling Report ID");
+
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[99;9;;42u");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 1);
+				DMibExpect(Collector.m_KeyEvents[0].m_ScanCode, ==, ch32('c'));
+				DMibExpect(Collector.m_KeyEvents[0].m_Modifiers == EKeyModifier::mc_Super, ==, true);
+				DMibExpect(Collector.m_KeyEvents[0].m_HandlingReportID, ==, uint16(42));
+
+				{
+					DMibTestPath("Absent");
+
+					// Without the parameter the id stays zero
+					Collector.m_KeyEvents.f_Clear();
+					Collector.m_Parser.f_AddInput("\x1B[99;9u");
+
+					DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 1);
+					DMibExpect(Collector.m_KeyEvents[0].m_HandlingReportID, ==, uint16(0));
+				}
+			}
+
+			{
+				DMibTestPath("Universal Key Block");
+
+				// Legacy-only functional keys arrive in the extension's U+F500 block and map to
+				// the kitty codes EKey uses
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[62722;9;;42u\x1B[62720;1u\x1B[62730;1u\x1B[62741;2u");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 4);
+				DMibExpect(Collector.m_KeyEvents[0].f_Is(EKey::mc_Left, EKeyModifier::mc_Super), ==, true);
+				DMibExpect(Collector.m_KeyEvents[0].m_HandlingReportID, ==, uint16(42));
+				DMibExpect(Collector.m_KeyEvents[0].m_Text, ==, NStr::CStr());
+				DMibExpect(Collector.m_KeyEvents[1].f_Is(EKey::mc_Insert), ==, true);
+				DMibExpect(Collector.m_KeyEvents[2].f_Is(EKey::mc_F1), ==, true);
+				DMibExpect(Collector.m_KeyEvents[3].f_Is(EKey::mc_F12, EKeyModifier::mc_Shift), ==, true);
+			}
+
+			{
+				DMibTestPath("Support Query Reply");
+
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[?21u\x1B[?149u");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 0);
+				DMibExpect(Collector.m_SupportReplies.f_GetLen(), ==, 2);
+				DMibExpect(Collector.m_SupportReplies[0], ==, uint8(21));
+				DMibExpect(Collector.m_SupportReplies[1] & uint8(CAnsiEncoding::EComprehensiveKeyFlags::mc_ReportKeyEventHandling), ==, uint8(128));
 			}
 
 			co_return {};

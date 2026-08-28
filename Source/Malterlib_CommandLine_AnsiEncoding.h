@@ -46,6 +46,12 @@ namespace NMib::NCommandLine
 			, mc_ReportAlternateKeys = fg_Bit(2)
 			, mc_ReportAllKeysAsEscapeCodes = fg_Bit(3)
 			, mc_ReportAssociatedText = fg_Bit(4)
+
+			// Key event handling reports (Unbroken extension): every physical key arrives in the
+			// CSI u form, legacy-only functional keys in the U+F500 block, and the terminal defers
+			// its own marked keybindings, forwarding the key with a report id and only running
+			// them when the application reports the event as unhandled
+			, mc_ReportKeyEventHandling = fg_Bit(7)
 		};
 
 		enum class EWeight : uint32
@@ -150,6 +156,15 @@ namespace NMib::NCommandLine
 		NStr::CFStr24 f_EnableMouseReporting(bool _bEnable) const;
 		NStr::CFStr24 f_PushComprehensiveKeyHandling(EComprehensiveKeyFlags _KeyHandlingFlags) const;
 		NStr::CStr const &f_PopComprehensiveKeyHandling() const;
+
+		// Support probe: a terminal implementing the comprehensive keyboard protocol replies with
+		// CSI ? flags u; others stay silent. Pushing mc_ReportKeyEventHandling and checking that
+		// the reply retains it is how support for the handling report extension is detected
+		NStr::CStr const &f_QueryComprehensiveKeyHandling() const;
+
+		// Answers a key event that carried a handling report id: unhandled runs the terminal's
+		// deferred keybinding, handled drops it
+		NStr::CFStr24 f_ReportKeyEventHandled(uint16 _ID, bool _bHandled) const;
 
 		NStr::CStr const &f_StatusNormal() const;
 		NStr::CStr f_StatusNormal(NStr::CStr const &_ToWrap) const;
