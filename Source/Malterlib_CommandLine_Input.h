@@ -105,6 +105,7 @@ namespace NMib::NCommandLine
 		EMouseEventType m_EventType = EMouseEventType::mc_Down;
 		EKeyModifier m_Modifiers = EKeyModifier::mc_None;
 		fp64 m_WheelDelta = 0.0; // Positive scrolls up
+		fp64 m_WheelDeltaX = 0.0; // Positive scrolls left
 	};
 }
 
