@@ -101,6 +101,25 @@ struct CAnsiEncodingParseInput_Tests : public NMib::NTest::CTest
 			}
 
 			{
+				DMibTestPath("Legacy Final Event Types");
+
+				// With event type reporting the terminal appends :event to the modifier field of
+				// every key form, the legacy finals included; a release must not parse as a press
+				CCollectingParser Collector;
+				Collector.m_Parser.f_AddInput("\x1B[1;1:3A\x1B[1;5:2C\x1B[5;2:3~\x1B[1;1:3Z");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 4);
+				DMibExpect(Collector.m_KeyEvents[0].f_Is(EKey::mc_Up, EKeyModifier::mc_None), ==, true);
+				DMibExpect(Collector.m_KeyEvents[0].m_EventType == EKeyEventType::mc_Release, ==, true);
+				DMibExpect(Collector.m_KeyEvents[1].f_Is(EKey::mc_Right, EKeyModifier::mc_Ctrl), ==, true);
+				DMibExpect(Collector.m_KeyEvents[1].m_EventType == EKeyEventType::mc_Repeat, ==, true);
+				DMibExpect(Collector.m_KeyEvents[2].f_Is(EKey::mc_PageUp, EKeyModifier::mc_Shift), ==, true);
+				DMibExpect(Collector.m_KeyEvents[2].m_EventType == EKeyEventType::mc_Release, ==, true);
+				DMibExpect(Collector.m_KeyEvents[3].f_Is(EKey::mc_Tab, EKeyModifier::mc_Shift), ==, true);
+				DMibExpect(Collector.m_KeyEvents[3].m_EventType == EKeyEventType::mc_Release, ==, true);
+			}
+
+			{
 				DMibTestPath("SS3 And Shift Tab");
 
 				CCollectingParser Collector;

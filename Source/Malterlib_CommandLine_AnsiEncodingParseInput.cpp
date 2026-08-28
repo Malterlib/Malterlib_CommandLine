@@ -261,6 +261,34 @@ namespace NMib::NCommandLine
 			}
 		;
 
+		// The modifiers[:event] subparameter is shared by every key form the terminal emits, the
+		// legacy final letter forms included (CSI 1;1:3 A is an arrow release)
+		auto fDecodeEventType = [&](CKeyEvent &_Event)
+			{
+				if (nParams < 2)
+					return;
+
+				CStrPtr ModifierParts[2];
+				umint nModifierParts = fg_SplitPieces(Params[1], ':', ModifierParts);
+				if (nModifierParts < 2)
+					return;
+
+				switch (ModifierParts[1].f_ToInt(1))
+				{
+					case 2:
+						_Event.m_EventType = EKeyEventType::mc_Repeat;
+						break;
+
+					case 3:
+						_Event.m_EventType = EKeyEventType::mc_Release;
+						break;
+
+					default:
+						break;
+				}
+			}
+		;
+
 		switch (_Final)
 		{
 			case 'u':
@@ -270,27 +298,7 @@ namespace NMib::NCommandLine
 				Event.m_ScanCode = ch32(fGetParam(0, 0));
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
 
-				if (nParams >= 2)
-				{
-					CStrPtr ModifierParts[2];
-					umint nModifierParts = fg_SplitPieces(Params[1], ':', ModifierParts);
-					if (nModifierParts >= 2)
-					{
-						switch (ModifierParts[1].f_ToInt(1))
-						{
-							case 2:
-								Event.m_EventType = EKeyEventType::mc_Repeat;
-								break;
-
-							case 3:
-								Event.m_EventType = EKeyEventType::mc_Release;
-								break;
-
-							default:
-								break;
-						}
-					}
-				}
+				fDecodeEventType(Event);
 
 				if (nParams >= 3)
 				{
@@ -336,6 +344,8 @@ namespace NMib::NCommandLine
 				Event.m_ScanCode = ScanCode;
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
 
+				fDecodeEventType(Event);
+
 				fp_EmitKey(fg_Move(Event));
 
 				break;
@@ -346,6 +356,8 @@ namespace NMib::NCommandLine
 				CKeyEvent Event;
 				Event.m_ScanCode = ch32(EKey::mc_Tab);
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1)) | EKeyModifier::mc_Shift;
+
+				fDecodeEventType(Event);
 
 				fp_EmitKey(fg_Move(Event));
 
@@ -365,6 +377,8 @@ namespace NMib::NCommandLine
 				CKeyEvent Event;
 				Event.m_ScanCode = ScanCode;
 				Event.m_Modifiers = fg_DecodeModifiers(fGetParam(1, 1));
+
+				fDecodeEventType(Event);
 
 				fp_EmitKey(fg_Move(Event));
 
