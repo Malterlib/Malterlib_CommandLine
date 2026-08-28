@@ -323,9 +323,12 @@ namespace NMib::NCommandLine
 					Event.m_ScanCode >= 0x20
 					&& Event.m_ScanCode != ch32(EKey::mc_Backspace)
 					&& (Event.m_ScanCode < 57344 || Event.m_ScanCode > 63743) // Kitty functional key range
+					&& !fg_IsSet(Event.m_Modifiers, (EKeyModifier::mc_Ctrl | EKeyModifier::mc_Super | EKeyModifier::mc_Hyper | EKeyModifier::mc_Meta))
 				)
 				{
-					// Without the optional associated text parameter the codepoint itself is the text
+					// Without the optional associated text parameter the codepoint itself is the
+					// text — but only for unmodified (or shift/alt) strokes: a chord like ctrl+t
+					// does not type a 't'
 					Event.m_Text = fg_CharToString(Event.m_ScanCode);
 				}
 
