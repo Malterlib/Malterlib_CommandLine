@@ -20,7 +20,7 @@ namespace NMib::NCommandLine
 		: mp_fOutput(_fOutput)
 		, mp_Options(_Options)
 		, mp_AnsiFlags(_AnsiFlags)
-		, mp_AvailableWidth(_AvailableWidth)
+		, mp_AvailableWidth(_AvailableWidth ? _AvailableWidth : 280)
 	{
 	}
 

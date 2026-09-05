@@ -45,6 +45,7 @@ namespace NMib::NCommandLine
 			NContainer::TCVector<NStr::CStr> mp_SortByColumns;
 		};
 
+		// An unknown terminal width (0) uses 280 columns for table layout.
 		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags, uint32 _AvailableWidth);
 		CTableRenderHelper(CTableRenderHelper &&) = default;
 
