@@ -103,6 +103,10 @@ namespace NMib::NCommandLine
 
 	void CAnsiEncodingParseInput::fp_EmitKey(CKeyEvent &&_KeyEvent)
 	{
+		// Terminals leave out the key of the base layout when it is the key, and legacy sequences do not have it
+		if (!_KeyEvent.m_BaseLayoutKey)
+			_KeyEvent.m_BaseLayoutKey = _KeyEvent.m_ScanCode;
+
 		if (mp_Options.m_fOnKeyEvent)
 			mp_Options.m_fOnKeyEvent(fg_Move(_KeyEvent));
 	}
@@ -319,6 +323,13 @@ namespace NMib::NCommandLine
 				}
 
 				fDecodeEventType(Event);
+
+				{
+					CStrPtr KeyParts[3];
+					umint nKeyParts = fg_SplitPieces(Params[0], ':', KeyParts);
+					if (nParams >= 1 && nKeyParts >= 3 && !KeyParts[2].f_IsEmpty())
+						Event.m_BaseLayoutKey = ch32(KeyParts[2].f_ToInt(0));
+				}
 
 				// An empty text field before a report id counts as absent; text must be synthesized.
 				if (nParams >= 3 && !Params[2].f_IsEmpty())

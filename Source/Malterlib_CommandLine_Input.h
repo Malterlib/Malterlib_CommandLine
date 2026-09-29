@@ -64,18 +64,65 @@ namespace NMib::NCommandLine
 		, mc_F10 = 57373
 		, mc_F11 = 57374
 		, mc_F12 = 57375
+		, mc_Keypad0 = 57399
+		, mc_Keypad1 = 57400
+		, mc_Keypad2 = 57401
+		, mc_Keypad3 = 57402
+		, mc_Keypad4 = 57403
+		, mc_Keypad5 = 57404
+		, mc_Keypad6 = 57405
+		, mc_Keypad7 = 57406
+		, mc_Keypad8 = 57407
+		, mc_Keypad9 = 57408
+		, mc_KeypadDecimal = 57409
+		, mc_KeypadDivide = 57410
+		, mc_KeypadMultiply = 57411
+		, mc_KeypadSubtract = 57412
+		, mc_KeypadAdd = 57413
+		, mc_KeypadEnter = 57414
+		, mc_KeypadEqual = 57415
+		, mc_KeypadSeparator = 57416
+		, mc_KeypadLeft = 57417
+		, mc_KeypadRight = 57418
+		, mc_KeypadUp = 57419
+		, mc_KeypadDown = 57420
+		, mc_KeypadPageUp = 57421
+		, mc_KeypadPageDown = 57422
+		, mc_KeypadHome = 57423
+		, mc_KeypadEnd = 57424
+		, mc_KeypadInsert = 57425
+		, mc_KeypadDelete = 57426
+		, mc_KeypadBegin = 57427
+		, mc_LeftShift = 57441
+		, mc_LeftControl = 57442
+		, mc_LeftAlt = 57443
+		, mc_LeftSuper = 57444
+		, mc_LeftHyper = 57445
+		, mc_LeftMeta = 57446
+		, mc_RightShift = 57447
+		, mc_RightControl = 57448
+		, mc_RightAlt = 57449
+		, mc_RightSuper = 57450
+		, mc_RightHyper = 57451
+		, mc_RightMeta = 57452
 	};
 
 	struct CKeyEvent
 	{
 		NStr::CStr m_Text;
 		ch32 m_ScanCode = 0;
+		ch32 m_BaseLayoutKey = 0; // What the key at the same position is in the US layout. The same as m_ScanCode where the source of the event does not say
 		EKeyModifier m_Modifiers = EKeyModifier::mc_None;
 		EKeyEventType m_EventType = EKeyEventType::mc_Press;
 		uint16 m_HandlingReportID = 0; // Nonzero while the terminal awaits a handling report for a deferred keybinding.
 
 		bool f_Is(EKey _Key) const;
 		bool f_Is(EKey _Key, EKeyModifier _Modifiers) const;
+		bool f_IsBaseLayout(EKey _Key) const;
+		bool f_IsBaseLayout(ch32 _Key) const;
+
+		template <typename tf_CStream>
+		void f_Stream(tf_CStream &_Stream);
 
 		static NStr::CStr fs_ModifiersToString(EKeyModifier _Modifiers);
 	};

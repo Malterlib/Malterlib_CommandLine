@@ -214,6 +214,26 @@ struct CAnsiEncodingParseInput_Tests : public NMib::NTest::CTest
 			}
 
 			{
+				DMibTestPath("Base Layout Key");
+
+				// The key for the letter a of AZERTY is where q is in the US layout
+				Collector.m_KeyEvents.f_Clear();
+				Collector.m_Parser.f_AddInput("\x1B[97::113;1u\x1B[97:65:113;2u\x1B[119;1u\x1B[57441;2u\x1B[A");
+
+				DMibExpect(Collector.m_KeyEvents.f_GetLen(), ==, 5);
+				DMibExpect(Collector.m_KeyEvents[0].m_ScanCode, ==, ch32('a'));
+				DMibExpect(Collector.m_KeyEvents[0].m_BaseLayoutKey, ==, ch32('q'));
+				DMibExpect(Collector.m_KeyEvents[0].f_IsBaseLayout(ch32('q')), ==, true);
+				DMibExpect(Collector.m_KeyEvents[0].m_Text, ==, NStr::CStr("a"));
+				DMibExpect(Collector.m_KeyEvents[1].m_BaseLayoutKey, ==, ch32('q'));
+				DMibExpect(Collector.m_KeyEvents[1].m_Text, ==, NStr::CStr("A"));
+				DMibExpect(Collector.m_KeyEvents[2].m_BaseLayoutKey, ==, ch32('w'));
+				DMibExpect(Collector.m_KeyEvents[3].f_Is(EKey::mc_LeftShift, EKeyModifier::mc_Shift), ==, true);
+				DMibExpect(Collector.m_KeyEvents[3].f_IsBaseLayout(EKey::mc_LeftShift), ==, true);
+				DMibExpect(Collector.m_KeyEvents[4].f_IsBaseLayout(EKey::mc_Up), ==, true);
+			}
+
+			{
 				DMibTestPath("Functional Key");
 
 				Collector.m_KeyEvents.f_Clear();
