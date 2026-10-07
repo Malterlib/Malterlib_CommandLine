@@ -434,6 +434,19 @@ namespace NMib::NCommandLine
 		Internal.m_pDefaultCommand = fg_AutoStaticCast(_Command.mp_pCommand);
 	}
 
+	// Finds a command by any of its names. Empty when no command has the name
+	template <typename t_CCustomization>
+	auto TCCommandLineSpecification<t_CCustomization>::f_GetCommand(NStr::CStr const &_Name) -> NStorage::TCOptional<CCommand>
+	{
+		auto &Internal = *mp_pInternal;
+
+		auto *pCommand = Internal.m_CommandByName.f_FindEqual(_Name);
+		if (!pCommand)
+			return {};
+
+		return CCommand(&Internal, *pCommand);
+	}
+
 	template <typename t_CCustomization>
 	auto TCCommandLineSpecification<t_CCustomization>::f_AccessInternal() -> CInternal &
 	{

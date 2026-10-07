@@ -1727,6 +1727,33 @@ namespace
 					};
 
 					{
+						DMibTestPath("Default command found by name");
+						TCSharedPointer<CCommandLineSpecification> pSpec = fg_Construct();
+						auto Section = pSpec->f_AddSection("Test", "Test");
+						Section.f_RegisterDirectCommand
+							(
+								{
+									"Names"_o= _o["--default", "-d"]
+									, "Description"_o= "Default command"
+								}
+								, [](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+								{
+									return 42;
+								}
+							)
+						;
+
+						DMibExpectFalse(bool(pSpec->f_GetCommand("--missing")));
+
+						auto DefaultCmd = pSpec->f_GetCommand("-d");
+						DMibAssertTrue(bool(DefaultCmd));
+
+						pSpec->f_SetDefaultCommand(*DefaultCmd);
+						CCommandLineClient Client(pSpec);
+						DMibExpect(Client.f_RunCommandLine(fg_CreateVector<CStr>("App")), ==, 42);
+					};
+
+					{
 						CEJsonSorted RunParams;
 						TCSharedPointer<CCommandLineSpecification> pSpec = fg_Construct();
 						auto Section = pSpec->f_AddSection("Test", "Test");

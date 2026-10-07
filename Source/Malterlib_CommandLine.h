@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Mib/Encoding/EJson>
+#include <Mib/Storage/Optional>
 
 namespace NMib::NCommandLine
 {
@@ -123,6 +124,7 @@ namespace NMib::NCommandLine
 		void f_AddHelpCommand();
 		void f_AddTerminalOptions();
 		void f_SetDefaultCommand(CCommand const &_Command);
+		NStorage::TCOptional<CCommand> f_GetCommand(NStr::CStr const &_Name);
 		void f_SetProgramDescription(NStr::CStr const &_Heading, NStr::CStr const &_Description);
 		void f_RegisterGlobalOptions(NEncoding::CEJsonOrdered &&_Options);
 		CParsedCommandLine f_ParseCommandLine(NContainer::TCVector<NStr::CStr> &&_Params, NCommandLine::EAnsiEncodingFlag _AnsiFlags);
