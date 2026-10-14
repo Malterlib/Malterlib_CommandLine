@@ -9,5 +9,5 @@ namespace NMib::NCommandLine::NPlatform
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif

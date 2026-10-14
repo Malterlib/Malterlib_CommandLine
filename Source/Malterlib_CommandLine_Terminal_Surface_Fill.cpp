@@ -9,7 +9,7 @@
 namespace NMib::NCommandLine
 {
 	using namespace NStr;
-	
+
 	void CTerminalSurface::f_Fill(CTerminalArea const &_Area, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		CTerminalArea Area = _Area.f_Intersection(mp_Size);
@@ -26,7 +26,7 @@ namespace NMib::NCommandLine
 		CTerminalColor BackgroundColor;
 		CTerminalColor ForegroundColor;
 		CTerminalColor UnderlineColor;
-		
+
 		if (_Properties.m_Properties.m_BackgroundColor)
 			BackgroundColor = *_Properties.m_Properties.m_BackgroundColor;
 		if (_Properties.m_Properties.m_ForegroundColor)

@@ -397,12 +397,7 @@ namespace NMib::NCommandLine
 										if (pParse[1] == 0)
 											break;
 
-										DMibError
-											(
-												"Option {} needs a value so needs to be last in list of short options"_f
-												<< fColor(ToTest, CurrentOptionColor)
-											)
-										;
+										DMibError("Option {} needs a value so needs to be last in list of short options"_f << fColor(ToTest, CurrentOptionColor));
 									}
 
 									if (bFoundParam)
@@ -432,16 +427,22 @@ namespace NMib::NCommandLine
 					}
 
 					if
+					(
+						bForceFail
+						||
 						(
-							bForceFail
-							||
-							(
-								(Parameter.f_StartsWith("-") || Parameter.f_StartsWith("+"))
-								&& (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter)
-								&& (!pCurrentCommand || pCurrentCommand->m_bErrorOnOptionAsParameterWhenDefaultCommand)
-							)
-							|| (!Parameter.f_StartsWith("-") && !Parameter.f_StartsWith("+") && !pFoundCommand && (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter))
+							(Parameter.f_StartsWith("-") || Parameter.f_StartsWith("+"))
+							&& (!pFoundCommand || pFoundCommand->m_bErrorOnOptionAsParameter)
+							&& (!pCurrentCommand || pCurrentCommand->m_bErrorOnOptionAsParameterWhenDefaultCommand)
 						)
+						||
+						(
+							!Parameter.f_StartsWith("-")
+							&& !Parameter.f_StartsWith("+")
+							&& !pFoundCommand
+							&& (!pCurrentCommand || !pCurrentCommand->m_bGreedyDefaultCommandParameters || !iCommandParameter)
+						)
+					)
 					{
 						struct CFuzzyEntry
 						{
@@ -540,16 +541,16 @@ namespace NMib::NCommandLine
 							fp64 BestScore = FuzzyEntries.f_GetFirst().m_Score;
 							for (auto &Entry : FuzzyEntries)
 							{
-	#if 1
+#if 1
 								if ((Entry.m_Score - BestScore) > 0.2)
 									break;
-								fg_AddStrSep(EntryNames, fg_Format("   {}", Entry.m_ColoredName) ,"\n");
-	#else
+								fg_AddStrSep(EntryNames, fg_Format("   {}", Entry.m_ColoredName), "\n");
+#else
 								if ((Entry.m_Score - BestScore) > 0.2)
-									fg_AddStrSep(EntryNames, fg_Format("-- {fe2} {}", Entry.m_Score, Entry.m_ColoredName) ,"\n");
+									fg_AddStrSep(EntryNames, fg_Format("-- {fe2} {}", Entry.m_Score, Entry.m_ColoredName), "\n");
 								else
-									fg_AddStrSep(EntryNames, fg_Format("   {fe2} {}", Entry.m_Score, Entry.m_ColoredName) ,"\n");
-	#endif
+									fg_AddStrSep(EntryNames, fg_Format("   {fe2} {}", Entry.m_Score, Entry.m_ColoredName), "\n");
+#endif
 							}
 							if (!EntryNames.f_IsEmpty())
 								Error += ". Did you mean any of the following?\n\n{}"_f << EntryNames.f_TrimRight();

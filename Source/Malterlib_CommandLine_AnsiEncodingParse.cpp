@@ -54,7 +54,7 @@ namespace NMib::NCommandLine
 		// Text is emitted as views of the input string instead of accumulating into a temporary
 		// buffer. Runs are committed when an escape byte is encountered, so the property-change
 		// callbacks never have pending text to flush.
-		const ch8 *pRunStart = _In;
+		ch8 const *pRunStart = _In;
 
 		auto fSetColor = [&](CDecodedColor const &_Color, CDecodedColor const &_BGColor, CDecodedColor const &_UnderlineColor)
 			{
@@ -126,7 +126,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		const ch8 *pParse = _In;
+		ch8 const *pParse = _In;
 
 		auto fCommitRun = [&](ch8 const *_pEnd)
 			{
@@ -441,7 +441,12 @@ namespace NMib::NCommandLine
 
 									switch (ParamNumber)
 									{
-									case 0: FgColor = {}; BgColor = {}; UnderlineColor = {}; fReset(); break;
+									case 0:
+										FgColor = {};
+										BgColor = {};
+										UnderlineColor = {};
+										fReset();
+										break;
 									case 39: FgColor = {}; break;
 									case 49: BgColor = {}; break;
 									case 59: UnderlineColor = {}; break;
@@ -535,9 +540,7 @@ namespace NMib::NCommandLine
 					{
 						ch32 Char = *iParse;
 						if (!fg_CharIsCombining(Char))
-						{
 							++Len;
-						}
 					}
 
 					return true;

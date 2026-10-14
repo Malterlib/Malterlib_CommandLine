@@ -80,22 +80,25 @@ namespace NMib::NCommandLine
 
 		auto fFill = [&]<bool t_bCharacter, NPrivate::EColorOperation t_Foreground, NPrivate::EColorOperation t_Background, NPrivate::EColorOperation t_Underline, bool t_bFlags>
 			{
-			 	fp32 Amount = AmountStart;
+				fp32 Amount = AmountStart;
 				for (int32 CoordY = Area.m_UpperLeft.m_CoordY; CoordY < LowerRight.m_CoordY; ++CoordY, Amount += AmountPerCoord)
 				{
 					CTerminalColor ForegroundColor;
 					if constexpr (t_Foreground != NPrivate::EColorOperation::mc_None)
 					{
-						auto ColorRed = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Red()) * (fp64(1.0) - Amount))
-							+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Red()) * Amount)
+						auto ColorRed
+							= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Red()) * (fp64(1.0) - Amount)) + (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Red()) * Amount)
 						;
-						auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Green()) * (fp64(1.0) - Amount))
+						auto ColorGreen
+							= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Green()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Green()) * Amount)
 						;
-						auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Blue()) * (fp64(1.0) - Amount))
+						auto ColorBlue
+							= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Blue()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Blue()) * Amount)
 						;
-						auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Alpha()) * (fp64(1.0) - Amount))
+						auto ColorAlpha
+							= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Alpha()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Alpha()) * Amount)
 						;
 						ForegroundColor = CTerminalColor::fs_FromRGBA(ColorRed.f_ToIntRound(), ColorGreen.f_ToIntRound(), ColorBlue.f_ToIntRound(), ColorAlpha.f_ToIntRound());
@@ -104,16 +107,19 @@ namespace NMib::NCommandLine
 					CTerminalColor BackgroundColor;
 					if constexpr (t_Background != NPrivate::EColorOperation::mc_None)
 					{
-						auto ColorRed = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Red()) * (fp64(1.0) - Amount))
-							+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Red()) * Amount)
+						auto ColorRed
+							= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Red()) * (fp64(1.0) - Amount)) + (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Red()) * Amount)
 						;
-						auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Green()) * (fp64(1.0) - Amount))
+						auto ColorGreen
+							= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Green()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Green()) * Amount)
 						;
-						auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Blue()) * (fp64(1.0) - Amount))
+						auto ColorBlue
+							= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Blue()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Blue()) * Amount)
 						;
-						auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Alpha()) * (fp64(1.0) - Amount))
+						auto ColorAlpha
+							= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Alpha()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Alpha()) * Amount)
 						;
 
@@ -123,16 +129,18 @@ namespace NMib::NCommandLine
 					CTerminalColor UnderlineColor;
 					if constexpr (t_Underline != NPrivate::EColorOperation::mc_None)
 					{
-						auto ColorRed = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Red()) * (fp64(1.0) - Amount))
-							+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Red()) * Amount)
+						auto ColorRed
+							= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Red()) * (fp64(1.0) - Amount)) + (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Red()) * Amount)
 						;
-						auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Green()) * (fp64(1.0) - Amount))
+						auto ColorGreen
+							= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Green()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Green()) * Amount)
 						;
-						auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Blue()) * (fp64(1.0) - Amount))
-							+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Blue()) * Amount)
+						auto ColorBlue
+							= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Blue()) * (fp64(1.0) - Amount)) + (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Blue()) * Amount)
 						;
-						auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Alpha()) * (fp64(1.0) - Amount))
+						auto ColorAlpha
+							= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Alpha()) * (fp64(1.0) - Amount))
 							+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Alpha()) * Amount)
 						;
 						UnderlineColor = CTerminalColor::fs_FromRGBA(ColorRed.f_ToIntRound(), ColorGreen.f_ToIntRound(), ColorBlue.f_ToIntRound(), ColorAlpha.f_ToIntRound());
@@ -246,7 +254,7 @@ namespace NMib::NCommandLine
 			{
 				for (int32 CoordY = Area.m_UpperLeft.m_CoordY; CoordY < LowerRight.m_CoordY; ++CoordY)
 				{
-				 	fp32 Amount = AmountStart;
+					fp32 Amount = AmountStart;
 					for (int32 CoordX = Area.m_UpperLeft.m_CoordX; CoordX < LowerRight.m_CoordX; ++CoordX, Amount += AmountPerCoord)
 					{
 						auto &Chixel = pBuffer[CoordY * SurfaceWidth + CoordX];
@@ -263,16 +271,20 @@ namespace NMib::NCommandLine
 
 						if constexpr (t_Foreground != NPrivate::EColorOperation::mc_None)
 						{
-							auto ColorRed = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Red()) * (fp64(1.0) - Amount))
+							auto ColorRed
+								= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Red()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Red()) * Amount)
 							;
-							auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Green()) * (fp64(1.0) - Amount))
+							auto ColorGreen
+								= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Green()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Green()) * Amount)
 							;
-							auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Blue()) * (fp64(1.0) - Amount))
+							auto ColorBlue
+								= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Blue()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Blue()) * Amount)
 							;
-							auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Alpha()) * (fp64(1.0) - Amount))
+							auto ColorAlpha
+								= (fp64(PropertiesStart.m_Properties.m_ForegroundColor->f_Alpha()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_ForegroundColor->f_Alpha()) * Amount)
 							;
 
@@ -286,16 +298,20 @@ namespace NMib::NCommandLine
 
 						if constexpr (t_Background != NPrivate::EColorOperation::mc_None)
 						{
-							auto ColorRed = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Red()) * (fp64(1.0) - Amount))
+							auto ColorRed
+								= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Red()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Red()) * Amount)
 							;
-							auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Green()) * (fp64(1.0) - Amount))
+							auto ColorGreen
+								= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Green()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Green()) * Amount)
 							;
-							auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Blue()) * (fp64(1.0) - Amount))
+							auto ColorBlue
+								= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Blue()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Blue()) * Amount)
 							;
-							auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Alpha()) * (fp64(1.0) - Amount))
+							auto ColorAlpha
+								= (fp64(PropertiesStart.m_Properties.m_BackgroundColor->f_Alpha()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_BackgroundColor->f_Alpha()) * Amount)
 							;
 
@@ -309,16 +325,20 @@ namespace NMib::NCommandLine
 
 						if constexpr (t_Underline != NPrivate::EColorOperation::mc_None)
 						{
-							auto ColorRed = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Red()) * (fp64(1.0) - Amount))
+							auto ColorRed
+								= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Red()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Red()) * Amount)
 							;
-							auto ColorGreen = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Green()) * (fp64(1.0) - Amount))
+							auto ColorGreen
+								= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Green()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Green()) * Amount)
 							;
-							auto ColorBlue = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Blue()) * (fp64(1.0) - Amount))
+							auto ColorBlue
+								= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Blue()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Blue()) * Amount)
 							;
-							auto ColorAlpha = (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Alpha()) * (fp64(1.0) - Amount))
+							auto ColorAlpha
+								= (fp64(PropertiesStart.m_Properties.m_UnderlineColor->f_Alpha()) * (fp64(1.0) - Amount))
 								+ (fp64(PropertiesEnd.m_Properties.m_UnderlineColor->f_Alpha()) * Amount)
 							;
 
@@ -432,10 +452,10 @@ namespace NMib::NCommandLine
 
 		auto fFill = [&]<bool t_bCharacter, NPrivate::EColorOperation t_Foreground, NPrivate::EColorOperation t_Background, NPrivate::EColorOperation t_Underline, bool t_bFlags>
 			{
-			 	fp32 AmountY = AmountStartY;
+				fp32 AmountY = AmountStartY;
 				for (int32 CoordY = UpperLeft.m_CoordY; CoordY < LowerRight.m_CoordY; ++CoordY, AmountY += AmountPerCoordY)
 				{
-				 	fp32 AmountX = AmountStartX;
+					fp32 AmountX = AmountStartX;
 					for (int32 CoordX = UpperLeft.m_CoordX; CoordX < LowerRight.m_CoordX; ++CoordX, AmountX += AmountPerCoordX)
 					{
 						auto &Chixel = pBuffer[CoordY * SurfaceWidth + CoordX];
@@ -455,22 +475,26 @@ namespace NMib::NCommandLine
 							fp32 AmountXInv = fp64(1.0) - AmountX;
 							fp32 AmountYInv = fp64(1.0) - AmountY;
 
- 							auto ColorRed = (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Red()) * AmountXInv * AmountYInv)
+							auto ColorRed
+								= (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Red()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_ForegroundColor->f_Red()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_ForegroundColor->f_Red()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_ForegroundColor->f_Red()) * AmountX * AmountY)
 							;
- 							auto ColorGreen = (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Green()) * AmountXInv * AmountYInv)
+							auto ColorGreen
+								= (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Green()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_ForegroundColor->f_Green()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_ForegroundColor->f_Green()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_ForegroundColor->f_Green()) * AmountX * AmountY)
 							;
- 							auto ColorBlue = (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Blue()) * AmountXInv * AmountYInv)
+							auto ColorBlue
+								= (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Blue()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_ForegroundColor->f_Blue()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_ForegroundColor->f_Blue()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_ForegroundColor->f_Blue()) * AmountX * AmountY)
 							;
- 							auto ColorAlpha = (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Alpha()) * AmountXInv * AmountYInv)
+							auto ColorAlpha
+								= (fp64(PropertiesUpperLeft.m_Properties.m_ForegroundColor->f_Alpha()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_ForegroundColor->f_Alpha()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_ForegroundColor->f_Alpha()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_ForegroundColor->f_Alpha()) * AmountX * AmountY)
@@ -489,22 +513,26 @@ namespace NMib::NCommandLine
 							fp32 AmountXInv = fp64(1.0) - AmountX;
 							fp32 AmountYInv = fp64(1.0) - AmountY;
 
- 							auto ColorRed = (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Red()) * AmountXInv * AmountYInv)
+							auto ColorRed
+								= (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Red()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_BackgroundColor->f_Red()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_BackgroundColor->f_Red()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_BackgroundColor->f_Red()) * AmountX * AmountY)
 							;
- 							auto ColorGreen = (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Green()) * AmountXInv * AmountYInv)
+							auto ColorGreen
+								= (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Green()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_BackgroundColor->f_Green()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_BackgroundColor->f_Green()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_BackgroundColor->f_Green()) * AmountX * AmountY)
 							;
- 							auto ColorBlue = (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Blue()) * AmountXInv * AmountYInv)
+							auto ColorBlue
+								= (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Blue()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_BackgroundColor->f_Blue()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_BackgroundColor->f_Blue()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_BackgroundColor->f_Blue()) * AmountX * AmountY)
 							;
- 							auto ColorAlpha = (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Alpha()) * AmountXInv * AmountYInv)
+							auto ColorAlpha
+								= (fp64(PropertiesUpperLeft.m_Properties.m_BackgroundColor->f_Alpha()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_BackgroundColor->f_Alpha()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_BackgroundColor->f_Alpha()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_BackgroundColor->f_Alpha()) * AmountX * AmountY)
@@ -523,22 +551,26 @@ namespace NMib::NCommandLine
 							fp32 AmountXInv = fp64(1.0) - AmountX;
 							fp32 AmountYInv = fp64(1.0) - AmountY;
 
- 							auto ColorRed = (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Red()) * AmountXInv * AmountYInv)
+							auto ColorRed
+								= (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Red()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_UnderlineColor->f_Red()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_UnderlineColor->f_Red()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_UnderlineColor->f_Red()) * AmountX * AmountY)
 							;
- 							auto ColorGreen = (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Green()) * AmountXInv * AmountYInv)
+							auto ColorGreen
+								= (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Green()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_UnderlineColor->f_Green()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_UnderlineColor->f_Green()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_UnderlineColor->f_Green()) * AmountX * AmountY)
 							;
- 							auto ColorBlue = (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Blue()) * AmountXInv * AmountYInv)
+							auto ColorBlue
+								= (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Blue()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_UnderlineColor->f_Blue()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_UnderlineColor->f_Blue()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_UnderlineColor->f_Blue()) * AmountX * AmountY)
 							;
- 							auto ColorAlpha = (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Alpha()) * AmountXInv * AmountYInv)
+							auto ColorAlpha
+								= (fp64(PropertiesUpperLeft.m_Properties.m_UnderlineColor->f_Alpha()) * AmountXInv * AmountYInv)
 								+ (fp64(PropertiesUpperRight.m_Properties.m_UnderlineColor->f_Alpha()) * AmountX * AmountYInv)
 								+ (fp64(PropertiesLowerLeft.m_Properties.m_UnderlineColor->f_Alpha()) * AmountXInv * AmountY)
 								+ (fp64(PropertiesLowerRight.m_Properties.m_UnderlineColor->f_Alpha()) * AmountX * AmountY)

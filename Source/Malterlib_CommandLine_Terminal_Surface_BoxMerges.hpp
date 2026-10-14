@@ -22,129 +22,129 @@ namespace NMib::NCommandLine
 			ETerminalEndpointType m_EndpointTypesRight[14] = {ETerminalEndpointType::mc_Unspecified};
 		};
 
-		#define DInsertFileLine , .m_pFile = DMibPFile \
-								, .m_Line = DMibPLine
+#	define DInsertFileLine , .m_pFile = DMibPFile \
+		, .m_Line = DMibPLine
 
-		#define DLightRoundedOnward ETerminalEndpointType::mc_LightRounded, \
-			ETerminalEndpointType::mc_LightDotted3Rounded, ETerminalEndpointType::mc_LightDotted2Rounded, \
-			ETerminalEndpointType::mc_LightDotted1Rounded
+#	define DLightRoundedOnward ETerminalEndpointType::mc_LightRounded, \
+		ETerminalEndpointType::mc_LightDotted3Rounded, ETerminalEndpointType::mc_LightDotted2Rounded, \
+		ETerminalEndpointType::mc_LightDotted1Rounded
 
-		#define DLightRoundedOnwardNoOpaque  ETerminalEndpointType::mc_LightDotted3Rounded, ETerminalEndpointType::mc_LightDotted2Rounded, \
-			ETerminalEndpointType::mc_LightDotted1Rounded
+#	define DLightRoundedOnwardNoOpaque  ETerminalEndpointType::mc_LightDotted3Rounded, ETerminalEndpointType::mc_LightDotted2Rounded, \
+		ETerminalEndpointType::mc_LightDotted1Rounded
 
-		#define DLightAllDotted3Onward ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
-			ETerminalEndpointType::mc_LightDotted1, ETerminalEndpointType::mc_LightDotted3Rounded, \
-			ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded
+#	define DLightAllDotted3Onward ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
+		ETerminalEndpointType::mc_LightDotted1, ETerminalEndpointType::mc_LightDotted3Rounded, \
+		ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded
 
-		#define DLightAllDotted2Onward ETerminalEndpointType::mc_LightDotted2, \
-			ETerminalEndpointType::mc_LightDotted1, \
-			ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded
+#	define DLightAllDotted2Onward ETerminalEndpointType::mc_LightDotted2, \
+		ETerminalEndpointType::mc_LightDotted1, \
+		ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded
 
-		#define DLightAllDotted1Onward ETerminalEndpointType::mc_LightDotted1, ETerminalEndpointType::mc_LightDotted1Rounded
+#	define DLightAllDotted1Onward ETerminalEndpointType::mc_LightDotted1, ETerminalEndpointType::mc_LightDotted1Rounded
 
-		#define DLightOnward ETerminalEndpointType::mc_Light, \
-			ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
-			ETerminalEndpointType::mc_LightDotted1, DLightRoundedOnward
+#	define DLightOnward ETerminalEndpointType::mc_Light, \
+		ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
+		ETerminalEndpointType::mc_LightDotted1, DLightRoundedOnward
 
-		#define DLightOnwardNoOpaque \
-			ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
-			ETerminalEndpointType::mc_LightDotted1, DLightRoundedOnwardNoOpaque
+#	define DLightOnwardNoOpaque \
+		ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
+		ETerminalEndpointType::mc_LightDotted1, DLightRoundedOnwardNoOpaque
 
-		#define DLightNoRounded ETerminalEndpointType::mc_Light, \
-			ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
-			ETerminalEndpointType::mc_LightDotted1
+#	define DLightNoRounded ETerminalEndpointType::mc_Light, \
+		ETerminalEndpointType::mc_LightDotted3, ETerminalEndpointType::mc_LightDotted2, \
+		ETerminalEndpointType::mc_LightDotted1
 
-		#define DDoubleOnward ETerminalEndpointType::mc_Double, DLightOnward
-		#define DDoubleOnwardNoOpaque ETerminalEndpointType::mc_Double, DLightOnwardNoOpaque
+#	define DDoubleOnward ETerminalEndpointType::mc_Double, DLightOnward
+#	define DDoubleOnwardNoOpaque ETerminalEndpointType::mc_Double, DLightOnwardNoOpaque
 
-		#define DHeavyDotted1Onward ETerminalEndpointType::mc_HeavyDotted1, DDoubleOnward
-		#define DHeavyDotted2Onward ETerminalEndpointType::mc_HeavyDotted2, DHeavyDotted1Onward
-		#define DHeavyDotted3Onward ETerminalEndpointType::mc_HeavyDotted3, DHeavyDotted2Onward
+#	define DHeavyDotted1Onward ETerminalEndpointType::mc_HeavyDotted1, DDoubleOnward
+#	define DHeavyDotted2Onward ETerminalEndpointType::mc_HeavyDotted2, DHeavyDotted1Onward
+#	define DHeavyDotted3Onward ETerminalEndpointType::mc_HeavyDotted3, DHeavyDotted2Onward
 
-		#define DHeavyOnward ETerminalEndpointType::mc_Heavy, DHeavyDotted3Onward
+#	define DHeavyOnward ETerminalEndpointType::mc_Heavy, DHeavyDotted3Onward
 
-		#define DAllHeavy ETerminalEndpointType::mc_Heavy, ETerminalEndpointType::mc_HeavyDotted3, \
-			ETerminalEndpointType::mc_HeavyDotted2, ETerminalEndpointType::mc_HeavyDotted1
+#	define DAllHeavy ETerminalEndpointType::mc_Heavy, ETerminalEndpointType::mc_HeavyDotted3, \
+		ETerminalEndpointType::mc_HeavyDotted2, ETerminalEndpointType::mc_HeavyDotted1
 
-		#define DAllHeavyAndDouble ETerminalEndpointType::mc_Heavy, ETerminalEndpointType::mc_HeavyDotted3, \
-			ETerminalEndpointType::mc_HeavyDotted2, ETerminalEndpointType::mc_HeavyDotted1, ETerminalEndpointType::mc_Double
+#	define DAllHeavyAndDouble ETerminalEndpointType::mc_Heavy, ETerminalEndpointType::mc_HeavyDotted3, \
+		ETerminalEndpointType::mc_HeavyDotted2, ETerminalEndpointType::mc_HeavyDotted1, ETerminalEndpointType::mc_Double
 
 		constexpr CBoxMergeSource gc_BoxMergesSources[] =
 			{
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_Coupling.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossHorizontalDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossVerticalDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossBottomLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossBottomRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossDownHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossHorizontalHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossTopLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossTopRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossUpHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossVerticalHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossDownLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossLeftLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossRightLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossUpLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingLeft.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingRight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingTop.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingBottom.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpHeavy.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpDouble.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightLight.hpp"
-				#include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarHorizontalLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_BarVerticalLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_Coupling.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossHorizontalDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossVerticalDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossFullLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossBottomLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossBottomRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossDownHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossHorizontalHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossTopLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossTopRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossUpHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossVerticalHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossDownLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossLeftLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossRightLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_CrossUpLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopLeftLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowTopRightLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomLeftLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_ElbowBottomRightLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingLeft.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingRight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingTop.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_EndingBottom.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpHeavy.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpDouble.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeDownLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeLeftLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeRightLight.hpp"
+#	include "BoxMerges/Malterlib_CommandLine_BoxMerges_TeeUpLight.hpp"
 			}
 		;
 
-		#undef DInsertFileLine
-		#undef DLightRoundedOnward
-		#undef DLightRoundedOnwardNoOpaque
-		#undef DLightAllDotted3Onward
-		#undef DLightAllDotted2Onward
-		#undef DLightAllDotted1Onward
-		#undef DLightOnward
-		#undef DLightOnwardNoOpaque
-		#undef DLightNoRounded
-		#undef DDoubleOnward
-		#undef DDoubleOnwardNoOpaque
-		#undef DHeavyDotted3Onward
-		#undef DHeavyDotted2Onward
-		#undef DHeavyDotted1Onward
-		#undef DHeavyOnward
-		#undef DAllHeavy
-		#undef DAllHeavyAndDouble
+#	undef DInsertFileLine
+#	undef DLightRoundedOnward
+#	undef DLightRoundedOnwardNoOpaque
+#	undef DLightAllDotted3Onward
+#	undef DLightAllDotted2Onward
+#	undef DLightAllDotted1Onward
+#	undef DLightOnward
+#	undef DLightOnwardNoOpaque
+#	undef DLightNoRounded
+#	undef DDoubleOnward
+#	undef DDoubleOnwardNoOpaque
+#	undef DHeavyDotted3Onward
+#	undef DHeavyDotted2Onward
+#	undef DHeavyDotted1Onward
+#	undef DHeavyOnward
+#	undef DAllHeavy
+#	undef DAllHeavyAndDouble
 #endif
 		struct CCharacterPair
 		{
@@ -176,12 +176,12 @@ namespace NMib::NCommandLine
 
 		struct CBoxMerge
 		{
-			COrdering_Strong operator <=>(CBoxMerge const &_Right) const
+			COrdering_Strong operator <=> (CBoxMerge const &_Right) const
 			{
 				return m_Characters <=> _Right.m_Characters;
 			}
 
-			COrdering_Strong operator <=>(CCharacterPair const &_Right) const
+			COrdering_Strong operator <=> (CCharacterPair const &_Right) const
 			{
 				return m_Characters <=> _Right;
 			}
@@ -512,7 +512,6 @@ namespace NMib::NCommandLine
 
 						if (!MappedCharacters.f_FindEqual(Pair))
 							MissingCharacters[Pair];
-
 					}
 				}
 
@@ -524,11 +523,11 @@ namespace NMib::NCommandLine
 					DMibConOut("nMissing: {}\n", MissingCharacters.f_GetLen());
 				}
 
-#if DOutputBoxMerges
+#	if DOutputBoxMerges
 				for (auto &BoxMerge : m_BoxMerges)
 					DMibConOut(", {{{{{}, {}}, {}}\n", BoxMerge.m_Characters.m_Left, BoxMerge.m_Characters.m_Right, BoxMerge.m_Combined);
 				NSys::fg_TerminateProcess(1);
-#endif
+#	endif
 			}
 #endif
 
