@@ -140,9 +140,7 @@ namespace NMib::NCommandLine
 			COptionSet m_SectionOptionSet;
 			COptionSet m_GlobalOptionSet;
 
-			NStorage::TCSharedPointer<NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>>
-				m_pDirectRunCommand
-			;
+			NStorage::TCSharedPointer<NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>> m_pDirectRunCommand;
 
 			bool m_bErrorOnCommandAsParameter = true;
 			bool m_bErrorOnOptionAsParameter = true;

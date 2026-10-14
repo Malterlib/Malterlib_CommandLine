@@ -16,23 +16,23 @@ namespace
 	{
 		CCollectingParser()
 			: m_Parser
-				(
-					CAnsiEncodingParseInputOptions
-						{
-							.m_fOnKeyEvent = [this](CKeyEvent &&_KeyEvent)
-							{
-								m_KeyEvents.f_InsertLast(fg_Move(_KeyEvent));
-							}
-							, .m_fOnMouseEvent = [this](CTerminalMouseEvent &&_MouseEvent)
-							{
-								m_MouseEvents.f_InsertLast(fg_Move(_MouseEvent));
-							}
-							, .m_fOnComprehensiveKeySupport = [this](uint8 _Flags)
-							{
-								m_SupportReplies.f_InsertLast(_Flags);
-							}
-						}
-				)
+			(
+				CAnsiEncodingParseInputOptions
+				{
+					.m_fOnKeyEvent = [this](CKeyEvent &&_KeyEvent)
+					{
+						m_KeyEvents.f_InsertLast(fg_Move(_KeyEvent));
+					}
+					, .m_fOnMouseEvent = [this](CTerminalMouseEvent &&_MouseEvent)
+					{
+						m_MouseEvents.f_InsertLast(fg_Move(_MouseEvent));
+					}
+					, .m_fOnComprehensiveKeySupport = [this](uint8 _Flags)
+					{
+						m_SupportReplies.f_InsertLast(_Flags);
+					}
+				}
+			)
 		{
 		}
 

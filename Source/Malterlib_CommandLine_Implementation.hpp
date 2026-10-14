@@ -368,7 +368,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	TCCommandLineSpecification<t_CCustomization> &TCCommandLineSpecification<t_CCustomization>::operator =(TCCommandLineSpecification const &_Other)
+	TCCommandLineSpecification<t_CCustomization> &TCCommandLineSpecification<t_CCustomization>::operator = (TCCommandLineSpecification const &_Other)
 	{
 		mp_pInternal = fg_Construct(*_Other.mp_pInternal);
 		return *this;
@@ -378,7 +378,7 @@ namespace NMib::NCommandLine
 	TCCommandLineSpecification<t_CCustomization>::TCCommandLineSpecification(TCCommandLineSpecification &&_Other) = default;
 
 	template <typename t_CCustomization>
-	TCCommandLineSpecification<t_CCustomization> &TCCommandLineSpecification<t_CCustomization>::operator =(TCCommandLineSpecification &&_Other) = default;
+	TCCommandLineSpecification<t_CCustomization> &TCCommandLineSpecification<t_CCustomization>::operator = (TCCommandLineSpecification &&_Other) = default;
 
 	template <typename t_CCustomization>
 	auto TCCommandLineSpecification<t_CCustomization>::f_GetDefaultSection() -> CSection

@@ -11,7 +11,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename ...tfp_CParams>
-	COneOf::COneOf(tfp_CParams const &...p_Config)
+	COneOf::COneOf(tfp_CParams const & ...p_Config)
 	{
 		auto &Array = m_Config.f_Array();
 
@@ -42,7 +42,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename ...tfp_CParams>
-	COneOfType::COneOfType(tfp_CParams const &...p_Config)
+	COneOfType::COneOfType(tfp_CParams const & ...p_Config)
 	{
 		auto &Array = m_Config.f_Array();
 

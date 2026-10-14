@@ -6,7 +6,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈│╎┆┊┐╮└╰┘╯┌╭╴╵╶╷├┤┬┴")>
 	, .m_Right = gc_Str<str_utf8("┼")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -14,7 +14,7 @@
 	, .m_Left = gc_Str<str_utf8("│╎┆┊├┤")>
 	, .m_Right = gc_Str<str_utf8("─╌┄┈")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -22,7 +22,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈┬┴")>
 	, .m_Right = gc_Str<str_utf8("│╎┆┊")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -30,7 +30,7 @@
 	, .m_Left = gc_Str<str_utf8("└╰├┴")>
 	, .m_Right = gc_Str<str_utf8("┐╮")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -38,7 +38,7 @@
 	, .m_Left = gc_Str<str_utf8("┐╮┤┬")>
 	, .m_Right = gc_Str<str_utf8("└╰")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -46,7 +46,7 @@
 	, .m_Left = gc_Str<str_utf8("┌╭├┬")>
 	, .m_Right = gc_Str<str_utf8("┘╯")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -54,7 +54,7 @@
 	, .m_Left = gc_Str<str_utf8("┘╯┤┴")>
 	, .m_Right = gc_Str<str_utf8("┌╭")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -62,7 +62,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈┐╮┘╯╴┤┬┴")>
 	, .m_Right = gc_Str<str_utf8("├")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -70,7 +70,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈└╰┌╭╶├┬┴")>
 	, .m_Right = gc_Str<str_utf8("┤")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -78,7 +78,7 @@
 	, .m_Left = gc_Str<str_utf8("│╎┆┊└╰┘╯╵├┤┴")>
 	, .m_Right = gc_Str<str_utf8("┬")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -86,6 +86,6 @@
 	, .m_Left = gc_Str<str_utf8("│╎┆┊┐╮┌╭╷├┤┬")>
 	, .m_Right = gc_Str<str_utf8("┴")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,

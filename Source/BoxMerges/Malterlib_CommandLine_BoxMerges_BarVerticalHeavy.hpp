@@ -6,7 +6,7 @@
 	, .m_Left = gc_Str<str_utf8("╏┇┋║│╎┆┊╹╻╵╷╽╿")>
 	, .m_Right = gc_Str<str_utf8("┃")>
 	, .m_EndpointTypesLeft = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -15,7 +15,7 @@
 	, .m_Right = gc_Str<str_utf8("╹╿")>
 	, .m_EndpointTypesLeft = {DAllHeavyAndDouble}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Heavy}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -24,7 +24,7 @@
 	, .m_Right = gc_Str<str_utf8("╻╽")>
 	, .m_EndpointTypesLeft = {DAllHeavyAndDouble}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Heavy}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -33,7 +33,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DLightOnwardNoOpaque}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Heavy}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -42,7 +42,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DLightOnwardNoOpaque}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Heavy}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ╏
@@ -51,7 +51,7 @@
 	, .m_Left = gc_Str<str_utf8("┇┋║│╎┆┊╹╻╵╷")>
 	, .m_Right = gc_Str<str_utf8("╏")>
 	, .m_EndpointTypesLeft = {DHeavyDotted3Onward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -60,7 +60,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DHeavyDotted3Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -69,7 +69,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DHeavyDotted3Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -78,7 +78,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -87,7 +87,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ┇
@@ -96,7 +96,7 @@
 	, .m_Left = gc_Str<str_utf8("┋║│╎┆┊╹╻╵╷")>
 	, .m_Right = gc_Str<str_utf8("┇")>
 	, .m_EndpointTypesLeft = {DHeavyDotted2Onward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -105,7 +105,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DHeavyDotted2Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -114,7 +114,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DHeavyDotted2Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -123,7 +123,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -132,7 +132,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ┋
@@ -141,7 +141,7 @@
 	, .m_Left = gc_Str<str_utf8("║│╎┆┊╹╻╵╷")>
 	, .m_Right = gc_Str<str_utf8("┋")>
 	, .m_EndpointTypesLeft = {DHeavyDotted1Onward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -150,7 +150,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DHeavyDotted1Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -159,7 +159,7 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DHeavyDotted1Onward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -168,7 +168,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -177,6 +177,6 @@
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,

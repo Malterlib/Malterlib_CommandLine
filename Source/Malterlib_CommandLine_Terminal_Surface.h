@@ -13,15 +13,15 @@ namespace NMib::NCommandLine
 
 	enum class ETerminalTextAlignment : uint32
 	{
-		mc_None = 0
+		mc_None               = 0
 		, mc_HorizontalCenter = DMibBit(0)
-		, mc_VerticalCenter = DMibBit(1)
+		, mc_VerticalCenter   = DMibBit(1)
 	};
 
 	enum class ETerminalRenderFlag : uint32
 	{
 		mc_None
-		, mc_ResetAtEndOfLine = DMibBit(0)
+		, mc_ResetAtEndOfLine     = DMibBit(0)
 		, mc_NoSynchronizedUpdate = DMibBit(1) // Do not wrap the output in the synchronized update protocol
 	};
 
@@ -39,150 +39,150 @@ namespace NMib::NCommandLine
 
 	enum class ETerminalBoxType : uint32
 	{
-		mc_NonBoxDrawing			// ----------- ----------- ----------- ----------- |         |
-									// | Testing | | Testing   | Testing |   Testing | | Testing |
-									// ----------- ----------- |         | ----------- -----------
+		mc_NonBoxDrawing // ----------- ----------- ----------- ----------- |         |
+						 // | Testing | | Testing   | Testing |   Testing | | Testing |
+						 // ----------- ----------- |         | ----------- -----------
 
-		, mc_NonBoxDrawingOuter		// |¯¯¯¯¯¯¯¯¯| |¯¯¯¯¯¯¯¯¯¯ |¯¯¯¯¯¯¯¯¯| ¯¯¯¯¯¯¯¯¯¯| |         |
-									// | Testing | | Testing   | Testing |   Testing | | Testing |
-									// |_________| |__________ |         | __________| |_________|
+		, mc_NonBoxDrawingOuter // |¯¯¯¯¯¯¯¯¯| |¯¯¯¯¯¯¯¯¯¯ |¯¯¯¯¯¯¯¯¯| ¯¯¯¯¯¯¯¯¯¯| |         |
+								// | Testing | | Testing   | Testing |   Testing | | Testing |
+								// |_________| |__________ |         | __________| |_________|
 
-		, mc_NonBoxDrawingRounded	// /¯¯¯¯¯¯¯¯¯\ /¯¯¯¯¯¯¯¯¯¯ /¯¯¯¯¯¯¯¯¯\ ¯¯¯¯¯¯¯¯¯¯\ |         |
-									// | Testing | | Testing   | Testing |   Testing | | Testing |
-									// \_________/ \__________ |         | __________/ \_________/
+		, mc_NonBoxDrawingRounded // /¯¯¯¯¯¯¯¯¯\ /¯¯¯¯¯¯¯¯¯¯ /¯¯¯¯¯¯¯¯¯\ ¯¯¯¯¯¯¯¯¯¯\ |         |
+								  // | Testing | | Testing   | Testing |   Testing | | Testing |
+								  // \_________/ \__________ |         | __________/ \_________/
 
-		, mc_Light 					// ┌─────────┐ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
-									// │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
-									// └─────────┘ └─────────╴ ╵         ╵ ╶─────────┘ └─────────┘
+		, mc_Light // ┌─────────┐ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
+				   // │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
+				   // └─────────┘ └─────────╴ ╵         ╵ ╶─────────┘ └─────────┘
 
-		, mc_LightRounded			// ╭─────────╮ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
-									// │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
-									// ╰─────────╯ └─────────╴ ╵         ╵ ╶─────────┘ └─────────┘
+		, mc_LightRounded // ╭─────────╮ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
+						  // │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
+						  // ╰─────────╯ └─────────╴ ╵         ╵ ╶─────────┘ └─────────┘
 
-		, mc_Heavy 					// ┏━━━━━━━━━┓ ┏━━━━━━━━━╸ ┏━━━━━━━━━┓ ╺━━━━━━━━━┓ ╻         ╻
-									// ┃ Testing ┃ ┃ Testing   ┃ Testing ┃   Testing ┃ ┃ Testing ┃
-									// ┗━━━━━━━━━┛ ┗━━━━━━━━━╸ ╹         ╹ ╺━━━━━━━━━┛ ┗━━━━━━━━━┛
+		, mc_Heavy // ┏━━━━━━━━━┓ ┏━━━━━━━━━╸ ┏━━━━━━━━━┓ ╺━━━━━━━━━┓ ╻         ╻
+				   // ┃ Testing ┃ ┃ Testing   ┃ Testing ┃   Testing ┃ ┃ Testing ┃
+				   // ┗━━━━━━━━━┛ ┗━━━━━━━━━╸ ╹         ╹ ╺━━━━━━━━━┛ ┗━━━━━━━━━┛
 
-		, mc_InnerHalf				// ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗         ▖
-									// ▐ Testing ▌ ▐ Testing   ▐ Testing ▌   Testing ▌ ▐ Testing ▌
-									// ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝         ▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘
+		, mc_InnerHalf // ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗         ▖
+					   // ▐ Testing ▌ ▐ Testing   ▐ Testing ▌   Testing ▌ ▐ Testing ▌
+					   // ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝         ▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘
 
-		, mc_OuterHalf				// ▛▀▀▀▀▀▀▀▀▀▜ ▛▀▀▀▀▀▀▀▀▀▀ ▛▀▀▀▀▀▀▀▀▀▜ ▀▀▀▀▀▀▀▀▀▀▜ ▌         ▐
-									// ▌ Testing ▐ ▌ Testing   ▌ Testing ▐   Testing ▐ ▌ Testing ▐
-									// ▙▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▄ ▌         ▐ ▄▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▟
+		, mc_OuterHalf // ▛▀▀▀▀▀▀▀▀▀▜ ▛▀▀▀▀▀▀▀▀▀▀ ▛▀▀▀▀▀▀▀▀▀▜ ▀▀▀▀▀▀▀▀▀▀▜ ▌         ▐
+					   // ▌ Testing ▐ ▌ Testing   ▌ Testing ▐   Testing ▐ ▌ Testing ▐
+					   // ▙▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▄ ▌         ▐ ▄▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▟
 
-		, mc_OuterHalfFullVertical	// █▀▀▀▀▀▀▀▀▀█ █▀▀▀▀▀▀▀▀▀▀ █▀▀▀▀▀▀▀▀▀█ ▀▀▀▀▀▀▀▀▀▀█ █         █
-									// █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
-									// █▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄▄ █         █ ▄▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄█
+		, mc_OuterHalfFullVertical // █▀▀▀▀▀▀▀▀▀█ █▀▀▀▀▀▀▀▀▀▀ █▀▀▀▀▀▀▀▀▀█ ▀▀▀▀▀▀▀▀▀▀█ █         █
+								   // █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
+								   // █▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄▄ █         █ ▄▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄█
 
-		, mc_FullHeavy				// ███████████ ███████████ ███████████ ███████████ █         █
-									// █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
-									// ███████████ ███████████ █         █ ███████████ ███████████
+		, mc_FullHeavy // ███████████ ███████████ ███████████ ███████████ █         █
+					   // █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
+					   // ███████████ ███████████ █         █ ███████████ ███████████
 
-		, mc_Double 				// ╔═════════╗ ╔═════════╸ ╔═════════╗ ╺═════════╗ ╻         ╻
-									// ║ Testing ║ ║ Testing   ║ Testing ║   Testing ║ ║ Testing ║
-									// ╚═════════╝ ╚═════════╸ ╹         ╹ ╺═════════╝ ╚═════════╝
+		, mc_Double // ╔═════════╗ ╔═════════╸ ╔═════════╗ ╺═════════╗ ╻         ╻
+					// ║ Testing ║ ║ Testing   ║ Testing ║   Testing ║ ║ Testing ║
+					// ╚═════════╝ ╚═════════╸ ╹         ╹ ╺═════════╝ ╚═════════╝
 
-		, mc_LightDotted1			// ┌┈┈┈┈┈┈┈┈┈┐ ┌┈┈┈┈┈┈┈┈┈╴ ┌┈┈┈┈┈┈┈┈┈┐ ╶┈┈┈┈┈┈┈┈┈┐ ╷         ╷
-									// ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
-									// └┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈┘
+		, mc_LightDotted1 // ┌┈┈┈┈┈┈┈┈┈┐ ┌┈┈┈┈┈┈┈┈┈╴ ┌┈┈┈┈┈┈┈┈┈┐ ╶┈┈┈┈┈┈┈┈┈┐ ╷         ╷
+						  // ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
+						  // └┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈┘
 
-		, mc_LightDotted2			// ┌┄┄┄┄┄┄┄┄┄┐ ┌┄┄┄┄┄┄┄┄┄╴ ┌┄┄┄┄┄┄┄┄┄┐ ╶┄┄┄┄┄┄┄┄┄┐ ╷         ╷
-									// ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
-									// └┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄┘
+		, mc_LightDotted2 // ┌┄┄┄┄┄┄┄┄┄┐ ┌┄┄┄┄┄┄┄┄┄╴ ┌┄┄┄┄┄┄┄┄┄┐ ╶┄┄┄┄┄┄┄┄┄┐ ╷         ╷
+						  // ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
+						  // └┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄┘
 
-		, mc_LightDotted3			// ┌╌╌╌╌╌╌╌╌╌┐ ┌╌╌╌╌╌╌╌╌╌╴ ┌╌╌╌╌╌╌╌╌╌┐ ╶╌╌╌╌╌╌╌╌╌┐ ╷         ╷
-									// ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
-									// └╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌┘
+		, mc_LightDotted3 // ┌╌╌╌╌╌╌╌╌╌┐ ┌╌╌╌╌╌╌╌╌╌╴ ┌╌╌╌╌╌╌╌╌╌┐ ╶╌╌╌╌╌╌╌╌╌┐ ╷         ╷
+						  // ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
+						  // └╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌┘
 
-		, mc_LightDotted1Rounded	// ╭┈┈┈┈┈┈┈┈┈╮ ╭┈┈┈┈┈┈┈┈┈╴ ╭┈┈┈┈┈┈┈┈┈╮ ╶┈┈┈┈┈┈┈┈┈╮ ╷         ╷
-									// ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
-									// ╰┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╯
+		, mc_LightDotted1Rounded // ╭┈┈┈┈┈┈┈┈┈╮ ╭┈┈┈┈┈┈┈┈┈╴ ╭┈┈┈┈┈┈┈┈┈╮ ╶┈┈┈┈┈┈┈┈┈╮ ╷         ╷
+								 // ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
+								 // ╰┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╯
 
-		, mc_LightDotted2Rounded	// ╭┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄╴ ╭┄┄┄┄┄┄┄┄┄╮ ╶┄┄┄┄┄┄┄┄┄╮ ╷         ╷
-									// ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
-									// ╰┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╯
+		, mc_LightDotted2Rounded // ╭┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄╴ ╭┄┄┄┄┄┄┄┄┄╮ ╶┄┄┄┄┄┄┄┄┄╮ ╷         ╷
+								 // ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
+								 // ╰┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╯
 
-		, mc_LightDotted3Rounded	// ╭╌╌╌╌╌╌╌╌╌╮ ╭╌╌╌╌╌╌╌╌╌╴ ╭╌╌╌╌╌╌╌╌╌╮ ╶╌╌╌╌╌╌╌╌╌╮ ╷         ╷
-									// ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
-									// ╰╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╯
+		, mc_LightDotted3Rounded // ╭╌╌╌╌╌╌╌╌╌╮ ╭╌╌╌╌╌╌╌╌╌╴ ╭╌╌╌╌╌╌╌╌╌╮ ╶╌╌╌╌╌╌╌╌╌╮ ╷         ╷
+								 // ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
+								 // ╰╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╯
 
-		, mc_HeavyDotted1			// ┏┉┉┉┉┉┉┉┉┉┓ ┏┉┉┉┉┉┉┉┉┉╸ ┏┉┉┉┉┉┉┉┉┉┓ ╺┉┉┉┉┉┉┉┉┉┓ ╻         ╻
-									// ┋ Testing ┋ ┋ Testing   ┋ Testing ┋   Testing ┋ ┋ Testing ┋
-									// ┗┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉╸ ╹         ╹ ╺┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉┛
+		, mc_HeavyDotted1 // ┏┉┉┉┉┉┉┉┉┉┓ ┏┉┉┉┉┉┉┉┉┉╸ ┏┉┉┉┉┉┉┉┉┉┓ ╺┉┉┉┉┉┉┉┉┉┓ ╻         ╻
+						  // ┋ Testing ┋ ┋ Testing   ┋ Testing ┋   Testing ┋ ┋ Testing ┋
+						  // ┗┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉╸ ╹         ╹ ╺┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉┛
 
-		, mc_HeavyDotted2			// ┏┅┅┅┅┅┅┅┅┅┓ ┏┅┅┅┅┅┅┅┅┅╸ ┏┅┅┅┅┅┅┅┅┅┓ ╺┅┅┅┅┅┅┅┅┅┓ ╻         ╻
-									// ┇ Testing ┇ ┇ Testing   ┇ Testing ┇   Testing ┇ ┇ Testing ┇
-									// ┗┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅╸ ╹         ╹ ╺┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅┛
+		, mc_HeavyDotted2 // ┏┅┅┅┅┅┅┅┅┅┓ ┏┅┅┅┅┅┅┅┅┅╸ ┏┅┅┅┅┅┅┅┅┅┓ ╺┅┅┅┅┅┅┅┅┅┓ ╻         ╻
+						  // ┇ Testing ┇ ┇ Testing   ┇ Testing ┇   Testing ┇ ┇ Testing ┇
+						  // ┗┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅╸ ╹         ╹ ╺┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅┛
 
-		, mc_HeavyDotted3			// ┏╍╍╍╍╍╍╍╍╍┓ ┏╍╍╍╍╍╍╍╍╍╸ ┏╍╍╍╍╍╍╍╍╍┓ ╺╍╍╍╍╍╍╍╍╍┓ ╻         ╻
-									// ╏ Testing ╏ ╏ Testing   ╏ Testing ╏   Testing ╏ ╏ Testing ╏
-									// ┗╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍╸ ╹         ╹ ╺╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍┛
+		, mc_HeavyDotted3 // ┏╍╍╍╍╍╍╍╍╍┓ ┏╍╍╍╍╍╍╍╍╍╸ ┏╍╍╍╍╍╍╍╍╍┓ ╺╍╍╍╍╍╍╍╍╍┓ ╻         ╻
+						  // ╏ Testing ╏ ╏ Testing   ╏ Testing ╏   Testing ╏ ╏ Testing ╏
+						  // ┗╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍╸ ╹         ╹ ╺╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍┛
 	};
 
 	enum class ETerminalBoxCoverage
 	{
 		mc_None = 0
 
-		, mc_Left = DMibBit(0)								// ╷
-															// │ Testing
-															// ╵
+		, mc_Left = DMibBit(0) // ╷
+							   // │ Testing
+							   // ╵
 
-		, mc_Right = DMibBit(1)								//           ╷
-															//   Testing │
-															//           ╵
+		, mc_Right = DMibBit(1) //           ╷
+								//   Testing │
+								//           ╵
 
-		, mc_Top = DMibBit(2)								// ╶─────────╴
-															//   Testing
-															//
+		, mc_Top = DMibBit(2) // ╶─────────╴
+							  //   Testing
+							  //
 
-		, mc_Bottom = DMibBit(3)							//
-															//   Testing
-															// ╶─────────╴
+		, mc_Bottom = DMibBit(3) //
+								 //   Testing
+								 // ╶─────────╴
 
-		, mc_Full = mc_Left | mc_Right | mc_Top | mc_Bottom	// ┌─────────┐
+		, mc_Full = mc_Left | mc_Right | mc_Top | mc_Bottom // ┌─────────┐
 															// │ Testing │
 															// └─────────┘
 
-		, mc_OpenTop  = mc_Left | mc_Right  | mc_Bottom		// ╷         ╷
-															// │ Testing │
-															// └─────────┘
+		, mc_OpenTop = mc_Left | mc_Right | mc_Bottom // ╷         ╷
+													  // │ Testing │
+													  // └─────────┘
 
-		, mc_OpenBottom = mc_Left | mc_Right | mc_Top		// ┌─────────┐
-															// │ Testing │
-															// ╵         ╵
+		, mc_OpenBottom = mc_Left | mc_Right | mc_Top // ┌─────────┐
+													  // │ Testing │
+													  // ╵         ╵
 
-		, mc_OpenLeft = mc_Right | mc_Top | mc_Bottom	 	// ╶─────────┐
-															//   Testing │
-															// ╶─────────┘
+		, mc_OpenLeft = mc_Right | mc_Top | mc_Bottom // ╶─────────┐
+													  //   Testing │
+													  // ╶─────────┘
 
-		, mc_OpenRight = mc_Left | mc_Top | mc_Bottom	 	// ┌─────────╴
-															// │ Testing
-															// └─────────╴
+		, mc_OpenRight = mc_Left | mc_Top | mc_Bottom // ┌─────────╴
+													  // │ Testing
+													  // └─────────╴
 
-		, mc_LeftAndBottom = mc_Left | mc_Bottom			// ╷
-															// │ Testing
-															// └─────────╴
+		, mc_LeftAndBottom = mc_Left | mc_Bottom // ╷
+												 // │ Testing
+												 // └─────────╴
 
-		, mc_RightAndBottom = mc_Right | mc_Bottom			//           ╷
-															//   Testing │
-															// ╶─────────┘
+		, mc_RightAndBottom = mc_Right | mc_Bottom //           ╷
+												   //   Testing │
+												   // ╶─────────┘
 
-		, mc_LeftAndTop = mc_Left | mc_Top 					// ┌─────────╴
-															// │ Testing
-															// ╵
+		, mc_LeftAndTop = mc_Left | mc_Top // ┌─────────╴
+										   // │ Testing
+										   // ╵
 
-		, mc_RightAndTop = mc_Right | mc_Top				// ╶─────────┐
-															//   Testing │
-															//           ╵
+		, mc_RightAndTop = mc_Right | mc_Top // ╶─────────┐
+											 //   Testing │
+											 //           ╵
 
-		, mc_LeftAndRight = mc_Left | mc_Right 				// ╷         ╷
-															// │ Testing │
-															// ╵         ╵
+		, mc_LeftAndRight = mc_Left | mc_Right // ╷         ╷
+											   // │ Testing │
+											   // ╵         ╵
 
-		, mc_TopAndBottom = mc_Top | mc_Bottom				// ╶─────────╴
-															//   Testing
-															// ╶─────────╴
+		, mc_TopAndBottom = mc_Top | mc_Bottom // ╶─────────╴
+											   //   Testing
+											   // ╶─────────╴
 	};
 
 	struct CBlendOptions
@@ -232,14 +232,7 @@ namespace NMib::NCommandLine
 			)
 		;
 
-		int32 f_TextRun
-			(
-				CTerminalPoint _Position
-				, NStr::CStrPtr const &_Text
-				, CSetChixelProperties const &_Properties
-				, CTerminalArea const &_ClipArea = {}
-			)
-		;
+		int32 f_TextRun(CTerminalPoint _Position, NStr::CStrPtr const &_Text, CSetChixelProperties const &_Properties, CTerminalArea const &_ClipArea = {});
 
 		NStr::CStr f_Render(ETerminalRenderFlag _Flags);
 		NStr::CStr f_DiffRender(CTerminalSurface const &_Previous, ETerminalRenderFlag _Flags);

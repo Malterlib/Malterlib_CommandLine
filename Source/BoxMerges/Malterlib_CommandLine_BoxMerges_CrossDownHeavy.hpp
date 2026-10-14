@@ -6,21 +6,21 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈│╎┆┊┐┒╖╮└╰┘╯┌┎╓╭╻╴╵╶╷├┟┤┧┬┰┴┼╥╽")>
 	, .m_Right = gc_Str<str_utf8("╁")>
 	, .m_EndpointTypesLeft = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
 	.m_Combined = str_utf32('╁')
 	, .m_Left = gc_Str<str_utf8("└╰├┟┴┼")>
 	, .m_Right = gc_Str<str_utf8("┒╖")>
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
 	.m_Combined = str_utf32('╁')
 	, .m_Left = gc_Str<str_utf8("┘╯┤┧┴┼")>
 	, .m_Right = gc_Str<str_utf8("┎╓")>
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -28,7 +28,7 @@
 	, .m_Left = gc_Str<str_utf8("┴┼")>
 	, .m_Right = gc_Str<str_utf8("╻")>
 	, .m_EndpointTypesRight = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -36,7 +36,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈┐┒╖╮┘╯╴┤┧┬┰┴┼╥")>
 	, .m_Right = gc_Str<str_utf8("┟")>
 	, .m_EndpointTypesLeft = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -44,7 +44,7 @@
 	, .m_Left = gc_Str<str_utf8("─╌┄┈└╰┌┎╓╭╶├┟┬┰┴┼╥")>
 	, .m_Right = gc_Str<str_utf8("┧")>
 	, .m_EndpointTypesLeft = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -52,15 +52,14 @@
 	, .m_Left = gc_Str<str_utf8("│╎┆┊└╰┘╯╵├┟┤┧┴┼╽")>
 	, .m_Right = gc_Str<str_utf8("┰╥")>
 	, .m_EndpointTypesLeft = {DHeavyOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
 	.m_Combined = str_utf32('╁')
 	, .m_Left = gc_Str<str_utf8("─╌┄┈┬┰┴┼╥")>
 	, .m_Right = gc_Str<str_utf8("╽")>
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 
- 

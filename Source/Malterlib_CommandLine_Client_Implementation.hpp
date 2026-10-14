@@ -177,11 +177,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization, typename t_CThis>
-	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::fp_RunCommand
-		(
-			void const *_pCommand
-			, NEncoding::CEJsonSorted &&_Params
-		)
+	uint32 TCCommandLineClient<t_CCustomization, t_CThis>::fp_RunCommand(void const *_pCommand, NEncoding::CEJsonSorted &&_Params)
 	{
 		if constexpr (NTraits::cIsSame<CThis, TCCommandLineClient>)
 		{
@@ -212,5 +208,5 @@ namespace NMib::NCommandLine
 	TCCommandLineClient<t_CCustomization, t_CThis>::TCCommandLineClient(TCCommandLineClient &&_Other) = default;
 
 	template <typename t_CCustomization, typename t_CThis>
-	TCCommandLineClient<t_CCustomization, t_CThis> &TCCommandLineClient<t_CCustomization, t_CThis>::operator =(TCCommandLineClient &&_Other) = default;
+	TCCommandLineClient<t_CCustomization, t_CThis> &TCCommandLineClient<t_CCustomization, t_CThis>::operator = (TCCommandLineClient &&_Other) = default;
 }
