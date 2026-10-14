@@ -12,7 +12,7 @@ namespace NMib::NCommandLine
 	{
 		inline_always COneOf(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
-		inline_always COneOf(tfp_CParams const &...p_Config);
+		inline_always COneOf(tfp_CParams const & ...p_Config);
 
 		inline_always operator NEncoding::CEJsonOrdered () &&;
 		inline_always operator NEncoding::CEJsonOrdered () const &;
@@ -24,7 +24,7 @@ namespace NMib::NCommandLine
 	{
 		inline_always COneOfType(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
-		inline_always COneOfType(tfp_CParams const &...p_Config);
+		inline_always COneOfType(tfp_CParams const & ...p_Config);
 
 		inline_always operator NEncoding::CEJsonOrdered () &&;
 		inline_always operator NEncoding::CEJsonOrdered () const &;
@@ -114,8 +114,8 @@ namespace NMib::NCommandLine
 
 		TCCommandLineSpecification(TCCommandLineSpecification const &_Other);
 		TCCommandLineSpecification(TCCommandLineSpecification &&_Other);
-		TCCommandLineSpecification &operator =(TCCommandLineSpecification const &_Other);
-		TCCommandLineSpecification &operator =(TCCommandLineSpecification &&_Other);
+		TCCommandLineSpecification &operator = (TCCommandLineSpecification const &_Other);
+		TCCommandLineSpecification &operator = (TCCommandLineSpecification &&_Other);
 
 		CSection f_GetDefaultSection();
 		CSection f_AddSection(NStr::CStr const &_Heading, NStr::CStr const &_Description, NStr::CStr const &_AfterSection = {});

@@ -165,17 +165,17 @@ namespace NMib::NCommandLine
 		void f_Italic(bool _bValue);
 		void f_Strikeout(bool _bValue);
 
-		constexpr static umint mc_CharacterOffset = 0;
-		constexpr static umint mc_CharacterBits = 21;
-		constexpr static ch32 mc_CharacterMask = DMibBitRangeTyped(mc_CharacterOffset, mc_CharacterOffset + mc_CharacterBits - 1, ch32);
+		static constexpr umint mc_CharacterOffset = 0;
+		static constexpr umint mc_CharacterBits = 21;
+		static constexpr ch32 mc_CharacterMask = DMibBitRangeTyped(mc_CharacterOffset, mc_CharacterOffset + mc_CharacterBits - 1, ch32);
 
-		constexpr static umint mc_FlagsOffset = mc_CharacterOffset + mc_CharacterBits;
-		constexpr static umint mc_FlagsBits = 7;
-		constexpr static ch32 mc_FlagsMask = DMibBitRangeTyped(mc_FlagsOffset, mc_FlagsOffset + mc_FlagsBits - 1, ch32);
+		static constexpr umint mc_FlagsOffset = mc_CharacterOffset + mc_CharacterBits;
+		static constexpr umint mc_FlagsBits = 7;
+		static constexpr ch32 mc_FlagsMask = DMibBitRangeTyped(mc_FlagsOffset, mc_FlagsOffset + mc_FlagsBits - 1, ch32);
 
-		constexpr static umint mc_EndpointOffset = mc_FlagsOffset + mc_FlagsBits;
-		constexpr static umint mc_EndpointBits = 4;
-		constexpr static ch32 mc_EndpointMask = DMibBitRangeTyped(mc_EndpointOffset, mc_EndpointOffset + mc_EndpointBits - 1, ch32);
+		static constexpr umint mc_EndpointOffset = mc_FlagsOffset + mc_FlagsBits;
+		static constexpr umint mc_EndpointBits = 4;
+		static constexpr ch32 mc_EndpointMask = DMibBitRangeTyped(mc_EndpointOffset, mc_EndpointOffset + mc_EndpointBits - 1, ch32);
 
 		ch32 m_CharaterFlagsAndEndpointType = 0; // One Unicode codepoint; combining codepoints live in the owning surface.
 		CTerminalColor m_BackgroundColor;
@@ -184,7 +184,6 @@ namespace NMib::NCommandLine
 #if DCommandLineSupportOverflow
 		bool m_bHasOverflow = false; // The owning surface stores additional codepoints by cell index.
 #endif
-
 	};
 
 	constexpr ch32 fg_CharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type)

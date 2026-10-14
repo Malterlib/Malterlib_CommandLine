@@ -190,11 +190,7 @@ namespace NMib::NCommandLine
 					{
 						smint NextSection = _LongText.f_FindChar('\n');
 						smint NextLine = _LongText.f_FindChar('\r');
-						bool bEndSection
-							= (NextLine < 0)
-							|| (NextSection >= 0 && NextLine < 0)
-							|| (NextLine >= 0 && NextSection >= 0 && NextSection < NextLine)
-						;
+						bool bEndSection = (NextLine < 0) || (NextSection >= 0 && NextLine < 0) || (NextLine >= 0 && NextSection >= 0 && NextSection < NextLine);
 
 						CStr Line = fg_GetStrLineSep(_LongText);
 						if (Line.f_StartsWith("@Indent="))
@@ -228,11 +224,7 @@ namespace NMib::NCommandLine
 					{
 						smint NextSection = _LongText.f_FindChar('\n');
 						smint NextLine = _LongText.f_FindChar('\r');
-						bool bEndSection
-							= ((NextLine < 0) && _bEndSection)
-							|| (NextSection >= 0 && NextLine < 0)
-							|| (NextLine >= 0 && NextSection >= 0 && NextSection < NextLine)
-						;
+						bool bEndSection = ((NextLine < 0) && _bEndSection) || (NextSection >= 0 && NextLine < 0) || (NextLine >= 0 && NextSection >= 0 && NextSection < NextLine);
 
 						CStr Line = fg_GetStrLineSep(_LongText);
 						if (Line.f_StartsWith("@Indent="))
@@ -289,11 +281,7 @@ namespace NMib::NCommandLine
 
 		auto fFormatShortWithDefault = [&](CStr const &_Description, CStr const &_Default) -> CStr
 			{
-				return "{} {}{}"_f
-					<< _Description
-					<< fColor("= ", CInternal::EColor_Default)
-					<< _Default
-				;
+				return "{} {}{}"_f << _Description << fColor("= ", CInternal::EColor_Default) << _Default;
 			}
 		;
 
@@ -301,10 +289,7 @@ namespace NMib::NCommandLine
 			{
 				fOutputSectionedText
 					(
-						"{sj*,sf ,a-}{}"_f
-						<< _SectionName
-						<< c_VerboseValueIndentWidth
-						<< (_Value.f_Indent(c_VerboseValueIndent, false).f_ReplaceChar('\n', '\r'))
+						"{sj*,sf ,a-}{}"_f << _SectionName << c_VerboseValueIndentWidth << (_Value.f_Indent(c_VerboseValueIndent, false).f_ReplaceChar('\n', '\r'))
 						, c_VerboseValueIndentWidth
 					)
 				;
@@ -329,6 +314,7 @@ namespace NMib::NCommandLine
 					CStr m_NegatedNames;
 					typename CInternal::COption const *m_pOption;
 				};
+
 				TCVector<CCommandEntry> OptionEntries;
 				umint LongestName = 0;
 				for (auto &Option : _Options)
@@ -421,6 +407,7 @@ namespace NMib::NCommandLine
 					CStr m_Name;
 					typename CInternal::CParameter const *m_pParameter;
 				};
+
 				TCVector<CCommandEntry> ParameterEntries;
 				umint LongestName = 0;
 				for (auto &Parameter : _Parameters)
@@ -733,6 +720,7 @@ namespace NMib::NCommandLine
 				typename CInternal::COptionSet m_OptionSet;
 				bool m_bIsDirectCommand = true;
 			};
+
 			TCSet<typename CInternal::CCommand *> CommandsMap;
 			TCMap<typename CInternal::CSection *, CSectionState> SectionMap;
 			TCVector<typename CInternal::CSection *> Sections;
@@ -781,7 +769,6 @@ namespace NMib::NCommandLine
 						bIsDirectCommand = false;
 						SectionState.m_bIsDirectCommand = false;
 					}
-
 				}
 			;
 			for (auto &CommandName : CommandNames)
@@ -907,20 +894,11 @@ namespace NMib::NCommandLine
 				TCVector<CCommandEntry> m_Commands;
 			};
 
-			TCMap<CStr, CCategory*> CategoryMap;
+			TCMap<CStr, CCategory *> CategoryMap;
 			TCLinkedList<CCategory> Categories;
 			umint LongestName = 0;
 
-			fOutputOptions
-				(
-					"{} Shared Options"_f << Section.m_Heading
-					, Section.m_SectionOptions
-					, typename CInternal::COptionSet{}
-					, false
-					, bVerbose
-					, CInternal::EColor_SectionOption
-				)
-			;
+			fOutputOptions("{} Shared Options"_f << Section.m_Heading, Section.m_SectionOptions, typename CInternal::COptionSet{}, false, bVerbose, CInternal::EColor_SectionOption);
 
 			for (auto &Command : Section.m_Commands)
 			{

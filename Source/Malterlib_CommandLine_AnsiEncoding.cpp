@@ -46,7 +46,7 @@ namespace NMib::NCommandLine
 			uint8 BestColor = 0;
 			uint32 SmallestError = TCLimitsInt<uint32>::mc_Max;
 
-			constexpr static uint8 c_CubeColors[6] = {0, 95, 135, 175, 215, 255};
+			static constexpr uint8 c_CubeColors[6] = {0, 95, 135, 175, 215, 255};
 
 			auto fBestComponent = [](uint8 _Value)
 				{
@@ -100,15 +100,15 @@ namespace NMib::NCommandLine
 
 		NGraphics::CColorR8G8B8 fg_InvertBrightness(uint8 _Red, uint8 _Green, uint8 _Blue)
 		{
-			fp32 R = fp32(1.0f/255.0f) * _Red;
-			fp32 G = fp32(1.0f/255.0f) * _Green;
-			fp32 B = fp32(1.0f/255.0f) * _Blue;
+			fp32 R = fp32(1.0f / 255.0f) * _Red;
+			fp32 G = fp32(1.0f / 255.0f) * _Green;
+			fp32 B = fp32(1.0f / 255.0f) * _Blue;
 
 			fp32 Y = fp32(0.299f) * R + fp32(0.587f) * G + fp32(0.114f) * B;
 			fp32 Cb = fp32(-0.1687f) * R - fp32(0.3313f) * G + fp32(0.5f) * B;
 			fp32 Cr = fp32(0.5f) * R - fp32(0.4187f) * G - fp32(0.0813f) * B;
 
-			Y = (fp32(1.0f) - Y.f_Pow(1.0f/1.5f));
+			Y = (fp32(1.0f) - Y.f_Pow(1.0f / 1.5f));
 
 			fp32 Rf = (Y + fp32(1.402f) * Cr);
 			fp32 Gf = (Y - fp32(0.34414f) * Cb - fp32(0.71414f) * Cr);
@@ -736,7 +736,7 @@ namespace NMib::NCommandLine
 		// Decodes the UTF-8 codepoint at _pParse and advances past it. The buffer is NUL
 		// terminated; invalid or truncated sequences decode as their first byte so every input
 		// byte round-trips unchanged into the output lines.
-		ch32 fg_DecodeUTF8Char(uch8 const *&_pParse)
+		ch32 fg_DecodeUTF8Char(uch8 const * &_pParse)
 		{
 			uch8 First = *_pParse;
 			++_pParse;
@@ -824,15 +824,8 @@ namespace NMib::NCommandLine
 					{
 						// A run covering the whole input means there were no escape sequences;
 						// share the input's storage instead of copying the bytes
-						if
-						(
-							o_Stripped.f_IsEmpty()
-							&& _Text.f_GetStr() == _String.f_GetStr()
-							&& _Text.f_GetLen() == _String.f_GetLen()
-						)
-						{
+						if (o_Stripped.f_IsEmpty() && _Text.f_GetStr() == _String.f_GetStr() && _Text.f_GetLen() == _String.f_GetLen())
 							o_Stripped = _String;
-						}
 						else
 							o_Stripped += _Text;
 
@@ -928,14 +921,7 @@ namespace NMib::NCommandLine
 		// front to back through _fOutputLine(pStart, nBytes, DisplayLen, bLeadingEllipsis), and
 		// _fAppendEllipsis(WidthDelta) appends a trailing "…" to the most recently output line.
 		template <typename t_FOutputLine, typename t_FAppendEllipsis>
-		void fg_LineBreakWalk
-			(
-				CStr const &_Stripped
-				, umint _Length
-				, CAnsiEncoding::EWordWrap _WordWrap
-				, t_FOutputLine &&_fOutputLine
-				, t_FAppendEllipsis &&_fAppendEllipsis
-			)
+		void fg_LineBreakWalk(CStr const &_Stripped, umint _Length, CAnsiEncoding::EWordWrap _WordWrap, t_FOutputLine &&_fOutputLine, t_FAppendEllipsis &&_fAppendEllipsis)
 		{
 			ch8 const *pStrippedBase = _Stripped.f_GetStr();
 			uch8 const *pParse = (uch8 const *)pStrippedBase;
@@ -1153,13 +1139,25 @@ namespace NMib::NCommandLine
 
 						if (ActiveProperties.m_BackgroundColor && ActiveProperties.m_BackgroundColor->m_bEnabled)
 						{
-							ToOutput += f_BackgroundRGBFormat(ActiveProperties.m_BackgroundColor->m_Red, ActiveProperties.m_BackgroundColor->m_Green, ActiveProperties.m_BackgroundColor->m_Blue);
+							ToOutput += f_BackgroundRGBFormat
+								(
+									ActiveProperties.m_BackgroundColor->m_Red
+									, ActiveProperties.m_BackgroundColor->m_Green
+									, ActiveProperties.m_BackgroundColor->m_Blue
+								)
+							;
 							bSetProperties = true;
 						}
 
 						if (ActiveProperties.m_ForegroundColor && ActiveProperties.m_ForegroundColor->m_bEnabled)
 						{
-							ToOutput += f_ForegroundRGBFormat(ActiveProperties.m_ForegroundColor->m_Red, ActiveProperties.m_ForegroundColor->m_Green, ActiveProperties.m_ForegroundColor->m_Blue);
+							ToOutput += f_ForegroundRGBFormat
+								(
+									ActiveProperties.m_ForegroundColor->m_Red
+									, ActiveProperties.m_ForegroundColor->m_Green
+									, ActiveProperties.m_ForegroundColor->m_Blue
+								)
+							;
 							bSetProperties = true;
 						}
 
@@ -1662,7 +1660,6 @@ namespace NMib::NCommandLine
 		}
 	}
 
-
 	uint32 CAnsiEncoding::CSgrSequence::f_ForegroundDefaultDiff(uint32 _Previous)
 	{
 		if (!(mp_Flags & EAnsiEncodingFlag_Color))
@@ -1713,9 +1710,18 @@ namespace NMib::NCommandLine
 		switch (_Weight)
 		{
 		case EWeight::mc_Normal: break;
-		case EWeight::mc_Bold: fp_StartSequence(); *mp_pAppender += gc_Str<"1">.m_Str; break;
-		case EWeight::mc_Dim: fp_StartSequence(); *mp_pAppender += gc_Str<"2">.m_Str; break;
-		case EWeight::mc_Shadowed: fp_StartSequence(); *mp_pAppender += gc_Str<"1:2">.m_Str; break;
+		case EWeight::mc_Bold:
+			fp_StartSequence();
+			*mp_pAppender += gc_Str<"1">.m_Str;
+			break;
+		case EWeight::mc_Dim:
+			fp_StartSequence();
+			*mp_pAppender += gc_Str<"2">.m_Str;
+			break;
+		case EWeight::mc_Shadowed:
+			fp_StartSequence();
+			*mp_pAppender += gc_Str<"1:2">.m_Str;
+			break;
 		}
 	}
 

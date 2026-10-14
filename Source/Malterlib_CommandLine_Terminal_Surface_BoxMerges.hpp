@@ -176,12 +176,12 @@ namespace NMib::NCommandLine
 
 		struct CBoxMerge
 		{
-			COrdering_Strong operator <=>(CBoxMerge const &_Right) const
+			COrdering_Strong operator <=> (CBoxMerge const &_Right) const
 			{
 				return m_Characters <=> _Right.m_Characters;
 			}
 
-			COrdering_Strong operator <=>(CCharacterPair const &_Right) const
+			COrdering_Strong operator <=> (CCharacterPair const &_Right) const
 			{
 				return m_Characters <=> _Right;
 			}
@@ -512,7 +512,6 @@ namespace NMib::NCommandLine
 
 						if (!MappedCharacters.f_FindEqual(Pair))
 							MissingCharacters[Pair];
-
 					}
 				}
 

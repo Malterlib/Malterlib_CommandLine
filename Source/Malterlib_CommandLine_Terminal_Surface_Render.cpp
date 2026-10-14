@@ -60,44 +60,17 @@ namespace NMib::NCommandLine
 					if (!ForegroundColor.f_Alpha())
 						LastForeground = SgrSequence.f_ForegroundDefaultDiff(LastForeground);
 					else
-					{
-						LastForeground = SgrSequence.f_ForegroundRGBDiff
-							(
-								LastForeground
-								, ForegroundColor.f_Red()
-								, ForegroundColor.f_Green()
-								, ForegroundColor.f_Blue()
-							)
-						;
-					}
+						LastForeground = SgrSequence.f_ForegroundRGBDiff(LastForeground, ForegroundColor.f_Red(), ForegroundColor.f_Green(), ForegroundColor.f_Blue());
 					auto &BackgroundColor = pBuffer->m_BackgroundColor;
 					if (!BackgroundColor.f_Alpha())
 						LastBackground = SgrSequence.f_BackgroundDefaultDiff(LastBackground);
 					else
-					{
-						LastBackground = SgrSequence.f_BackgroundRGBDiff
-							(
-								LastBackground
-								, BackgroundColor.f_Red()
-								, BackgroundColor.f_Green()
-								, BackgroundColor.f_Blue()
-							)
-						;
-					}
+						LastBackground = SgrSequence.f_BackgroundRGBDiff(LastBackground, BackgroundColor.f_Red(), BackgroundColor.f_Green(), BackgroundColor.f_Blue());
 					auto &UnderlineColor = pBuffer->m_UnderlineColor;
 					if (!UnderlineColor.f_Alpha())
 						LastUnderline = SgrSequence.f_UnderlineDefaultDiff(LastUnderline);
 					else
-					{
-						LastUnderline = SgrSequence.f_UnderlineRGBDiff
-							(
-								LastUnderline
-								, UnderlineColor.f_Red()
-								, UnderlineColor.f_Green()
-								, UnderlineColor.f_Blue()
-							)
-						;
-					}
+						LastUnderline = SgrSequence.f_UnderlineRGBDiff(LastUnderline, UnderlineColor.f_Red(), UnderlineColor.f_Green(), UnderlineColor.f_Blue());
 
 					LastProperties.m_ForegroundColor = ForegroundColor;
 					LastProperties.m_BackgroundColor = BackgroundColor;
@@ -148,16 +121,7 @@ namespace NMib::NCommandLine
 							if (!ForegroundColor.f_Alpha())
 								LastForeground = SgrSequence.f_ForegroundDefaultDiff(LastForeground);
 							else
-							{
-								LastForeground = SgrSequence.f_ForegroundRGBDiff
-									(
-										LastForeground
-										, ForegroundColor.f_Red()
-										, ForegroundColor.f_Green()
-										, ForegroundColor.f_Blue()
-									)
-								;
-							}
+								LastForeground = SgrSequence.f_ForegroundRGBDiff(LastForeground, ForegroundColor.f_Red(), ForegroundColor.f_Green(), ForegroundColor.f_Blue());
 						}
 
 						if (BackgroundColor != LastProperties.m_BackgroundColor)
@@ -165,16 +129,7 @@ namespace NMib::NCommandLine
 							if (!BackgroundColor.f_Alpha())
 								LastBackground = SgrSequence.f_BackgroundDefaultDiff(LastBackground);
 							else
-							{
-								LastBackground = SgrSequence.f_BackgroundRGBDiff
-									(
-										LastBackground
-										, BackgroundColor.f_Red()
-										, BackgroundColor.f_Green()
-										, BackgroundColor.f_Blue()
-									)
-								;
-							}
+								LastBackground = SgrSequence.f_BackgroundRGBDiff(LastBackground, BackgroundColor.f_Red(), BackgroundColor.f_Green(), BackgroundColor.f_Blue());
 						}
 
 						if (UnderlineColor != LastProperties.m_UnderlineColor)
@@ -182,16 +137,7 @@ namespace NMib::NCommandLine
 							if (!UnderlineColor.f_Alpha())
 								LastUnderline = SgrSequence.f_UnderlineDefaultDiff(LastUnderline);
 							else
-							{
-								LastUnderline = SgrSequence.f_UnderlineRGBDiff
-									(
-										LastUnderline
-										, UnderlineColor.f_Red()
-										, UnderlineColor.f_Green()
-										, UnderlineColor.f_Blue()
-									)
-								;
-							}
+								LastUnderline = SgrSequence.f_UnderlineRGBDiff(LastUnderline, UnderlineColor.f_Red(), UnderlineColor.f_Green(), UnderlineColor.f_Blue());
 						}
 					}
 

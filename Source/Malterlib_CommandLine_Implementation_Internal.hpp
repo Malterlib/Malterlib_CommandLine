@@ -69,7 +69,8 @@ namespace NMib::NCommandLine
 		case EColor_ObjectName: return 0xffa600;
 		case EColor_Heading1:
 		case EColor_None:
-		default: return 0;
+		default:
+			return 0;
 		}
 	}
 
@@ -138,17 +139,41 @@ namespace NMib::NCommandLine
 		fp32 R1, G1, B1;
 		fp32 Hs = H / fp32(60.0f);
 		if (Hs < fp32(1.0f))
-			{ R1 = C1; G1 = X1; B1 = fp32(0.0f); }
+		{
+			R1 = C1;
+			G1 = X1;
+			B1 = fp32(0.0f);
+		}
 		else if (Hs < fp32(2.0f))
-			{ R1 = X1; G1 = C1; B1 = fp32(0.0f); }
+		{
+			R1 = X1;
+			G1 = C1;
+			B1 = fp32(0.0f);
+		}
 		else if (Hs < fp32(3.0f))
-			{ R1 = fp32(0.0f); G1 = C1; B1 = X1; }
+		{
+			R1 = fp32(0.0f);
+			G1 = C1;
+			B1 = X1;
+		}
 		else if (Hs < fp32(4.0f))
-			{ R1 = fp32(0.0f); G1 = X1; B1 = C1; }
+		{
+			R1 = fp32(0.0f);
+			G1 = X1;
+			B1 = C1;
+		}
 		else if (Hs < fp32(5.0f))
-			{ R1 = X1; G1 = fp32(0.0f); B1 = C1; }
+		{
+			R1 = X1;
+			G1 = fp32(0.0f);
+			B1 = C1;
+		}
 		else
-			{ R1 = C1; G1 = fp32(0.0f); B1 = X1; }
+		{
+			R1 = C1;
+			G1 = fp32(0.0f);
+			B1 = X1;
+		}
 
 		R1 += M1;
 		G1 += M1;
@@ -265,7 +290,13 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename t_CCustomization>
-	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue(NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const
+	NEncoding::CEJsonSorted TCCommandLineSpecification<t_CCustomization>::CInternal::CValue::f_ConvertValue
+		(
+			NEncoding::CEJsonSorted const &_Value
+			, EColor _Color
+			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+		)
+		const
 	{
 		return fp_ConvertValue(m_TypeTemplate, _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 	}
@@ -277,7 +308,8 @@ namespace NMib::NCommandLine
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		return fp_ConvertValue(m_TypeTemplate, _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 	}
@@ -301,7 +333,8 @@ namespace NMib::NCommandLine
 			, NEncoding::CEJsonSorted const &_Value
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		NEncoding::CEJsonSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(m_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
@@ -315,7 +348,8 @@ namespace NMib::NCommandLine
 			, NStr::CStr const &_Identifier
 			, EColor _Color
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		NEncoding::CEJsonSorted NewParams = fp_ConvertValue(m_TypeTemplate.f_Array()[0], _Value, fs_Color(_Identifier, _Color, _AnsiFlags), false, _AnsiFlags);
 		o_Value.f_Array().f_Insert(NewParams);
@@ -418,9 +452,7 @@ namespace NMib::NCommandLine
 				break;
 			DMibError("null can only be used in COneOf statements");
 			break;
-		default:
-			DMibError("Invalid template type");
-			break;
+		default: DMibError("Invalid template type"); break;
 		}
 	}
 
@@ -565,7 +597,7 @@ namespace NMib::NCommandLine
 						}
 					;
 
-					auto fParseInt = [&](ch8 const *&_pParse, auto _Type, ch8 const *_pTerminators)
+					auto fParseInt = [&](ch8 const * &_pParse, auto _Type, ch8 const *_pTerminators)
 						{
 							bool bFailed = false;
 							auto Return = fg_StrToIntParse(_pParse, _Type, _pTerminators, false, EStrToIntParseMode_Base10, &bFailed);
@@ -742,9 +774,7 @@ namespace NMib::NCommandLine
 								continue;
 							}
 
-							OutputObject.f_CreateMember(Identifier)
-								= fp_ConvertValue(TemplateMember.f_Value(), *pInputMember, fg_Format("{}.{}", _Identifier, Identifier), true, _AnsiFlags)
-							;
+							OutputObject.f_CreateMember(Identifier) = fp_ConvertValue(TemplateMember.f_Value(), *pInputMember, fg_Format("{}.{}", _Identifier, Identifier), true, _AnsiFlags);
 						}
 
 						for (auto &InputMember : InputObject)
@@ -838,9 +868,7 @@ namespace NMib::NCommandLine
 				else
 					DMibError("Null can only be converted from string");
 				break;
-			default:
-				DMibError("Invalid template type");
-				break;
+			default: DMibError("Invalid template type"); break;
 			}
 		}
 		catch (CCommandLineConvertException const &)
@@ -861,7 +889,8 @@ namespace NMib::NCommandLine
 			NEncoding::CEJsonSorted const &_Template
 			, bool _bType
 			, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-		) const
+		)
+		const
 	{
 		using namespace NEncoding;
 		using namespace NStr;
@@ -979,9 +1008,7 @@ namespace NMib::NCommandLine
 					return Return;
 				}
 				break;
-			default:
-				DMibError("Invalid template type");
-				break;
+			default: DMibError("Invalid template type"); break;
 			}
 			return {};
 		}
@@ -999,9 +1026,7 @@ namespace NMib::NCommandLine
 		case EEJsonType_Binary: return fColor(fg_Base64Encode(_Template.f_Binary()), EColor_Binary);
 		case EEJsonType_Date: return fColor("{}"_f << _Template.f_Date(), EColor_Date);
 		case EEJsonType_UserType: return fToString(_Template);
-		default:
-			DMibError("Invalid template type");
-			break;
+		default: DMibError("Invalid template type"); break;
 		}
 
 		return {};
@@ -1069,16 +1094,20 @@ namespace NMib::NCommandLine
 					return fToString(_Value);
 			}
 			break;
-		default:
-			DMibError("Invalid template type");
-			break;
+		default: DMibError("Invalid template type"); break;
 		}
 
 		return {};
 	}
 
 	template <typename t_CCustomization>
-	TCCommandLineSpecification<t_CCustomization>::CInternal::COption::COption(NStr::CStr const &_Identifier, NContainer::TCVector<NStr::CStr> const &_Names, CCommandCommon *_pCommand, bool _bOptional)
+	TCCommandLineSpecification<t_CCustomization>::CInternal::COption::COption
+		(
+			NStr::CStr const &_Identifier
+			, NContainer::TCVector<NStr::CStr> const &_Names
+			, CCommandCommon *_pCommand
+			, bool _bOptional
+		)
 		: CValue(_Identifier, _bOptional)
 		, m_pCommand(_pCommand)
 		, m_Names(_Names)
@@ -1158,7 +1187,7 @@ namespace NMib::NCommandLine
 		for (auto &Member : _ToCheck.f_Object())
 		{
 			if (!_AllowedKeys.f_FindEqual(Member.f_Name()))
-				DMibError(fg_Format("Unexpected member '{}'",Member.f_Name()));
+				DMibError(fg_Format("Unexpected member '{}'", Member.f_Name()));
 		}
 	}
 

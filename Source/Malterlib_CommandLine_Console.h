@@ -6,8 +6,8 @@
 namespace NMib::NCommandLine
 {
 	void fg_MalterlibConOut(ch8 const *_pStr, umint _Len);
-	void fg_MalterlibConOut(const NStr::CStrNonTracked &_Str);
-	void fg_MalterlibConErrOut(const NStr::CStrNonTracked &_Str);
+	void fg_MalterlibConOut(NStr::CStrNonTracked const &_Str);
+	void fg_MalterlibConErrOut(NStr::CStrNonTracked const &_Str);
 
 #	ifndef DMibEnableConsole
 #		define DMibEnableConsole 1

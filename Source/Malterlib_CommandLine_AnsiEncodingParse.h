@@ -142,14 +142,7 @@ namespace NMib::NCommandLine
 		// layout and rendering; o_Text is cleared without releasing its buffers. The run views
 		// stay valid while o_Text.m_Source keeps its storage: reassigning it (including a later
 		// fs_LineBreak into the same o_Text) invalidates them
-		static void fs_LineBreak
-			(
-				NStr::CStr const &_String
-				, umint _Length
-				, CAnsiEncoding::EWordWrap _WordWrap
-				, CParsedText &o_Text
-			)
-		;
+		static void fs_LineBreak(NStr::CStr const &_String, umint _Length, CAnsiEncoding::EWordWrap _WordWrap, CParsedText &o_Text);
 	};
 }
 
