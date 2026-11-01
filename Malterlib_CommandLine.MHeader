@@ -37,7 +37,6 @@ Import "../Core/Lib_Malterlib.MTarget"
 	}
 }
 
-
 Property
 {
 	MalterlibLibrary_CommandLine: bool = MalterlibLibrary_All
@@ -55,8 +54,7 @@ Property
 Property
 {
 	!!MalterlibEnableInternalTests true
-	
+
 	MalterlibTests =+ "Malterlib_CommandLine"
 	MalterlibTestFiles_Malterlib_CommandLine: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
 }
-

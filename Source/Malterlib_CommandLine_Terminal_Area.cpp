@@ -78,12 +78,12 @@ namespace NMib::NCommandLine
 
 	CTerminalArea CTerminalArea::f_Intersection(CTerminalSize const &_Other) const
 	{
-		return f_Intersection(CTerminalArea{{0,0}, _Other});
+		return f_Intersection(CTerminalArea{{0, 0}, _Other});
 	}
 
 	CTerminalArea CTerminalArea::f_Crop(CTerminalSize const &_Other) const
 	{
-		return f_Intersection(CTerminalArea{{0,0}, _Other});
+		return f_Intersection(CTerminalArea{{0, 0}, _Other});
 	}
 
 	CTerminalPoint CTerminalArea::f_UpperLeft() const

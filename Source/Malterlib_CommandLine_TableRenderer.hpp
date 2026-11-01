@@ -6,7 +6,7 @@
 namespace NMib::NCommandLine
 {
 	template <typename ...tfp_CString>
-	void CTableRenderHelper::f_AddHeadings(tfp_CString &&...p_Headings)
+	void CTableRenderHelper::f_AddHeadings(tfp_CString && ...p_Headings)
 		requires (sizeof...(p_Headings) >= 1)
 	{
 		DMibRequire(mp_Headings.f_IsEmpty());
@@ -23,7 +23,7 @@ namespace NMib::NCommandLine
 	}
 
 	template <typename ...tfp_CString>
-	void CTableRenderHelper::f_AddRow(tfp_CString &&...p_RowColumns)
+	void CTableRenderHelper::f_AddRow(tfp_CString && ...p_RowColumns)
 		requires (sizeof...(p_RowColumns) >= 1)
 	{
 		DMibRequire(!mp_Widths.f_IsEmpty());

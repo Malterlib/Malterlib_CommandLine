@@ -7,7 +7,7 @@ namespace NMib::NCommandLine
 {
 	struct CTerminalArea;
 	struct CTerminalPoint;
-	
+
 	struct CTerminalSize
 	{
 		CTerminalSize &operator += (CTerminalSize const &_Right);

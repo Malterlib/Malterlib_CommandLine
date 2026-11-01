@@ -12,11 +12,11 @@ namespace NMib::NCommandLine
 	{
 		enum EOption : uint32
 		{
-			EOption_None = 0
-			, EOption_Rounded = DMibBit(0)
+			EOption_None                 = 0
+			, EOption_Rounded            = DMibBit(0)
 			, EOption_AvoidRowSeparators = DMibBit(1)
-			, EOption_NoExtraLines = DMibBit(2)
-			, EOption_NoHeadings = DMibBit(3)
+			, EOption_NoExtraLines       = DMibBit(2)
+			, EOption_NoHeadings         = DMibBit(3)
 		};
 
 		enum EOutputType : uint32
@@ -51,14 +51,14 @@ namespace NMib::NCommandLine
 
 		void f_AddDescription(NStr::CStr const &_Description);
 		template <typename ...tfp_CString>
-		void f_AddHeadings(tfp_CString &&...p_Headings)
+		void f_AddHeadings(tfp_CString && ...p_Headings)
 			requires (sizeof...(p_Headings) >= 1)
 		;
 		void f_AddHeadingsVector(NContainer::TCVector<NStr::CStr> const &_Headings);
 		void f_AddHeadings(CColumnHelper *_pHelper);
 
 		template <typename ...tfp_CString>
-		void f_AddRow(tfp_CString &&...p_RowColumns)
+		void f_AddRow(tfp_CString && ...p_RowColumns)
 			requires (sizeof...(p_RowColumns) >= 1)
 		;
 		void f_AddRowVector(NContainer::TCVector<NStr::CStr> const &_RowColumns);
@@ -108,7 +108,7 @@ namespace NMib::NCommandLine
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif
 
 #include "Malterlib_CommandLine_TableRenderer.hpp"

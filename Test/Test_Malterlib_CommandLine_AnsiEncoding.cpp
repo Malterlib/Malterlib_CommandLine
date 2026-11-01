@@ -124,135 +124,72 @@ namespace NMib::NCommandLine
 				DMibExpect(AnsiEncoding.f_LineBreak("\n\nTest\n", 10), ==, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"", 0}}));
 
 				// Multi byte UTF-8: every codepoint is one cell, so CJK text breaks per codepoint
-				DMibExpect
-					(
-						AnsiEncoding.f_LineBreak("中文字符", 10)
-						, ==
-						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"中文字符", 4}})
-					)
-				;
-				DMibExpect
-					(
-						AnsiEncoding.f_LineBreak("日本語のテキスト", 4, CAnsiEncoding::EWordWrap_Character)
-						, ==
-						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"日本語の", 4}, {"テキスト", 4}})
-					)
-				;
+				DMibExpect(AnsiEncoding.f_LineBreak("中文字符", 10), ==, (NContainer::TCVector<CAnsiEncoding::CLine>{{"中文字符", 4}}));
+				DMibExpect(AnsiEncoding.f_LineBreak("日本語のテキスト", 4, CAnsiEncoding::EWordWrap_Character), ==, (NContainer::TCVector<CAnsiEncoding::CLine>{{"日本語の", 4}, {"テキスト", 4}}));
 
 				// Combining characters attach to the preceding cell and do not add to the width
+				DMibExpect(AnsiEncoding.f_LineBreak("xe\u0301y", 10), ==, (NContainer::TCVector<CAnsiEncoding::CLine>{{"xe\u0301y", 3}}));
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak("xe\u0301y", 10)
+						AnsiEncoding.f_LineBreak("\n\nTest Testing TestTestTestTest 22\n", 10, CAnsiEncoding::EWordWrap_Word)
 						, ==
-						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"xe\u0301y", 3}})
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"Testing", 7}, {"TestTestTe", 10}, {"stTest 22", 9}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"\n\nTest Testing TestTestTestTest 22\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_Word)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"Testing", 7}, {"TestTestTe", 10}, {"stTest 22", 9}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("\n\nTest Testing TestTestTestTest 22\n", 10, CAnsiEncoding::EWordWrap_Character)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test Testi", 10}, {"ng TestTes", 10}, {"tTestTest", 9}, {"22", 2}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"\n\nTest Testing TestTestTestTest 22\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_Character)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test Testi", 10}, {"ng TestTes", 10}, {"tTestTest", 9}, {"22", 2}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("Test Testing TestTestTestTest 22", 10, CAnsiEncoding::EWordWrap_Ellipsis)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test Test…", 10}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test Testing TestTestTestTest 22"
-							, 10
-							, CAnsiEncoding::EWordWrap_Ellipsis)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test Test…", 10}}
-						)
+						AnsiEncoding.f_LineBreak("Test Testing TestTestTestTest 22", 10, CAnsiEncoding::EWordWrap_None)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test Testi", 10}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test Testing TestTestTestTest 22"
-							, 10
-							, CAnsiEncoding::EWordWrap_None)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test Testi", 10}}
-						)
+						AnsiEncoding.f_LineBreak("\n\nTest Testing TestTestTestTest 22\n", 10, CAnsiEncoding::EWordWrap_WordEllipsis)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"Testing", 7}, {"TestTestT…", 10}, {"…estTest", 8}, {"22", 2}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"\n\nTest Testing TestTestTestTest 22\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_WordEllipsis)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"", 0}, {"", 0}, {"Test", 4}, {"Testing", 7}, {"TestTestT…", 10}, {"…estTest", 8}, {"22", 2}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("Test\n{\n    TestValue \"Value\"\n}\n", 10, CAnsiEncoding::EWordWrap_WordEllipsis)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"…alue", 5}, {"\"Value\"", 7}, {"}", 1}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test\n{\n    TestValue \"Value\"\n}\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_WordEllipsis)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"…alue", 5}, {"\"Value\"", 7}, {"}", 1}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("Test\n{\n    TestValue \"Value\"\n}\n", 10, CAnsiEncoding::EWordWrap_CharacterEllipsis)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"…alue \"Va…", 10}, {"…lue\"", 5}, {"}", 1}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test\n{\n    TestValue \"Value\"\n}\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_CharacterEllipsis)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"…alue \"Va…", 10}, {"…lue\"", 5}, {"}", 1}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("Test\n{\n    TestValue \"Value\"\n}\n", 10, CAnsiEncoding::EWordWrap_Ellipsis)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"}", 1}, {"", 0}})
 					)
 				;
 				DMibExpect
 					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test\n{\n    TestValue \"Value\"\n}\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_Ellipsis)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestV…", 10}, {"}", 1}, {"", 0}}
-						)
-					)
-				;
-				DMibExpect
-					(
-						AnsiEncoding.f_LineBreak
-						(
-							"Test\n{\n    TestValue \"Value\"\n}\n"
-							, 10
-							, CAnsiEncoding::EWordWrap_None)
-							, ==
-							, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestVa", 10}, {"}", 1}, {"", 0}}
-						)
+						AnsiEncoding.f_LineBreak("Test\n{\n    TestValue \"Value\"\n}\n", 10, CAnsiEncoding::EWordWrap_None)
+						, ==
+						, (NContainer::TCVector<CAnsiEncoding::CLine>{{"Test", 4}, {"{", 1}, {"    TestVa", 10}, {"}", 1}, {"", 0}})
 					)
 				;
 			};

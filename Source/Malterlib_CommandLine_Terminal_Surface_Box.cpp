@@ -37,7 +37,7 @@ namespace NMib::NCommandLine
 		int32 OriginalBottom = OriginalLowerRight.m_CoordY - 1;
 		int32 OriginalLeft = OriginalUpperLeft.m_CoordX;
 		int32 OriginalRight = OriginalLowerRight.m_CoordX - 1;
-		
+
 		auto &UpperLeft = Area.m_UpperLeft;
 		auto LowerRight = Area.f_LowerRight();
 		auto pBuffer = mp_Buffer.f_GetArray();
@@ -82,7 +82,7 @@ namespace NMib::NCommandLine
 			if ((BoxCoverage & ETerminalBoxCoverage::mc_Left) != ETerminalBoxCoverage::mc_None && Left == OriginalLeft)
 				fWriteCharacter(pBuffer[CoordY * SurfaceWidth + Left], BoxDrawingCharacters.m_VerticalLeft);
 			if ((BoxCoverage & ETerminalBoxCoverage::mc_Right) != ETerminalBoxCoverage::mc_None && Right == OriginalRight)
-				fWriteCharacter(pBuffer[CoordY * SurfaceWidth + Right],  BoxDrawingCharacters.m_VerticalRight);
+				fWriteCharacter(pBuffer[CoordY * SurfaceWidth + Right], BoxDrawingCharacters.m_VerticalRight);
 		}
 
 		if (Top == OriginalTop)

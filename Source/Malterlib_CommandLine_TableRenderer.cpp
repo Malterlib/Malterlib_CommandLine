@@ -34,11 +34,12 @@ namespace NMib::NCommandLine
 				{
 					switch (_Default)
 					{
-						default:
-						case EOutputType_HumanReadable: return "human-readable";
-						case EOutputType_TabSeparated: return "tab-separated";
-						case EOutputType_Json: return "json";
-						case EOutputType_ColoredJson: return "colored-json";
+					default:
+					case EOutputType_HumanReadable:
+						return "human-readable";
+					case EOutputType_TabSeparated: return "tab-separated";
+					case EOutputType_Json: return "json";
+					case EOutputType_ColoredJson: return "colored-json";
 					}
 				}
 				()
@@ -83,12 +84,7 @@ namespace NMib::NCommandLine
 
 		// Wrap description with default formatting (bold + yellow foreground) before line-breaking,
 		// so any ANSI resets in _Description return to this default rather than terminal default
-		CStr FormattedDescription = "{}{}{}{}"_f
-			<< AnsiColor.f_Bold()
-			<< AnsiColor.f_Foreground256(11)
-			<< _Description
-			<< AnsiColor.f_Default()
-		;
+		CStr FormattedDescription = "{}{}{}{}"_f << AnsiColor.f_Bold() << AnsiColor.f_Foreground256(11) << _Description << AnsiColor.f_Default();
 
 		auto Lines = AnsiColor.f_LineBreak(FormattedDescription, TCLimitsInt<umint>::mc_Max, CAnsiEncoding::EWordWrap_Character);
 
@@ -379,7 +375,8 @@ namespace NMib::NCommandLine
 
 			auto fAddLine = [&](CUStr const &_Line)
 				{
-					Description += U"{} {sj*,sf ,a-}{}{} {}\n"_f
+					Description
+						+= U"{} {sj*,sf ,a-}{}{} {}\n"_f
 						<< LineSeparator
 						<< _Line
 						<< (mp_DescriptionWidth + (_Line.f_GetLen() - CAnsiEncodingParse::fs_RenderedStrLen(_Line)))
@@ -495,7 +492,7 @@ namespace NMib::NCommandLine
 				BottomLine = (f_IsRounded() ? U"{}╰"_f : U"{}└"_f) << LineColor;
 				for (auto &MaxWidth : LimitedWidths)
 					BottomLine += U"{sf─,sj*}┴"_f << "" << (MaxWidth + 2);
-				BottomLine[BottomLine.f_GetLen() - 1] = f_IsRounded() ? U'╯' :U'┘';
+				BottomLine[BottomLine.f_GetLen() - 1] = f_IsRounded() ? U'╯' : U'┘';
 				BottomLine += AnsiColor.f_Default();
 			}
 			else
@@ -522,7 +519,8 @@ namespace NMib::NCommandLine
 					if (mp_AlignRight[iColumn])
 						pFormatString = U" {3}{sj*,sf ,a+}{4} {}";
 
-					Line += CUStr::CFormat(pFormatString)
+					Line
+						+= CUStr::CFormat(pFormatString)
 						<< Heading
 						<< (MaxWidth + (Heading.f_GetLen() - CAnsiEncodingParse::fs_RenderedStrLen(Heading)))
 						<< LineSeparator
@@ -594,11 +592,7 @@ namespace NMib::NCommandLine
 						if (ColumnLines.f_IsPosValid(iLine))
 							SourceLine = ColumnLines[iLine];
 
-						Line += CUStr::CFormat(pFormatString)
-							<< SourceLine
-							<< (MaxWidth + (SourceLine.f_GetLen() - CAnsiEncodingParse::fs_RenderedStrLen(SourceLine)))
-							<< LineSeparator
-						;
+						Line += CUStr::CFormat(pFormatString) << SourceLine << (MaxWidth + (SourceLine.f_GetLen() - CAnsiEncodingParse::fs_RenderedStrLen(SourceLine))) << LineSeparator;
 
 						++iColumn;
 					}
@@ -669,5 +663,5 @@ namespace NMib::NCommandLine
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif

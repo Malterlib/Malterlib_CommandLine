@@ -7,11 +7,11 @@ namespace NMib::NCommandLine
 {
 	enum EAnsiEncodingFlag
 	{
-		EAnsiEncodingFlag_None = 0
-		, EAnsiEncodingFlag_Color = DMibBit(1)
-		, EAnsiEncodingFlag_Color24Bit = DMibBit(2)
-		, EAnsiEncodingFlag_ColorLightBackground = DMibBit(3)
-		, EAnsiEncodingFlag_BoxDrawing = DMibBit(4)
+		EAnsiEncodingFlag_None                    = 0
+		, EAnsiEncodingFlag_Color                 = DMibBit(1)
+		, EAnsiEncodingFlag_Color24Bit            = DMibBit(2)
+		, EAnsiEncodingFlag_ColorLightBackground  = DMibBit(3)
+		, EAnsiEncodingFlag_BoxDrawing            = DMibBit(4)
 		, EAnsiEncodingFlag_ColorSgrUsesSemiColon = DMibBit(5)
 
 		, EAnsiEncodingFlag_AllFeatures = EAnsiEncodingFlag_Color | EAnsiEncodingFlag_Color24Bit | EAnsiEncodingFlag_BoxDrawing
@@ -41,12 +41,12 @@ namespace NMib::NCommandLine
 
 		enum class EComprehensiveKeyFlags : uint8
 		{
-			mc_None = 0
-			, mc_DisambiguateEscapeCodes = fg_Bit(0)
-			, mc_ReportEventTypes = fg_Bit(1)
-			, mc_ReportAlternateKeys = fg_Bit(2)
+			mc_None                         = 0
+			, mc_DisambiguateEscapeCodes    = fg_Bit(0)
+			, mc_ReportEventTypes           = fg_Bit(1)
+			, mc_ReportAlternateKeys        = fg_Bit(2)
 			, mc_ReportAllKeysAsEscapeCodes = fg_Bit(3)
-			, mc_ReportAssociatedText = fg_Bit(4)
+			, mc_ReportAssociatedText       = fg_Bit(4)
 
 			, mc_ReportKeyEventHandling = fg_Bit(7) // Unbroken extension: defer terminal keybindings until the application reports whether it handled the key.
 		};
@@ -207,7 +207,7 @@ namespace NMib::NCommandLine
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif
 
 #include "Malterlib_CommandLine_AnsiEncoding.hpp"

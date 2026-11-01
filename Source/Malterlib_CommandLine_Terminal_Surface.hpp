@@ -26,7 +26,7 @@ namespace NMib::NCommandLine::NPrivate
 		else
 			fg_CallFillFunctionFull<t_bCharacter, t_Foreground, t_Background, t_Underline, false>(_fFill, _Properties);
 	}
-	
+
 	template <bool t_bCharacter, EColorOperation t_Foreground, EColorOperation t_Background, typename tf_CFill>
 	inline_always void fg_CallFillFunction3(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
@@ -40,7 +40,7 @@ namespace NMib::NCommandLine::NPrivate
 		else
 			fg_CallFillFunction4<t_bCharacter, t_Foreground, t_Background, EColorOperation::mc_None>(_fFill, _Properties);
 	}
-	
+
 	template <bool t_bCharacter, EColorOperation t_Foreground, typename tf_CFill>
 	inline_always void fg_CallFillFunction2(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
@@ -54,7 +54,7 @@ namespace NMib::NCommandLine::NPrivate
 		else
 			fg_CallFillFunction3<t_bCharacter, t_Foreground, EColorOperation::mc_None>(_fFill, _Properties);
 	}
-	
+
 	template <bool t_bCharacter, typename tf_CFill>
 	inline_always void fg_CallFillFunction1(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
@@ -68,7 +68,7 @@ namespace NMib::NCommandLine::NPrivate
 		else
 			fg_CallFillFunction2<t_bCharacter, EColorOperation::mc_None>(_fFill, _Properties);
 	}
-	
+
 	template <typename tf_CFill>
 	inline_always void fg_CallFillFunction(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{

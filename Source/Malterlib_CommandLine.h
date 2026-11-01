@@ -12,7 +12,7 @@ namespace NMib::NCommandLine
 	{
 		inline_always COneOf(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
-		inline_always COneOf(tfp_CParams const &...p_Config);
+		inline_always COneOf(tfp_CParams const & ...p_Config);
 
 		inline_always operator NEncoding::CEJsonOrdered () &&;
 		inline_always operator NEncoding::CEJsonOrdered () const &;
@@ -24,7 +24,7 @@ namespace NMib::NCommandLine
 	{
 		inline_always COneOfType(NEncoding::CEJsonOrdered const &_Config);
 		template <typename ...tfp_CParams>
-		inline_always COneOfType(tfp_CParams const &...p_Config);
+		inline_always COneOfType(tfp_CParams const & ...p_Config);
 
 		inline_always operator NEncoding::CEJsonOrdered () &&;
 		inline_always operator NEncoding::CEJsonOrdered () const &;
@@ -87,11 +87,12 @@ namespace NMib::NCommandLine
 		{
 			void f_RegisterSectionOptions(NEncoding::CEJsonOrdered &&_Options);
 
-			CCommand f_RegisterDirectCommand
+			auto f_RegisterDirectCommand
 				(
 					NEncoding::CEJsonOrdered &&_CommandDescription
 					, NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)> &&_fRunCommand
 				)
+				-> CCommand
 			;
 
 		protected:
@@ -114,8 +115,8 @@ namespace NMib::NCommandLine
 
 		TCCommandLineSpecification(TCCommandLineSpecification const &_Other);
 		TCCommandLineSpecification(TCCommandLineSpecification &&_Other);
-		TCCommandLineSpecification &operator =(TCCommandLineSpecification const &_Other);
-		TCCommandLineSpecification &operator =(TCCommandLineSpecification &&_Other);
+		TCCommandLineSpecification &operator = (TCCommandLineSpecification const &_Other);
+		TCCommandLineSpecification &operator = (TCCommandLineSpecification &&_Other);
 
 		CSection f_GetDefaultSection();
 		CSection f_AddSection(NStr::CStr const &_Heading, NStr::CStr const &_Description, NStr::CStr const &_AfterSection = {});
@@ -153,7 +154,7 @@ namespace NMib::NCommandLine
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif
 
 #include "Malterlib_CommandLine_Console.h"

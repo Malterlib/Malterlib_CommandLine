@@ -12,13 +12,7 @@ namespace NMib::NCommandLine
 
 	// Writes plain text without escapes or line breaks, clipped to _ClipArea (the whole surface if invalid).
 	// Combining characters attach to the previous cell. Returns the column after the last cell.
-	int32 CTerminalSurface::f_TextRun
-		(
-			CTerminalPoint _Position
-			, CStrPtr const &_Text
-			, CSetChixelProperties const &_Properties
-			, CTerminalArea const &_ClipArea
-		)
+	int32 CTerminalSurface::f_TextRun(CTerminalPoint _Position, CStrPtr const &_Text, CSetChixelProperties const &_Properties, CTerminalArea const &_ClipArea)
 	{
 		CTerminalArea SurfaceArea = f_Area();
 

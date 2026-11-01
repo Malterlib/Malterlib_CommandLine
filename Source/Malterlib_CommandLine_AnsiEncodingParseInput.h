@@ -34,7 +34,7 @@ namespace NMib::NCommandLine
 	private:
 		void fp_EmitKey(CKeyEvent &&_KeyEvent);
 		void fp_EmitControl(ch8 _Char);
-		bool fp_ParseCsi(ch8 const *&_pParse, ch8 const *_pEnd);
+		bool fp_ParseCsi(ch8 const * &_pParse, ch8 const *_pEnd);
 		void fp_DispatchCsi(NStr::CStrPtr const &_Params, char _Final);
 		void fp_DispatchCsiMouse(NStr::CStrPtr const &_Params, char _Final);
 
@@ -44,5 +44,5 @@ namespace NMib::NCommandLine
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NCommandLine;
+using namespace NMib::NCommandLine;
 #endif

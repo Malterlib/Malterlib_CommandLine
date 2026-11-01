@@ -31,7 +31,7 @@ namespace NMib::NCommandLine
 
 		if (Area.m_Size.m_Height <= 0 || Area.m_Size.m_Width <= 0)
 			return;
-		
+
 		auto &UpperLeft = Area.m_UpperLeft;
 		auto LowerRight = Area.f_LowerRight();
 		auto pBuffer = mp_Buffer.f_GetArray();
@@ -122,10 +122,7 @@ namespace NMib::NCommandLine
 				auto &Chixel = pBuffer[CoordY * SurfaceWidth + CoordX];
 				auto &SourceChixel = pSourceBuffer[(CoordY + SourceOffset.m_CoordY) * SourceSurfaceWidth + (CoordX + SourceOffset.m_CoordX)];
 
-				bool bSourceHasGlyph = SourceChixel.f_GetCharacter() != ch32(' ')
-					|| SourceChixel.m_ForegroundColor.f_Alpha() != 0
-					|| SourceChixel.m_BackgroundColor.f_Alpha() != 0
-				;
+				bool bSourceHasGlyph = SourceChixel.f_GetCharacter() != ch32(' ') || SourceChixel.m_ForegroundColor.f_Alpha() != 0 || SourceChixel.m_BackgroundColor.f_Alpha() != 0;
 
 				if (!bSourceHasGlyph)
 				{

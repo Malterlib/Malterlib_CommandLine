@@ -271,7 +271,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -370,7 +373,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -945,7 +951,10 @@ namespace
 										"Names"_o= _o["--no-bad"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance
 								(
@@ -968,12 +977,12 @@ namespace
 										"Names"_o= _o["+bad"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
-								, DMibErrorInstance
-								(
-									"An option or command name cannot start with + as this is reserved for negating a short boolean option."
-								)
+								, DMibErrorInstance("An option or command name cannot start with + as this is reserved for negating a short boolean option.")
 							)
 						;
 					};
@@ -990,7 +999,10 @@ namespace
 										"Names"_o= _o["--bad=name"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("An option or command name cannot contain '=' as this can be used to specify the value for an option.")
 							)
@@ -1017,7 +1029,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("An option needs to specify at least 'Default' or 'Type'")
 							)
@@ -1036,7 +1051,10 @@ namespace
 										"Names"_o= _o[]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("You need to specify at least one name for command")
 							)
@@ -1053,7 +1071,10 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1064,7 +1085,10 @@ namespace
 										"Names"_o= _o["--cmd"]
 										, "Description"_o= "Test 2"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Name is already used for another command '--cmd'")
 							)
@@ -1104,7 +1128,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Option with same identifier 'Shared' already exists in global options")
 							)
@@ -1144,7 +1171,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Option with same name '--same-name' already exists in global options")
 							)
@@ -1161,7 +1191,10 @@ namespace
 									"Names"_o= _o["--existing-cmd"]
 									, "Description"_o= "Existing"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1181,7 +1214,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Name is already used as a command '--existing-cmd'")
 							)
@@ -1212,7 +1248,10 @@ namespace
 										"Names"_o= _o["--taken"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("A global option with same name '--taken' already exists")
 							)
@@ -1295,7 +1334,10 @@ namespace
 									"Names"_o= _o["--existing"]
 									, "Description"_o= "Existing"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1341,7 +1383,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Previous parameter was optional, but this one is not. This does not make sense.")
 							)
@@ -1367,7 +1412,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1407,7 +1455,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1461,7 +1512,10 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									{
+										return 0;
+									}
 								)
 								, DMibErrorInstance("Option with same identifier 'SectOpt' already exists in section options")
 							)
@@ -1481,7 +1535,10 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1511,7 +1568,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1540,7 +1600,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1561,7 +1624,10 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1587,7 +1653,10 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1617,7 +1686,10 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1638,7 +1710,10 @@ namespace
 									"Names"_o= _o["--cmd1"]
 									, "Description"_o= "Test 1"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						Section.f_RegisterDirectCommand
@@ -1647,7 +1722,10 @@ namespace
 									"Names"_o= _o["--cmd2"]
 									, "Description"_o= "Test 2"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								{
+									return 0;
+								}
 							)
 						;
 						DMibExpectException
@@ -1819,7 +1897,10 @@ namespace
 									}
 								}
 							}
-							, [](CEJsonSorted const &, CCommandLineClient &) -> uint32 { return 0; }
+							, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+							{
+								return 0;
+							}
 						)
 					;
 
@@ -1828,8 +1909,7 @@ namespace
 
 					{
 						DMibTestPath("Valid params");
-						CEJsonSorted Params =
-							_=
+						CEJsonSorted Params = _=
 							{
 								"Command"_= "--cmd"
 								, "Arg"_= "test"
@@ -1841,25 +1921,18 @@ namespace
 
 					{
 						DMibTestPath("Missing Command key");
-						CEJsonSorted Params =
-							_=
+						CEJsonSorted Params = _=
 							{
 								"Arg"_= "test"
 								, "Opt"_= "default"
 							}
 						;
-						DMibExpectException
-							(
-								Internal.f_ValidateParams(**pCommand, Params)
-								, DMibErrorInstance("'Command' missing in params")
-							)
-						;
+						DMibExpectException(Internal.f_ValidateParams(**pCommand, Params), DMibErrorInstance("'Command' missing in params"));
 					};
 
 					{
 						DMibTestPath("Unexpected parameter key");
-						CEJsonSorted Params =
-							_=
+						CEJsonSorted Params = _=
 							{
 								"Command"_= "--cmd"
 								, "Arg"_= ""
@@ -1867,12 +1940,7 @@ namespace
 								, "Unknown"_= "value"
 							}
 						;
-						DMibExpectException
-							(
-								Internal.f_ValidateParams(**pCommand, Params)
-								, DMibErrorInstance("Unexpected parameter 'Unknown' in command params")
-							)
-						;
+						DMibExpectException(Internal.f_ValidateParams(**pCommand, Params), DMibErrorInstance("Unexpected parameter 'Unknown' in command params"));
 					};
 				};
 			};

@@ -56,10 +56,7 @@ namespace NMib::NCommandLine
 						NStr::CStr const *pOverflow = fp_FindOverflow(iYCoord * Width + iXCoord);
 						NStr::CStr const *pPreviousOverflow = _Previous.fp_FindOverflow(iYCoord * Width + iXCoord);
 
-						bEqual = pOverflow && pPreviousOverflow
-							? *pOverflow == *pPreviousOverflow
-							: pOverflow == pPreviousOverflow
-						;
+						bEqual = pOverflow && pPreviousOverflow ? *pOverflow == *pPreviousOverflow : pOverflow == pPreviousOverflow;
 					}
 #endif
 
@@ -70,12 +67,7 @@ namespace NMib::NCommandLine
 						continue;
 					}
 
-					if
-					(
-						(_Flags & ETerminalRenderFlag::mc_ResetAtEndOfLine) != ETerminalRenderFlag::mc_None
-						&& iYCoordLast != TCLimitsInt<umint>::mc_Max
-						&& iYCoordLast != iYCoord
-					)
+					if ((_Flags & ETerminalRenderFlag::mc_ResetAtEndOfLine) != ETerminalRenderFlag::mc_None && iYCoordLast != TCLimitsInt<umint>::mc_Max && iYCoordLast != iYCoord)
 					{
 						StringAppender += mp_AnsiEncoding.f_Default();
 
@@ -134,16 +126,7 @@ namespace NMib::NCommandLine
 							if (!ForegroundColor.f_Alpha())
 								LastForeground = SgrSequence.f_ForegroundDefaultDiff(LastForeground);
 							else
-							{
-								LastForeground = SgrSequence.f_ForegroundRGBDiff
-									(
-										LastForeground
-										, ForegroundColor.f_Red()
-										, ForegroundColor.f_Green()
-										, ForegroundColor.f_Blue()
-									)
-								;
-							}
+								LastForeground = SgrSequence.f_ForegroundRGBDiff(LastForeground, ForegroundColor.f_Red(), ForegroundColor.f_Green(), ForegroundColor.f_Blue());
 						}
 
 						if (BackgroundColor != LastProperties.m_BackgroundColor || fg_Exchange(bFirstBackgroundColor, false))
@@ -151,16 +134,7 @@ namespace NMib::NCommandLine
 							if (!BackgroundColor.f_Alpha())
 								LastBackground = SgrSequence.f_BackgroundDefaultDiff(LastBackground);
 							else
-							{
-								LastBackground = SgrSequence.f_BackgroundRGBDiff
-									(
-										LastBackground
-										, BackgroundColor.f_Red()
-										, BackgroundColor.f_Green()
-										, BackgroundColor.f_Blue()
-									)
-								;
-							}
+								LastBackground = SgrSequence.f_BackgroundRGBDiff(LastBackground, BackgroundColor.f_Red(), BackgroundColor.f_Green(), BackgroundColor.f_Blue());
 						}
 
 						if (UnderlineColor != LastProperties.m_UnderlineColor || fg_Exchange(bFirstUnderlineColor, false))
@@ -168,28 +142,19 @@ namespace NMib::NCommandLine
 							if (!UnderlineColor.f_Alpha())
 								LastUnderline = SgrSequence.f_UnderlineDefaultDiff(LastUnderline);
 							else
-							{
-								LastUnderline = SgrSequence.f_UnderlineRGBDiff
-									(
-										LastUnderline
-										, UnderlineColor.f_Red()
-										, UnderlineColor.f_Green()
-										, UnderlineColor.f_Blue()
-									)
-								;
-							}
+								LastUnderline = SgrSequence.f_UnderlineRGBDiff(LastUnderline, UnderlineColor.f_Red(), UnderlineColor.f_Green(), UnderlineColor.f_Blue());
 						}
 					}
 
 					StringAppender.f_AddUnicodeChar(pBuffer->f_GetCharacter());
 
-	#if DCommandLineSupportOverflow
+#if DCommandLineSupportOverflow
 					if (pBuffer->m_bHasOverflow)
 					{
 						if (NStr::CStr const *pOverflow = fp_FindOverflow(iYCoord * Width + iXCoord))
 							StringAppender += *pOverflow;
 					}
-	#endif
+#endif
 
 					LastProperties.m_ForegroundColor = ForegroundColor;
 					LastProperties.m_BackgroundColor = BackgroundColor;

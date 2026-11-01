@@ -10,12 +10,12 @@ namespace NMib::NCommandLine
 		NSys::fg_ConsoleOutput(_pStr, _Len);
 	}
 
-	void fg_MalterlibConOut(const NStr::CStrNonTracked &_Str)
+	void fg_MalterlibConOut(NStr::CStrNonTracked const &_Str)
 	{
 		NSys::fg_ConsoleOutput(_Str);
 	}
 
-	void fg_MalterlibConErrOut(const NStr::CStrNonTracked &_Str)
+	void fg_MalterlibConErrOut(NStr::CStrNonTracked const &_Str)
 	{
 		NSys::fg_ConsoleErrorOutput(_Str);
 	}

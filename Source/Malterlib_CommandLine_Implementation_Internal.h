@@ -43,7 +43,7 @@ namespace NMib::NCommandLine
 
 			void f_Parse(NEncoding::CEJsonOrdered &&_Option);
 			NEncoding::CEJsonSorted fp_ParseEJson(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
-			NEncoding::CEJsonSorted fp_ConvertValue
+			auto fp_ConvertValue
 				(
 					NEncoding::CEJsonSorted const &_Template
 					, NEncoding::CEJsonSorted const &_Value
@@ -52,6 +52,7 @@ namespace NMib::NCommandLine
 					, NCommandLine::EAnsiEncodingFlag _AnsiFlags
 				)
 				const
+				-> NEncoding::CEJsonSorted
 			;
 			NStr::CStr fp_FormatValue(NEncoding::CEJsonSorted const &_Template, NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NStr::CStr fp_FormatType(NEncoding::CEJsonSorted const &_Template, bool _bType, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
@@ -140,9 +141,7 @@ namespace NMib::NCommandLine
 			COptionSet m_SectionOptionSet;
 			COptionSet m_GlobalOptionSet;
 
-			NStorage::TCSharedPointer<NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>>
-				m_pDirectRunCommand
-			;
+			NStorage::TCSharedPointer<NFunction::TCFunctionMovable<uint32 (NEncoding::CEJsonSorted &&_Parameters, CCommandLineClient &_CommandLineClient)>> m_pDirectRunCommand;
 
 			bool m_bErrorOnCommandAsParameter = true;
 			bool m_bErrorOnOptionAsParameter = true;

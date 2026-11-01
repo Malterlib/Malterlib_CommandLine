@@ -24,27 +24,27 @@ namespace NMib::NCommandLine
 		{
 			switch (_Number)
 			{
-				case 1: return ch32(EKey::mc_Home); // Linux console and vt220 style Home
-				case 2: return ch32(EKey::mc_Insert);
-				case 3: return ch32(EKey::mc_Delete);
-				case 4: return ch32(EKey::mc_End); // Linux console and vt220 style End
-				case 5: return ch32(EKey::mc_PageUp);
-				case 6: return ch32(EKey::mc_PageDown);
-				case 7: return ch32(EKey::mc_Home);
-				case 8: return ch32(EKey::mc_End);
-				case 11: return ch32(EKey::mc_F1);
-				case 12: return ch32(EKey::mc_F2);
-				case 13: return ch32(EKey::mc_F3);
-				case 14: return ch32(EKey::mc_F4);
-				case 15: return ch32(EKey::mc_F5);
-				case 17: return ch32(EKey::mc_F6);
-				case 18: return ch32(EKey::mc_F7);
-				case 19: return ch32(EKey::mc_F8);
-				case 20: return ch32(EKey::mc_F9);
-				case 21: return ch32(EKey::mc_F10);
-				case 23: return ch32(EKey::mc_F11);
-				case 24: return ch32(EKey::mc_F12);
-				default: return 0;
+			case 1: return ch32(EKey::mc_Home); // Linux console and vt220 style Home
+			case 2: return ch32(EKey::mc_Insert);
+			case 3: return ch32(EKey::mc_Delete);
+			case 4: return ch32(EKey::mc_End); // Linux console and vt220 style End
+			case 5: return ch32(EKey::mc_PageUp);
+			case 6: return ch32(EKey::mc_PageDown);
+			case 7: return ch32(EKey::mc_Home);
+			case 8: return ch32(EKey::mc_End);
+			case 11: return ch32(EKey::mc_F1);
+			case 12: return ch32(EKey::mc_F2);
+			case 13: return ch32(EKey::mc_F3);
+			case 14: return ch32(EKey::mc_F4);
+			case 15: return ch32(EKey::mc_F5);
+			case 17: return ch32(EKey::mc_F6);
+			case 18: return ch32(EKey::mc_F7);
+			case 19: return ch32(EKey::mc_F8);
+			case 20: return ch32(EKey::mc_F9);
+			case 21: return ch32(EKey::mc_F10);
+			case 23: return ch32(EKey::mc_F11);
+			case 24: return ch32(EKey::mc_F12);
+			default: return 0;
 			}
 		}
 
@@ -52,17 +52,17 @@ namespace NMib::NCommandLine
 		{
 			switch (_Final)
 			{
-				case 'A': return ch32(EKey::mc_Up);
-				case 'B': return ch32(EKey::mc_Down);
-				case 'C': return ch32(EKey::mc_Right);
-				case 'D': return ch32(EKey::mc_Left);
-				case 'H': return ch32(EKey::mc_Home);
-				case 'F': return ch32(EKey::mc_End);
-				case 'P': return ch32(EKey::mc_F1);
-				case 'Q': return ch32(EKey::mc_F2);
-				case 'R': return ch32(EKey::mc_F3);
-				case 'S': return ch32(EKey::mc_F4);
-				default: return 0;
+			case 'A': return ch32(EKey::mc_Up);
+			case 'B': return ch32(EKey::mc_Down);
+			case 'C': return ch32(EKey::mc_Right);
+			case 'D': return ch32(EKey::mc_Left);
+			case 'H': return ch32(EKey::mc_Home);
+			case 'F': return ch32(EKey::mc_End);
+			case 'P': return ch32(EKey::mc_F1);
+			case 'Q': return ch32(EKey::mc_F2);
+			case 'R': return ch32(EKey::mc_F3);
+			case 'S': return ch32(EKey::mc_F4);
+			default: return 0;
 			}
 		}
 
@@ -113,47 +113,43 @@ namespace NMib::NCommandLine
 
 		switch (_Char)
 		{
-			case 0x00:
-				Event.m_ScanCode = ch32(EKey::mc_Space);
+		case 0x00:
+			Event.m_ScanCode = ch32(EKey::mc_Space);
+			Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+			break;
+
+		case 0x08:
+			Event.m_ScanCode = ch32(EKey::mc_Backspace);
+			Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+			break;
+
+		case 0x09: Event.m_ScanCode = ch32(EKey::mc_Tab); break;
+
+		case 0x0A:
+		case 0x0D:
+			Event.m_ScanCode = ch32(EKey::mc_Enter);
+			break;
+
+		case 0x7F: Event.m_ScanCode = ch32(EKey::mc_Backspace); break;
+
+		default:
+			if (_Char >= 0x01 && _Char <= 0x1A)
+			{
+				Event.m_ScanCode = ch32('a' + _Char - 1);
 				Event.m_Modifiers = EKeyModifier::mc_Ctrl;
-				break;
-
-			case 0x08:
-				Event.m_ScanCode = ch32(EKey::mc_Backspace);
+			}
+			else if (_Char >= 0x1C && _Char <= 0x1F)
+			{
+				// Traditional C0 controls for Ctrl with the printable characters \ ] ^ _
+				Event.m_ScanCode = ch32('\\' + _Char - 0x1C);
 				Event.m_Modifiers = EKeyModifier::mc_Ctrl;
-				break;
-
-			case 0x09:
-				Event.m_ScanCode = ch32(EKey::mc_Tab);
-				break;
-
-			case 0x0A:
-			case 0x0D:
-				Event.m_ScanCode = ch32(EKey::mc_Enter);
-				break;
-
-			case 0x7F:
-				Event.m_ScanCode = ch32(EKey::mc_Backspace);
-				break;
-
-			default:
-				if (_Char >= 0x01 && _Char <= 0x1A)
-				{
-					Event.m_ScanCode = ch32('a' + _Char - 1);
-					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
-				}
-				else if (_Char >= 0x1C && _Char <= 0x1F)
-				{
-					// Traditional C0 controls for Ctrl with the printable characters \ ] ^ _
-					Event.m_ScanCode = ch32('\\' + _Char - 0x1C);
-					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
-				}
-				else
-				{
-					Event.m_ScanCode = ch32(uch8(_Char));
-					Event.m_Modifiers = EKeyModifier::mc_Ctrl;
-				}
-				break;
+			}
+			else
+			{
+				Event.m_ScanCode = ch32(uch8(_Char));
+				Event.m_Modifiers = EKeyModifier::mc_Ctrl;
+			}
+			break;
 		}
 
 		fp_EmitKey(fg_Move(Event));
@@ -189,42 +185,26 @@ namespace NMib::NCommandLine
 			// Wheel buttons: 64 up, 65 down, 66 left, 67 right
 			switch (ButtonBits & 0x03)
 			{
-				case 0:
-					Event.m_WheelDelta = 1.0;
-					break;
+			case 0: Event.m_WheelDelta = 1.0; break;
 
-				case 1:
-					Event.m_WheelDelta = -1.0;
-					break;
+			case 1: Event.m_WheelDelta = -1.0; break;
 
-				case 2:
-					Event.m_WheelDeltaX = 1.0;
-					break;
+			case 2: Event.m_WheelDeltaX = 1.0; break;
 
-				case 3:
-					Event.m_WheelDeltaX = -1.0;
-					break;
+			case 3: Event.m_WheelDeltaX = -1.0; break;
 			}
 		}
 		else
 		{
 			switch (ButtonBits & 0x03)
 			{
-				case 0:
-					Event.m_Button = EMouseButton::mc_Left;
-					break;
+			case 0: Event.m_Button = EMouseButton::mc_Left; break;
 
-				case 1:
-					Event.m_Button = EMouseButton::mc_Middle;
-					break;
+			case 1: Event.m_Button = EMouseButton::mc_Middle; break;
 
-				case 2:
-					Event.m_Button = EMouseButton::mc_Right;
-					break;
+			case 2: Event.m_Button = EMouseButton::mc_Right; break;
 
-				default:
-					Event.m_Button = EMouseButton::mc_None;
-					break;
+			default: Event.m_Button = EMouseButton::mc_None; break;
 			}
 
 			if (ButtonBits & 0x20)
@@ -287,23 +267,18 @@ namespace NMib::NCommandLine
 
 				switch (ModifierParts[1].f_ToInt(1))
 				{
-					case 2:
-						_Event.m_EventType = EKeyEventType::mc_Repeat;
-						break;
+				case 2: _Event.m_EventType = EKeyEventType::mc_Repeat; break;
 
-					case 3:
-						_Event.m_EventType = EKeyEventType::mc_Release;
-						break;
+				case 3: _Event.m_EventType = EKeyEventType::mc_Release; break;
 
-					default:
-						break;
+				default: break;
 				}
 			}
 		;
 
 		switch (_Final)
 		{
-			case 'u':
+		case 'u':
 			{
 				// CSI unicode[:shifted[:base]] ; modifiers[:event] ; text [; report-id] u
 				CKeyEvent Event;
@@ -368,7 +343,7 @@ namespace NMib::NCommandLine
 				break;
 			}
 
-			case '~':
+		case '~':
 			{
 				ch32 ScanCode = fg_TildeKeyCode(fGetParam(0, 0));
 				if (!ScanCode)
@@ -385,7 +360,7 @@ namespace NMib::NCommandLine
 				break;
 			}
 
-			case 'Z':
+		case 'Z':
 			{
 				CKeyEvent Event;
 				Event.m_ScanCode = ch32(EKey::mc_Tab);
@@ -398,7 +373,7 @@ namespace NMib::NCommandLine
 				break;
 			}
 
-			default:
+		default:
 			{
 				ch32 ScanCode = fg_LetterKeyCode(_Final);
 				if (!ScanCode)
@@ -421,7 +396,7 @@ namespace NMib::NCommandLine
 		}
 	}
 
-	bool CAnsiEncodingParseInput::fp_ParseCsi(ch8 const *&_pParse, ch8 const *_pEnd)
+	bool CAnsiEncodingParseInput::fp_ParseCsi(ch8 const * &_pParse, ch8 const *_pEnd)
 	{
 		// _pParse points after "ESC ["; returns false if the sequence is incomplete
 		ch8 const *pParse = _pParse;
@@ -497,7 +472,7 @@ namespace NMib::NCommandLine
 
 				switch (*pSequence)
 				{
-					case '[': // CSI
+				case '[': // CSI
 					{
 						++pSequence;
 						if (!fp_ParseCsi(pSequence, pEnd))
@@ -513,7 +488,7 @@ namespace NMib::NCommandLine
 						break;
 					}
 
-					case 'O': // SS3
+				case 'O': // SS3
 					{
 						++pSequence;
 						if (pSequence >= pEnd)
@@ -538,11 +513,11 @@ namespace NMib::NCommandLine
 						break;
 					}
 
-					case ']': // OSC
-					case 'P': // DCS
-					case 'X': // SOS
-					case '^': // PM
-					case '_': // APC
+				case ']': // OSC
+				case 'P': // DCS
+				case 'X': // SOS
+				case '^': // PM
+				case '_': // APC
 					{
 						// String sequences terminate with ST (ESC \) or BEL; skip their payload
 						++pSequence;
@@ -582,8 +557,8 @@ namespace NMib::NCommandLine
 						break;
 					}
 
-					case 'N': // SS2
-					case '\\': // ST
+				case 'N': // SS2
+				case '\\': // ST
 					{
 						++pSequence;
 						pParse = pSequence;
@@ -591,7 +566,7 @@ namespace NMib::NCommandLine
 						break;
 					}
 
-					case '\x1B':
+				case '\x1B':
 					{
 						// ESC ESC: emit Escape, reparse the second ESC
 						CKeyEvent Event;
@@ -603,7 +578,7 @@ namespace NMib::NCommandLine
 						break;
 					}
 
-					default:
+				default:
 					{
 						// ESC prefixed printable: legacy Alt+key, which may be a multibyte UTF-8 codepoint
 						umint SequenceLen = 1;
