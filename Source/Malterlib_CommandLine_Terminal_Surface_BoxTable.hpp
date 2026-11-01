@@ -28,8 +28,8 @@ namespace NMib::NCommandLine
 		static constexpr CTerminalBoxCharaters gc_TerminalBoxCharacters[] =
 			{
 				{ // ETerminalBoxType::mc_NonBoxDrawing
-					.m_TopLeft = str_utf32('-') // ----------- ----------- ----------- ----------- |         |
-					, .m_TopRight = str_utf32('-') // | Testing | | Testing   | Testing |   Testing | | Testing |
+					.m_TopLeft = str_utf32('-') //      ----------- ----------- ----------- ----------- |         |
+					, .m_TopRight = str_utf32('-') //   | Testing | | Testing   | Testing |   Testing | | Testing |
 					, .m_BottomLeft = str_utf32('-') // ----------- ----------- |         | ----------- -----------
 					, .m_BottomRight = str_utf32('-')
 					, .m_HorizontalTop = str_utf32('-')
@@ -47,8 +47,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_NonBoxDrawingOuter
-					.m_TopLeft = str_utf32('|') // |¯¯¯¯¯¯¯¯¯| |¯¯¯¯¯¯¯¯¯¯ |¯¯¯¯¯¯¯¯¯| ¯¯¯¯¯¯¯¯¯¯| |         |
-					, .m_TopRight = str_utf32('|') // | Testing | | Testing   | Testing |   Testing | | Testing |
+					.m_TopLeft = str_utf32('|') //      |¯¯¯¯¯¯¯¯¯| |¯¯¯¯¯¯¯¯¯¯ |¯¯¯¯¯¯¯¯¯| ¯¯¯¯¯¯¯¯¯¯| |         |
+					, .m_TopRight = str_utf32('|') //   | Testing | | Testing   | Testing |   Testing | | Testing |
 					, .m_BottomLeft = str_utf32('|') // |_________| |__________ |         | __________| |_________|
 					, .m_BottomRight = str_utf32('|')
 					, .m_HorizontalTop = str_utf32('¯')
@@ -66,8 +66,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_NonBoxDrawingRounded
-					.m_TopLeft = str_utf32('/') // /¯¯¯¯¯¯¯¯¯\ /¯¯¯¯¯¯¯¯¯¯ /¯¯¯¯¯¯¯¯¯\ ¯¯¯¯¯¯¯¯¯¯\ |         |
-					, .m_TopRight = str_utf32('\\') // | Testing | | Testing   | Testing |   Testing | | Testing |
+					.m_TopLeft = str_utf32('/') //       /¯¯¯¯¯¯¯¯¯\ /¯¯¯¯¯¯¯¯¯¯ /¯¯¯¯¯¯¯¯¯\ ¯¯¯¯¯¯¯¯¯¯\ |         |
+					, .m_TopRight = str_utf32('\\') //   | Testing | | Testing   | Testing |   Testing | | Testing |
 					, .m_BottomLeft = str_utf32('\\') // \_________/ \__________ |         | __________/ \_________/
 					, .m_BottomRight = str_utf32('/')
 					, .m_HorizontalTop = str_utf32('¯')
@@ -85,8 +85,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_Light
-					.m_TopLeft = str_utf32('┌') // ┌─────────┐ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
-					, .m_TopRight = str_utf32('┐') // │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
+					.m_TopLeft = str_utf32('┌') //      ┌─────────┐ ┌─────────╴ ┌─────────┐ ╶─────────┐ ╷         ╷
+					, .m_TopRight = str_utf32('┐') //   │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
 					, .m_BottomLeft = str_utf32('└') // └─────────┘ └─────────╴ ╵         ╵ ╶─────────┘ └─────────┘
 					, .m_BottomRight = str_utf32('┘')
 					, .m_HorizontalTop = str_utf32('─')
@@ -104,8 +104,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightRounded
-					.m_TopLeft = str_utf32('╭') // ╭─────────╮ ╭─────────╴ ╭─────────╮ ╶─────────╮ ╷         ╷
-					, .m_TopRight = str_utf32('╮') // │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
+					.m_TopLeft = str_utf32('╭') //      ╭─────────╮ ╭─────────╴ ╭─────────╮ ╶─────────╮ ╷         ╷
+					, .m_TopRight = str_utf32('╮') //   │ Testing │ │ Testing   │ Testing │   Testing │ │ Testing │
 					, .m_BottomLeft = str_utf32('╰') // ╰─────────╯ ╰─────────╴ ╵         ╵ ╶─────────╯ ╰─────────╯
 					, .m_BottomRight = str_utf32('╯')
 					, .m_HorizontalTop = str_utf32('─')
@@ -123,8 +123,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_Heavy
-					.m_TopLeft = str_utf32('┏') // ┏━━━━━━━━━┓ ┏━━━━━━━━━╸ ┏━━━━━━━━━┓ ╺━━━━━━━━━┓ ╻         ╻
-					, .m_TopRight = str_utf32('┓') // ┃ Testing ┃ ┃ Testing   ┃ Testing ┃   Testing ┃ ┃ Testing ┃
+					.m_TopLeft = str_utf32('┏') //      ┏━━━━━━━━━┓ ┏━━━━━━━━━╸ ┏━━━━━━━━━┓ ╺━━━━━━━━━┓ ╻         ╻
+					, .m_TopRight = str_utf32('┓') //   ┃ Testing ┃ ┃ Testing   ┃ Testing ┃   Testing ┃ ┃ Testing ┃
 					, .m_BottomLeft = str_utf32('┗') // ┗━━━━━━━━━┛ ┗━━━━━━━━━╸ ╹         ╹ ╺━━━━━━━━━┛ ┗━━━━━━━━━┛
 					, .m_BottomRight = str_utf32('┛')
 					, .m_HorizontalTop = str_utf32('━')
@@ -142,8 +142,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_InnerHalf
-					.m_TopLeft = str_utf32('▗') // ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗         ▖
-					, .m_TopRight = str_utf32('▖') // ▐ Testing ▌ ▐ Testing   ▐ Testing ▌   Testing ▌ ▐ Testing ▌
+					.m_TopLeft = str_utf32('▗') //      ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗▄▄▄▄▄▄▄▄▄▖ ▗         ▖
+					, .m_TopRight = str_utf32('▖') //   ▐ Testing ▌ ▐ Testing   ▐ Testing ▌   Testing ▌ ▐ Testing ▌
 					, .m_BottomLeft = str_utf32('▝') // ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝         ▘ ▝▀▀▀▀▀▀▀▀▀▘ ▝▀▀▀▀▀▀▀▀▀▘
 					, .m_BottomRight = str_utf32('▘')
 					, .m_HorizontalTop = str_utf32('▄')
@@ -161,8 +161,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_OuterHalf
-					.m_TopLeft = str_utf32('▛') // ▛▀▀▀▀▀▀▀▀▀▜ ▛▀▀▀▀▀▀▀▀▀▀ ▛▀▀▀▀▀▀▀▀▀▜ ▀▀▀▀▀▀▀▀▀▀▜ ▌         ▐
-					, .m_TopRight = str_utf32('▜') // ▌ Testing ▐ ▌ Testing   ▌ Testing ▐   Testing ▐ ▌ Testing ▐
+					.m_TopLeft = str_utf32('▛') //      ▛▀▀▀▀▀▀▀▀▀▜ ▛▀▀▀▀▀▀▀▀▀▀ ▛▀▀▀▀▀▀▀▀▀▜ ▀▀▀▀▀▀▀▀▀▀▜ ▌         ▐
+					, .m_TopRight = str_utf32('▜') //   ▌ Testing ▐ ▌ Testing   ▌ Testing ▐   Testing ▐ ▌ Testing ▐
 					, .m_BottomLeft = str_utf32('▙') // ▙▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▄ ▌         ▐ ▄▄▄▄▄▄▄▄▄▄▟ ▙▄▄▄▄▄▄▄▄▄▟
 					, .m_BottomRight = str_utf32('▟')
 					, .m_HorizontalTop = str_utf32('▀')
@@ -180,8 +180,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_OuterHalfFullVertical
-					.m_TopLeft = str_utf32('█') // █▀▀▀▀▀▀▀▀▀█ █▀▀▀▀▀▀▀▀▀▀ █▀▀▀▀▀▀▀▀▀█ ▀▀▀▀▀▀▀▀▀▀█ █         █
-					, .m_TopRight = str_utf32('█') // █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
+					.m_TopLeft = str_utf32('█') //      █▀▀▀▀▀▀▀▀▀█ █▀▀▀▀▀▀▀▀▀▀ █▀▀▀▀▀▀▀▀▀█ ▀▀▀▀▀▀▀▀▀▀█ █         █
+					, .m_TopRight = str_utf32('█') //   █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
 					, .m_BottomLeft = str_utf32('█') // █▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄▄ █         █ ▄▄▄▄▄▄▄▄▄▄█ █▄▄▄▄▄▄▄▄▄█
 					, .m_BottomRight = str_utf32('█')
 					, .m_HorizontalTop = str_utf32('▀')
@@ -199,8 +199,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_FullHeavy
-					.m_TopLeft = str_utf32('█') // ███████████ ███████████ ███████████ ███████████ █         █
-					, .m_TopRight = str_utf32('█') // █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
+					.m_TopLeft = str_utf32('█') //      ███████████ ███████████ ███████████ ███████████ █         █
+					, .m_TopRight = str_utf32('█') //   █ Testing █ █ Testing   █ Testing █   Testing █ █ Testing █
 					, .m_BottomLeft = str_utf32('█') // ███████████ ███████████ █         █ ███████████ ███████████
 					, .m_BottomRight = str_utf32('█')
 					, .m_HorizontalTop = str_utf32('█')
@@ -218,8 +218,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_Double
-					.m_TopLeft = str_utf32('╔') // ╔═════════╗ ╔═════════╸ ╔═════════╗ ╺═════════╗ ╻         ╻
-					, .m_TopRight = str_utf32('╗') // ║ Testing ║ ║ Testing   ║ Testing ║   Testing ║ ║ Testing ║
+					.m_TopLeft = str_utf32('╔') //      ╔═════════╗ ╔═════════╸ ╔═════════╗ ╺═════════╗ ╻         ╻
+					, .m_TopRight = str_utf32('╗') //   ║ Testing ║ ║ Testing   ║ Testing ║   Testing ║ ║ Testing ║
 					, .m_BottomLeft = str_utf32('╚') // ╚═════════╝ ╚═════════╸ ╹         ╹ ╺═════════╝ ╚═════════╝
 					, .m_BottomRight = str_utf32('╝')
 					, .m_HorizontalTop = str_utf32('═')
@@ -237,8 +237,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted1
-					.m_TopLeft = str_utf32('┌') // ┌┈┈┈┈┈┈┈┈┈┐ ┌┈┈┈┈┈┈┈┈┈╴ ┌┈┈┈┈┈┈┈┈┈┐ ╶┈┈┈┈┈┈┈┈┈┐ ╷         ╷
-					, .m_TopRight = str_utf32('┐') // ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
+					.m_TopLeft = str_utf32('┌') //      ┌┈┈┈┈┈┈┈┈┈┐ ┌┈┈┈┈┈┈┈┈┈╴ ┌┈┈┈┈┈┈┈┈┈┐ ╶┈┈┈┈┈┈┈┈┈┐ ╷         ╷
+					, .m_TopRight = str_utf32('┐') //   ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
 					, .m_BottomLeft = str_utf32('└') // └┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈┘ └┈┈┈┈┈┈┈┈┈┘
 					, .m_BottomRight = str_utf32('┘')
 					, .m_HorizontalTop = str_utf32('┈')
@@ -256,8 +256,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted2
-					.m_TopLeft = str_utf32('┌') // ┌┄┄┄┄┄┄┄┄┄┐ ┌┄┄┄┄┄┄┄┄┄╴ ┌┄┄┄┄┄┄┄┄┄┐ ╶┄┄┄┄┄┄┄┄┄┐ ╷         ╷
-					, .m_TopRight = str_utf32('┐') // ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
+					.m_TopLeft = str_utf32('┌') //      ┌┄┄┄┄┄┄┄┄┄┐ ┌┄┄┄┄┄┄┄┄┄╴ ┌┄┄┄┄┄┄┄┄┄┐ ╶┄┄┄┄┄┄┄┄┄┐ ╷         ╷
+					, .m_TopRight = str_utf32('┐') //   ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
 					, .m_BottomLeft = str_utf32('└') // └┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄┘ └┄┄┄┄┄┄┄┄┄┘
 					, .m_BottomRight = str_utf32('┘')
 					, .m_HorizontalTop = str_utf32('┄')
@@ -275,8 +275,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted3
-					.m_TopLeft = str_utf32('┌') // ┌╌╌╌╌╌╌╌╌╌┐ ┌╌╌╌╌╌╌╌╌╌╴ ┌╌╌╌╌╌╌╌╌╌┐ ╶╌╌╌╌╌╌╌╌╌┐ ╷         ╷
-					, .m_TopRight = str_utf32('┐') // ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
+					.m_TopLeft = str_utf32('┌') //      ┌╌╌╌╌╌╌╌╌╌┐ ┌╌╌╌╌╌╌╌╌╌╴ ┌╌╌╌╌╌╌╌╌╌┐ ╶╌╌╌╌╌╌╌╌╌┐ ╷         ╷
+					, .m_TopRight = str_utf32('┐') //   ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
 					, .m_BottomLeft = str_utf32('└') // └╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌┘ └╌╌╌╌╌╌╌╌╌┘
 					, .m_BottomRight = str_utf32('┘')
 					, .m_HorizontalTop = str_utf32('╌')
@@ -294,8 +294,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted1Rounded
-					.m_TopLeft = str_utf32('╭') // ╭┈┈┈┈┈┈┈┈┈╮ ╭┈┈┈┈┈┈┈┈┈╴ ╭┈┈┈┈┈┈┈┈┈╮ ╶┈┈┈┈┈┈┈┈┈╮ ╷         ╷
-					, .m_TopRight = str_utf32('╮') // ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
+					.m_TopLeft = str_utf32('╭') //      ╭┈┈┈┈┈┈┈┈┈╮ ╭┈┈┈┈┈┈┈┈┈╴ ╭┈┈┈┈┈┈┈┈┈╮ ╶┈┈┈┈┈┈┈┈┈╮ ╷         ╷
+					, .m_TopRight = str_utf32('╮') //   ┊ Testing ┊ ┊ Testing   ┊ Testing ┊   Testing ┊ ┊ Testing ┊
 					, .m_BottomLeft = str_utf32('╰') // ╰┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╴ ╵         ╵ ╶┈┈┈┈┈┈┈┈┈╯ ╰┈┈┈┈┈┈┈┈┈╯
 					, .m_BottomRight = str_utf32('╯')
 					, .m_HorizontalTop = str_utf32('┈')
@@ -313,8 +313,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted2Rounded
-					.m_TopLeft = str_utf32('╭') // ╭┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄╴ ╭┄┄┄┄┄┄┄┄┄╮ ╶┄┄┄┄┄┄┄┄┄╮ ╷         ╷
-					, .m_TopRight = str_utf32('╮') // ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
+					.m_TopLeft = str_utf32('╭') //      ╭┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄╴ ╭┄┄┄┄┄┄┄┄┄╮ ╶┄┄┄┄┄┄┄┄┄╮ ╷         ╷
+					, .m_TopRight = str_utf32('╮') //   ┆ Testing ┆ ┆ Testing   ┆ Testing ┆   Testing ┆ ┆ Testing ┆
 					, .m_BottomLeft = str_utf32('╰') // ╰┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╴ ╵         ╵ ╶┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄╯
 					, .m_BottomRight = str_utf32('╯')
 					, .m_HorizontalTop = str_utf32('┄')
@@ -332,8 +332,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_LightDotted3Rounded
-					.m_TopLeft = str_utf32('╭') // ╭╌╌╌╌╌╌╌╌╌╮ ╭╌╌╌╌╌╌╌╌╌╴ ╭╌╌╌╌╌╌╌╌╌╮ ╶╌╌╌╌╌╌╌╌╌╮ ╷         ╷
-					, .m_TopRight = str_utf32('╮') // ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
+					.m_TopLeft = str_utf32('╭') //      ╭╌╌╌╌╌╌╌╌╌╮ ╭╌╌╌╌╌╌╌╌╌╴ ╭╌╌╌╌╌╌╌╌╌╮ ╶╌╌╌╌╌╌╌╌╌╮ ╷         ╷
+					, .m_TopRight = str_utf32('╮') //   ╎ Testing ╎ ╎ Testing   ╎ Testing ╎   Testing ╎ ╎ Testing ╎
 					, .m_BottomLeft = str_utf32('╰') // ╰╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╴ ╵         ╵ ╶╌╌╌╌╌╌╌╌╌╯ ╰╌╌╌╌╌╌╌╌╌╯
 					, .m_BottomRight = str_utf32('╯')
 					, .m_HorizontalTop = str_utf32('╌')
@@ -351,8 +351,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_HeavyDotted1
-					.m_TopLeft = str_utf32('┏') // ┏┉┉┉┉┉┉┉┉┉┓ ┏┉┉┉┉┉┉┉┉┉╸ ┏┉┉┉┉┉┉┉┉┉┓ ╺┉┉┉┉┉┉┉┉┉┓ ╻         ╻
-					, .m_TopRight = str_utf32('┓') // ┋ Testing ┋ ┋ Testing   ┋ Testing ┋   Testing ┋ ┋ Testing ┋
+					.m_TopLeft = str_utf32('┏') //      ┏┉┉┉┉┉┉┉┉┉┓ ┏┉┉┉┉┉┉┉┉┉╸ ┏┉┉┉┉┉┉┉┉┉┓ ╺┉┉┉┉┉┉┉┉┉┓ ╻         ╻
+					, .m_TopRight = str_utf32('┓') //   ┋ Testing ┋ ┋ Testing   ┋ Testing ┋   Testing ┋ ┋ Testing ┋
 					, .m_BottomLeft = str_utf32('┗') // ┗┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉╸ ╹         ╹ ╺┉┉┉┉┉┉┉┉┉┛ ┗┉┉┉┉┉┉┉┉┉┛
 					, .m_BottomRight = str_utf32('┛')
 					, .m_HorizontalTop = str_utf32('┉')
@@ -370,8 +370,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_HeavyDotted2
-					.m_TopLeft = str_utf32('┏') // ┏┅┅┅┅┅┅┅┅┅┓ ┏┅┅┅┅┅┅┅┅┅╸ ┏┅┅┅┅┅┅┅┅┅┓ ╺┅┅┅┅┅┅┅┅┅┓ ╻         ╻
-					, .m_TopRight = str_utf32('┓') // ┇ Testing ┇ ┇ Testing   ┇ Testing ┇   Testing ┇ ┇ Testing ┇
+					.m_TopLeft = str_utf32('┏') //      ┏┅┅┅┅┅┅┅┅┅┓ ┏┅┅┅┅┅┅┅┅┅╸ ┏┅┅┅┅┅┅┅┅┅┓ ╺┅┅┅┅┅┅┅┅┅┓ ╻         ╻
+					, .m_TopRight = str_utf32('┓') //   ┇ Testing ┇ ┇ Testing   ┇ Testing ┇   Testing ┇ ┇ Testing ┇
 					, .m_BottomLeft = str_utf32('┗') // ┗┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅╸ ╹         ╹ ╺┅┅┅┅┅┅┅┅┅┛ ┗┅┅┅┅┅┅┅┅┅┛
 					, .m_BottomRight = str_utf32('┛')
 					, .m_HorizontalTop = str_utf32('┅')
@@ -389,8 +389,8 @@ namespace NMib::NCommandLine
 				}
 				,
 				{ // ETerminalBoxType::mc_HeavyDotted3
-					.m_TopLeft = str_utf32('┏') // ┏╍╍╍╍╍╍╍╍╍┓ ┏╍╍╍╍╍╍╍╍╍╸ ┏╍╍╍╍╍╍╍╍╍┓ ╺╍╍╍╍╍╍╍╍╍┓ ╻         ╻
-					, .m_TopRight = str_utf32('┓') // ╏ Testing ╏ ╏ Testing   ╏ Testing ╏   Testing ╏ ╏ Testing ╏
+					.m_TopLeft = str_utf32('┏') //      ┏╍╍╍╍╍╍╍╍╍┓ ┏╍╍╍╍╍╍╍╍╍╸ ┏╍╍╍╍╍╍╍╍╍┓ ╺╍╍╍╍╍╍╍╍╍┓ ╻         ╻
+					, .m_TopRight = str_utf32('┓') //   ╏ Testing ╏ ╏ Testing   ╏ Testing ╏   Testing ╏ ╏ Testing ╏
 					, .m_BottomLeft = str_utf32('┗') // ┗╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍╸ ╹         ╹ ╺╍╍╍╍╍╍╍╍╍┛ ┗╍╍╍╍╍╍╍╍╍┛
 					, .m_BottomRight = str_utf32('┛')
 					, .m_HorizontalTop = str_utf32('╍')
