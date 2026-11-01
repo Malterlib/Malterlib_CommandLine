@@ -6,7 +6,7 @@
 	, .m_Left = gc_Str<str_utf8("┐╮╴╷")>
 	, .m_Right = gc_Str<str_utf8("┐")>
 	, .m_EndpointTypesLeft = {DLightOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -14,7 +14,7 @@
 	, .m_Left = gc_Str<str_utf8("╷╴")>
 	, .m_Right = gc_Str<str_utf8("╮")>
 	, .m_EndpointTypesLeft = {DLightNoRounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -23,7 +23,7 @@
 	, .m_Right = gc_Str<str_utf8("╷")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {DLightNoRounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -32,7 +32,7 @@
 	, .m_Right = gc_Str<str_utf8("╴")>
 	, .m_EndpointTypesLeft = {DLightOnward}
 	, .m_EndpointTypesRight = {DLightNoRounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ╮
@@ -41,7 +41,7 @@
 	, .m_Left = gc_Str<str_utf8("╮╴╷")>
 	, .m_Right = gc_Str<str_utf8("╮")>
 	, .m_EndpointTypesLeft = {DLightRoundedOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -50,6 +50,6 @@
 	, .m_Right = gc_Str<str_utf8("╴")>
 	, .m_EndpointTypesLeft = {DLightRoundedOnward}
 	, .m_EndpointTypesRight = {DLightRoundedOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,

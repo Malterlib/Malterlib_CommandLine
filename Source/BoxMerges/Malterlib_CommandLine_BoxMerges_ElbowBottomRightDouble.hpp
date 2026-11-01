@@ -6,7 +6,7 @@
 	, .m_Left = gc_Str<str_utf8("┘╛╜╯╸╹╴╵")>
 	, .m_Right = gc_Str<str_utf8("╝")>
 	, .m_EndpointTypesLeft = {DDoubleOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -15,7 +15,7 @@
 	, .m_Right = gc_Str<str_utf8("╜╹")>
 	, .m_EndpointTypesLeft = {ETerminalEndpointType::mc_Double}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Double}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ╜
@@ -24,7 +24,7 @@
 	, .m_Left = gc_Str<str_utf8("┘╯╹╴╵")>
 	, .m_Right = gc_Str<str_utf8("╜")>
 	, .m_EndpointTypesLeft = {DDoubleOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -33,7 +33,7 @@
 	, .m_Right = gc_Str<str_utf8("╹")>
 	, .m_EndpointTypesLeft = {DDoubleOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Double}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ╛
@@ -42,7 +42,7 @@
 	, .m_Left = gc_Str<str_utf8("┘╯╸╴╵")>
 	, .m_Right = gc_Str<str_utf8("╛")>
 	, .m_EndpointTypesLeft = {DDoubleOnward}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -51,6 +51,6 @@
 	, .m_Right = gc_Str<str_utf8("╸")>
 	, .m_EndpointTypesLeft = {DDoubleOnward}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Double}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,

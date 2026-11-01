@@ -22,7 +22,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Heavy}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -45,7 +45,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -67,7 +67,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -88,7 +88,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_HeavyDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -108,7 +108,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Double}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 // ╶
@@ -128,7 +128,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_Light}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -146,7 +146,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightDotted3}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -163,7 +163,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightDotted2}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -179,7 +179,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightDotted1}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -194,7 +194,7 @@
 		, ETerminalEndpointType::mc_LightDotted1Rounded
 	}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightRounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -203,7 +203,7 @@
 	, .m_Right = gc_Str<str_utf8("╶")>
 	, .m_EndpointTypesLeft = {ETerminalEndpointType::mc_LightDotted3Rounded, ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightDotted3Rounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,
 {
@@ -212,6 +212,6 @@
 	, .m_Right = gc_Str<str_utf8("╶")>
 	, .m_EndpointTypesLeft = {ETerminalEndpointType::mc_LightDotted2Rounded, ETerminalEndpointType::mc_LightDotted1Rounded}
 	, .m_EndpointTypesRight = {ETerminalEndpointType::mc_LightDotted2Rounded}
-	DInsertFileLine
+	, DInsertFileLine
 }
 ,

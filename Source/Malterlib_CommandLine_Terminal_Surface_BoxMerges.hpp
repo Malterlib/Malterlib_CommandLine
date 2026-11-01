@@ -22,7 +22,7 @@ namespace NMib::NCommandLine
 			ETerminalEndpointType m_EndpointTypesRight[14] = {ETerminalEndpointType::mc_Unspecified};
 		};
 
-		#define DInsertFileLine , .m_pFile = DMibPFile \
+		#define DInsertFileLine .m_pFile = DMibPFile \
 								, .m_Line = DMibPLine
 
 		#define DLightRoundedOnward ETerminalEndpointType::mc_LightRounded, \
