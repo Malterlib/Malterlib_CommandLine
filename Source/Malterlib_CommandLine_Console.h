@@ -18,17 +18,17 @@ namespace NMib::NCommandLine
 #	define DMibConErrOutRaw(...) NMib::NCommandLine::fg_MalterlibConErrOut(__VA_ARGS__)
 
 #	define DMibConOut(...) NMib::NCommandLine::fg_MalterlibConOut((NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
-#	define DMibColorConOut(_Color, ...) NMib::NCommandLine::fg_MalterlibConOut(_Color, (NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
+#	define DMibColorConOut(d_Color, ...) NMib::NCommandLine::fg_MalterlibConOut(d_Color, (NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
 #	define DMibConErrOut(...) NMib::NCommandLine::fg_MalterlibConErrOut((NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
-#	define DMibColorConErrOut(_Color, ...) NMib::NCommandLine::fg_MalterlibConErrOut(_Color, (NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
+#	define DMibColorConErrOut(d_Color, ...) NMib::NCommandLine::fg_MalterlibConErrOut(d_Color, (NMib::NStr::fg_Format<NMib::NStr::CStrNonTracked>(__VA_ARGS__)).f_GetStr())
 #else
 #	define DMibConOutRaw(...) (void)0
 #	define DMibConErrOutRaw(...) (void)0
 
 #	define DMibConOut(...) (void)0
-#	define DMibColorConOut(_Color, ...) (void)0
+#	define DMibColorConOut(d_Color, ...) (void)0
 #	define DMibConErrOut(...) (void)0
-#	define DMibColorConErrOut(_Color, ...) (void)0
+#	define DMibColorConErrOut(d_Color, ...) (void)0
 #endif
 
 #ifndef DMibPNoShortCuts

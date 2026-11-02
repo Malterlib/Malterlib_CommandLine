@@ -460,7 +460,7 @@ namespace NMib::NCommandLine
 
 	DMibImpErrorClassDefine(CCommandLineConvertException, NMib::NException::CException);
 
-#define DMibCommandLineConvertException(_Description) DMibImpError(CCommandLineConvertException, _Description)
+#define DMibCommandLineConvertException(d_Description) DMibImpError(CCommandLineConvertException, d_Description)
 
 	static inline void fg_CheckType(NEncoding::CEJsonSorted const &_Value, NEncoding::EEJsonType _Type)
 	{
