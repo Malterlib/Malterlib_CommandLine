@@ -73,9 +73,9 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fLineBreak = [&](CStr _String, smint _SubsequentIndent) -> TCVector<CStr>
+		auto fLineBreak = [&](CStr const &_String, smint _SubsequentIndent) -> TCVector<CStr>
 			{
-				_String = _String.f_Replace("\t", "   ");
+				CStr String = _String.f_Replace("\t", "   ");
 				smint MinAvailableWidth = 15;
 				smint AvailableWidth = (smint)MaxWidth - (smint)Indentation;
 				if (AvailableWidth < MinAvailableWidth)
@@ -83,7 +83,7 @@ namespace NMib::NCommandLine
 
 				TCVector<CStr> Lines;
 				CStr CurrentLine;
-				ch8 const *pParse = _String;
+				ch8 const *pParse = String;
 				while (*pParse)
 				{
 					ch8 const *pStart = pParse;
@@ -134,7 +134,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputLine = [&](CStr _Line, bool _bEndSection = false, umint _SubsequentIndent = 0, bool _bSeparateSectionOnMultiline = true)
+		auto fOutputLine = [&](CStr &&_Line, bool _bEndSection = false, umint _SubsequentIndent = 0, bool _bSeparateSectionOnMultiline = true)
 			{
 				TCVector<CStr> Lines = fLineBreak(fg_GetStrLineSep(_Line), _SubsequentIndent);
 
@@ -159,7 +159,7 @@ namespace NMib::NCommandLine
 			}
 		;
 
-		auto fOutputLines = [&](CStr _Lines, bool _bEndSection = false, umint _SubsequentIndent = 0)
+		auto fOutputLines = [&](CStr const &_Lines, bool _bEndSection = false, umint _SubsequentIndent = 0)
 			{
 				bool bFirst = true;
 				COnScopeExitShared SubsequentIndentScope;
@@ -167,19 +167,19 @@ namespace NMib::NCommandLine
 				{
 					if (bFirst)
 					{
-						fOutputLine(Line, false, _SubsequentIndent, false);
+						fOutputLine(fg_Move(Line), false, _SubsequentIndent, false);
 						bFirst = false;
 						SubsequentIndentScope = fAddIndent(_SubsequentIndent);
 					}
 					else
-						fOutputLine(Line, false, 0, false);
+						fOutputLine(fg_Move(Line), false, 0, false);
 				}
 				if (!bFirst && _bEndSection)
 					fOutputEndSection();
 			}
 		;
 
-		auto fOutputSectionedText = [&](CStr _LongText, umint _SubsequentIndent = 0)
+		auto fOutputSectionedText = [&](CStr &&_LongText, umint _SubsequentIndent = 0)
 			{
 				if (_LongText.f_IsEmpty())
 					return;
@@ -199,14 +199,14 @@ namespace NMib::NCommandLine
 							continue;
 						}
 
-						fOutputLine(Line, bEndSection, _SubsequentIndent);
+						fOutputLine(fg_Move(Line), bEndSection, _SubsequentIndent);
 					}
 				}
 				fOutputEndSection();
 			}
 		;
 
-		auto fOutputTableText = [&](CStr _LongText, umint _SubsequentIndent, bool _bEndSection)
+		auto fOutputTableText = [&](CStr &&_LongText, umint _SubsequentIndent, bool _bEndSection)
 			{
 				if (_LongText.f_IsEmpty())
 					return;
@@ -233,7 +233,7 @@ namespace NMib::NCommandLine
 							continue;
 						}
 
-						fOutputLine(Line, bEndSection, _SubsequentIndent);
+						fOutputLine(fg_Move(Line), bEndSection, _SubsequentIndent);
 					}
 				}
 				if (_bEndSection)
@@ -245,7 +245,7 @@ namespace NMib::NCommandLine
 			{
 				if (fRenderLength(_Heading) == 0)
 					return COnScopeExitShared();
-				fOutputTableText(_Heading, _SubsequentIndent, true);
+				fOutputTableText(fg_TempCopy(_Heading), _SubsequentIndent, true);
 				return fAddIndent(3);
 			}
 		;
@@ -369,11 +369,11 @@ namespace NMib::NCommandLine
 
 					if (_bVerbose)
 					{
-						fOutputLine(OptionLine, !bShowNegated, LongestName + 3);
+						fOutputLine(fg_Move(OptionLine), !bShowNegated, LongestName + 3);
 						if (bShowNegated)
-							fOutputLine(OptionEntry.m_NegatedNames, true, LongestName + 3);
+							fOutputLine(fg_TempCopy(OptionEntry.m_NegatedNames), true, LongestName + 3);
 						auto OptionScope = fAddIndent(3);
-						fOutputSectionedText(Option.m_LongDescription);
+						fOutputSectionedText(fg_TempCopy(Option.m_LongDescription));
 
 						fOutputVerboseValueSection(gc_Str<"Type:">, Option.f_FormatType(AnsiFlags));
 
@@ -384,11 +384,11 @@ namespace NMib::NCommandLine
 					{
 						if (bShowNegated)
 							fOutputEndSection();
-						fOutputTableText(OptionLine, LongestName + 3, false);
+						fOutputTableText(fg_Move(OptionLine), LongestName + 3, false);
 
 						if (bShowNegated)
 						{
-							fOutputLine(OptionEntry.m_NegatedNames, false, LongestName + 3);
+							fOutputLine(fg_TempCopy(OptionEntry.m_NegatedNames), false, LongestName + 3);
 							fOutputEndSection();
 						}
 					}
@@ -441,12 +441,12 @@ namespace NMib::NCommandLine
 						Description = Parameter.m_ShortDescription;
 
 					CStr OptionLine = fFormatTableLine(ParameterEntry.m_Name, LongestName, Description);
-					fOutputTableText(OptionLine, LongestName + 3, _bVerbose);
+					fOutputTableText(fg_Move(OptionLine), LongestName + 3, _bVerbose);
 
 					if (_bVerbose)
 					{
 						auto VerboseScope = fAddIndent(3);
-						fOutputSectionedText(Parameter.m_LongDescription);
+						fOutputSectionedText(fg_TempCopy(Parameter.m_LongDescription));
 
 						fOutputVerboseValueSection(gc_Str<"Type:">, Parameter.f_FormatType(AnsiFlags));
 
@@ -646,8 +646,8 @@ namespace NMib::NCommandLine
 			{
 				auto &Command = *_CommandEntry.m_pCommand;
 				auto NameScope = fOutputHeading(_CommandEntry.m_Text);
-				fOutputLine(Command.m_ShortDescription, true);
-				fOutputSectionedText(Command.m_LongDescription);
+				fOutputLine(fg_TempCopy(Command.m_ShortDescription), true);
+				fOutputSectionedText(fg_TempCopy(Command.m_LongDescription));
 
 				{
 					umint Indent = 0;
@@ -661,7 +661,7 @@ namespace NMib::NCommandLine
 				if (!Command.m_OutputDescription.f_IsEmpty())
 				{
 					auto OutputScope = fOutputHeading("Output");
-					fOutputSectionedText(Command.m_OutputDescription);
+					fOutputSectionedText(fg_TempCopy(Command.m_OutputDescription));
 				}
 				if (!Command.m_StatusDescription.f_IsEmpty())
 				{
@@ -701,7 +701,7 @@ namespace NMib::NCommandLine
 				else
 				{
 					CStr Line = fFormatTableLine(CommandEntry.m_TextWithOptions, LongestName, CommandEntry.m_pCommand->m_ShortDescription);
-					fOutputTableText(Line, LongestName + 3, false);
+					fOutputTableText(fg_Move(Line), LongestName + 3, false);
 				}
 			}
 
@@ -799,7 +799,7 @@ namespace NMib::NCommandLine
 				auto &SectionState = SectionMap[pSection];
 				auto SectionScope = fOutputHeading(fHeading1(Section.m_Heading));
 				if (bVerbose)
-					fOutputSectionedText(Section.m_Description);
+					fOutputSectionedText(fg_TempCopy(Section.m_Description));
 
 				fOutputOptions
 					(
@@ -829,7 +829,7 @@ namespace NMib::NCommandLine
 						{
 							fOutputEndSection();
 							auto pIndent = fAddIndent(Indent);
-							fOutputLine(Command.m_ShortDescription, false);
+							fOutputLine(fg_TempCopy(Command.m_ShortDescription), false);
 						}
 
 						if (!Command.m_Options.f_IsEmpty())
@@ -860,7 +860,7 @@ namespace NMib::NCommandLine
 		{
 			auto SectionScope = fOutputHeading(fHeading1(Section.m_Heading));
 			if (bVerbose)
-				fOutputSectionedText(Section.m_Description);
+				fOutputSectionedText(fg_TempCopy(Section.m_Description));
 
 			if (bFirstSection)
 			{
@@ -933,7 +933,7 @@ namespace NMib::NCommandLine
 					else
 					{
 						CStr Line = fFormatTableLine(CommandEntry.m_TextWithOptions, LongestName, CommandEntry.m_pCommand->m_ShortDescription);
-						fOutputTableText(Line, LongestName + 3, false);
+						fOutputTableText(fg_Move(Line), LongestName + 3, false);
 					}
 				}
 				fOutputEndSection();
