@@ -16,9 +16,8 @@ namespace NMib::NCommandLine
 {
 	using namespace NStr;
 
-	class CTerminal_Tests : public NMib::NTest::CTest
+	struct CTerminal_Tests : public NMib::NTest::CTest
 	{
-	public:
 		void f_DoTests()
 		{
 			DMibTestSuite("TextCJK")

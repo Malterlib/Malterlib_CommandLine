@@ -19,9 +19,8 @@ using namespace NMib::NStorage;
 
 namespace
 {
-	class CCommandLine_Tests : public NMib::NTest::CTest
+	struct CCommandLine_Tests : public NMib::NTest::CTest
 	{
-	public:
 		void f_DoTests()
 		{
 			DMibTestCategory("Command Line")

@@ -11,9 +11,8 @@ namespace NMib::NCommandLine
 {
 	using namespace NStr;
 
-	class CAnsiEncoding_Tests : public NMib::NTest::CTest
+	struct CAnsiEncoding_Tests : public NMib::NTest::CTest
 	{
-	public:
 		void f_DoTests()
 		{
 			DMibTestSuite("LineBreakParsed")
