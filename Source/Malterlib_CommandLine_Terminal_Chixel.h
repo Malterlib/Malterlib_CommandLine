@@ -79,81 +79,20 @@ namespace NMib::NCommandLine
 		template <typename tf_CStr>
 		void f_Format(tf_CStr &o_Str) const;
 
-		EChixelFlag f_GetFlags() const
-		{
-			return EChixelFlag((m_CharaterFlagsAndEndpointType & mc_FlagsMask) >> mc_FlagsOffset);
-		}
-
-		ch32 f_GetCharacter() const
-		{
-			return m_CharaterFlagsAndEndpointType & mc_CharacterMask;
-		}
-
-		ETerminalEndpointType f_GetEndpointType()
-		{
-			return ETerminalEndpointType((m_CharaterFlagsAndEndpointType & mc_EndpointMask) >> mc_EndpointOffset);
-		}
-
-		ch32 f_GetCharacterAndEndpointType()
-		{
-			return (m_CharaterFlagsAndEndpointType & (mc_CharacterMask | mc_EndpointMask));
-		}
-
-		void f_SetFlags(EChixelFlag _Flags)
-		{
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_FlagsMask) | ch32(_Flags) << mc_FlagsOffset;
-		}
-
-		void f_AddFlags(EChixelFlag _Flags)
-		{
-			m_CharaterFlagsAndEndpointType |= (ch32(_Flags) << mc_FlagsOffset);
-		}
-
-		void f_ChangeFlags(EChixelFlag _Remove, EChixelFlag _Add)
-		{
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(ch32(_Remove) << mc_FlagsOffset)) | (ch32(_Add) << mc_FlagsOffset);
-		}
-
-		void f_RemoveFlags(EChixelFlag _Flags)
-		{
-			m_CharaterFlagsAndEndpointType &= ~(ch32(_Flags) << mc_FlagsOffset);
-		}
-
-		void f_SetEndpointType(ETerminalEndpointType _Type)
-		{
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_EndpointMask) | ch32(_Type) << mc_EndpointOffset;
-		}
-
-		void f_ClearOverflow()
-		{
-#if DCommandLineSupportOverflow
-			m_bHasOverflow = false;
-#endif
-		}
-
-		void f_SetCharacter(ch32 _Character)
-		{
-			f_ClearOverflow();
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_CharacterMask) | _Character;
-		}
-
-		void f_SetAll(ch32 _Character, EChixelFlag _Flags, ETerminalEndpointType _Type = ETerminalEndpointType::mc_Unspecified)
-		{
-			f_ClearOverflow();
-			m_CharaterFlagsAndEndpointType = _Character | (ch32(_Flags) << mc_FlagsOffset) | (ch32(_Type) << mc_EndpointOffset);
-		}
-
-		void f_SetCharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type = ETerminalEndpointType::mc_Unspecified)
-		{
-			f_ClearOverflow();
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(mc_EndpointMask | mc_CharacterMask)) | _Character | ch32(_Type) << mc_EndpointOffset;
-		}
-
-		void f_SetCharacterAndEndpointTypeRaw(ch32 _CharacterAndEndpointType)
-		{
-			f_ClearOverflow();
-			m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(mc_EndpointMask | mc_CharacterMask)) | _CharacterAndEndpointType;
-		}
+		EChixelFlag f_GetFlags() const;
+		ch32 f_GetCharacter() const;
+		ETerminalEndpointType f_GetEndpointType();
+		ch32 f_GetCharacterAndEndpointType();
+		void f_SetFlags(EChixelFlag _Flags);
+		void f_AddFlags(EChixelFlag _Flags);
+		void f_ChangeFlags(EChixelFlag _Remove, EChixelFlag _Add);
+		void f_RemoveFlags(EChixelFlag _Flags);
+		void f_SetEndpointType(ETerminalEndpointType _Type);
+		void f_ClearOverflow();
+		void f_SetCharacter(ch32 _Character);
+		void f_SetAll(ch32 _Character, EChixelFlag _Flags, ETerminalEndpointType _Type = ETerminalEndpointType::mc_Unspecified);
+		void f_SetCharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type = ETerminalEndpointType::mc_Unspecified);
+		void f_SetCharacterAndEndpointTypeRaw(ch32 _CharacterAndEndpointType);
 
 		CAnsiEncoding::EWeight f_Weight() const;
 		CAnsiEncoding::EUnderline f_Underline() const;
@@ -186,10 +125,7 @@ namespace NMib::NCommandLine
 #endif
 	};
 
-	constexpr ch32 fg_CharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type)
-	{
-		return _Character | (ch32(_Type) << CChixel::mc_EndpointOffset);
-	}
+	constexpr ch32 fg_CharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type);
 
 	struct CSetChixelProperties
 	{

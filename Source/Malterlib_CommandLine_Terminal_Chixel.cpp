@@ -160,6 +160,82 @@ namespace NMib::NCommandLine
 		f_ChangeFlags(EChixelFlag::mc_Strikeout, _bValue ? EChixelFlag::mc_Strikeout : EChixelFlag::mc_None);
 	}
 
+	inline_always_lto EChixelFlag CChixel::f_GetFlags() const
+	{
+		return EChixelFlag((m_CharaterFlagsAndEndpointType & mc_FlagsMask) >> mc_FlagsOffset);
+	}
+
+	inline_always_lto ch32 CChixel::f_GetCharacter() const
+	{
+		return m_CharaterFlagsAndEndpointType & mc_CharacterMask;
+	}
+
+	inline_always_lto ETerminalEndpointType CChixel::f_GetEndpointType()
+	{
+		return ETerminalEndpointType((m_CharaterFlagsAndEndpointType & mc_EndpointMask) >> mc_EndpointOffset);
+	}
+
+	inline_always_lto ch32 CChixel::f_GetCharacterAndEndpointType()
+	{
+		return (m_CharaterFlagsAndEndpointType & (mc_CharacterMask | mc_EndpointMask));
+	}
+
+	inline_always_lto void CChixel::f_SetFlags(EChixelFlag _Flags)
+	{
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_FlagsMask) | ch32(_Flags) << mc_FlagsOffset;
+	}
+
+	inline_always_lto void CChixel::f_AddFlags(EChixelFlag _Flags)
+	{
+		m_CharaterFlagsAndEndpointType |= (ch32(_Flags) << mc_FlagsOffset);
+	}
+
+	inline_always_lto void CChixel::f_ChangeFlags(EChixelFlag _Remove, EChixelFlag _Add)
+	{
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(ch32(_Remove) << mc_FlagsOffset)) | (ch32(_Add) << mc_FlagsOffset);
+	}
+
+	inline_always_lto void CChixel::f_RemoveFlags(EChixelFlag _Flags)
+	{
+		m_CharaterFlagsAndEndpointType &= ~(ch32(_Flags) << mc_FlagsOffset);
+	}
+
+	inline_always_lto void CChixel::f_SetEndpointType(ETerminalEndpointType _Type)
+	{
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_EndpointMask) | ch32(_Type) << mc_EndpointOffset;
+	}
+
+	inline_always_lto void CChixel::f_ClearOverflow()
+	{
+#if DCommandLineSupportOverflow
+		m_bHasOverflow = false;
+#endif
+	}
+
+	inline_always_lto void CChixel::f_SetCharacter(ch32 _Character)
+	{
+		f_ClearOverflow();
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~mc_CharacterMask) | _Character;
+	}
+
+	inline_always_lto void CChixel::f_SetAll(ch32 _Character, EChixelFlag _Flags, ETerminalEndpointType _Type)
+	{
+		f_ClearOverflow();
+		m_CharaterFlagsAndEndpointType = _Character | (ch32(_Flags) << mc_FlagsOffset) | (ch32(_Type) << mc_EndpointOffset);
+	}
+
+	inline_always_lto void CChixel::f_SetCharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type)
+	{
+		f_ClearOverflow();
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(mc_EndpointMask | mc_CharacterMask)) | _Character | ch32(_Type) << mc_EndpointOffset;
+	}
+
+	inline_always_lto void CChixel::f_SetCharacterAndEndpointTypeRaw(ch32 _CharacterAndEndpointType)
+	{
+		f_ClearOverflow();
+		m_CharaterFlagsAndEndpointType = (m_CharaterFlagsAndEndpointType & ~(mc_EndpointMask | mc_CharacterMask)) | _CharacterAndEndpointType;
+	}
+
 	CAnsiEncoding::EWeight CChixel::f_Weight() const
 	{
 		return CAnsiEncoding::EWeight((f_GetFlags() & EChixelFlag::mc_WeightMask) >> int(EChixelFlag::mc_WeightOffset));

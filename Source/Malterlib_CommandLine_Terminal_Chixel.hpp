@@ -39,6 +39,11 @@ namespace NMib::NCommandLine
 		;
 	}
 
+	constexpr ch32 fg_CharacterAndEndpointType(ch32 _Character, ETerminalEndpointType _Type)
+	{
+		return _Character | (ch32(_Type) << CChixel::mc_EndpointOffset);
+	}
+
 	template <typename tf_CStr>
 	void CSetChixelProperties::f_Format(tf_CStr &o_Str) const
 	{
