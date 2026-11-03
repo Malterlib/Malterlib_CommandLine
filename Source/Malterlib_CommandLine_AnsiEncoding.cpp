@@ -795,7 +795,7 @@ namespace NMib::NCommandLine
 		};
 
 		// UTF-8 ellipsis in constant storage so parsed runs can view it without owning text
-		constexpr ch8 gc_pLineBreakEllipsis[] = "…";
+		constexpr ch8 gc_LineBreakEllipsis[] = "…";
 
 		// The characters fg_StrTrimRight removes, matched here for trimming through views
 		bool fg_LineBreakIsTrimmed(ch8 _Char)
@@ -1226,7 +1226,7 @@ namespace NMib::NCommandLine
 		// constant storage
 		auto fEllipsisView = []() -> CStrPtr
 			{
-				return CStrPtr(gc_pLineBreakEllipsis, sizeof(gc_pLineBreakEllipsis) - 1);
+				return CStrPtr(gc_LineBreakEllipsis, sizeof(gc_LineBreakEllipsis) - 1);
 			}
 		;
 

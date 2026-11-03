@@ -643,8 +643,8 @@ namespace NMib::NCommandLine
 		{
 			NException::CExceptionExceptionVectorData::CErrorCollector ErrorCollector;
 
-			for (auto &Exception : Exceptions)
-				ErrorCollector.f_AddError(fg_Move(Exception));
+			for (auto &pException : Exceptions)
+				ErrorCollector.f_AddError(fg_Move(pException));
 
 			if (bFoundCommand)
 				ErrorCollector.f_AddError(fg_MakeException(DMibErrorInstance("\nTo see command syntax, run command with {}\n"_f << fColor("'-?'", CInternal::EColor_GlobalOption))));

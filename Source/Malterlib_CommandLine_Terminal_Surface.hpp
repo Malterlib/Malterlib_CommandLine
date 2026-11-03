@@ -12,14 +12,14 @@ namespace NMib::NCommandLine::NPrivate
 		, mc_Blend
 	};
 
-	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, EColorOperation tf_Underline, bool tf_bFlags, typename tf_CFill>
-	inline_always void fg_CallFillFunctionFull(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, EColorOperation tf_Underline, bool tf_bFlags, typename tf_FFill>
+	inline_always void fg_CallFillFunctionFull(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		_fFill.template operator ()<tf_bCharacter, tf_Foreground, tf_Background, tf_Underline, tf_bFlags>();
 	}
 
-	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, EColorOperation tf_Underline, typename tf_CFill>
-	inline_always void fg_CallFillFunction4(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, EColorOperation tf_Underline, typename tf_FFill>
+	inline_always void fg_CallFillFunction4(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		if (_Properties.m_Properties.m_ChixelFlags)
 			fg_CallFillFunctionFull<tf_bCharacter, tf_Foreground, tf_Background, tf_Underline, true>(_fFill, _Properties);
@@ -27,8 +27,8 @@ namespace NMib::NCommandLine::NPrivate
 			fg_CallFillFunctionFull<tf_bCharacter, tf_Foreground, tf_Background, tf_Underline, false>(_fFill, _Properties);
 	}
 
-	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, typename tf_CFill>
-	inline_always void fg_CallFillFunction3(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <bool tf_bCharacter, EColorOperation tf_Foreground, EColorOperation tf_Background, typename tf_FFill>
+	inline_always void fg_CallFillFunction3(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		if (_Properties.m_Properties.m_UnderlineColor)
 		{
@@ -41,8 +41,8 @@ namespace NMib::NCommandLine::NPrivate
 			fg_CallFillFunction4<tf_bCharacter, tf_Foreground, tf_Background, EColorOperation::mc_None>(_fFill, _Properties);
 	}
 
-	template <bool tf_bCharacter, EColorOperation tf_Foreground, typename tf_CFill>
-	inline_always void fg_CallFillFunction2(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <bool tf_bCharacter, EColorOperation tf_Foreground, typename tf_FFill>
+	inline_always void fg_CallFillFunction2(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		if (_Properties.m_Properties.m_BackgroundColor)
 		{
@@ -55,8 +55,8 @@ namespace NMib::NCommandLine::NPrivate
 			fg_CallFillFunction3<tf_bCharacter, tf_Foreground, EColorOperation::mc_None>(_fFill, _Properties);
 	}
 
-	template <bool tf_bCharacter, typename tf_CFill>
-	inline_always void fg_CallFillFunction1(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <bool tf_bCharacter, typename tf_FFill>
+	inline_always void fg_CallFillFunction1(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		if (_Properties.m_Properties.m_ForegroundColor)
 		{
@@ -69,8 +69,8 @@ namespace NMib::NCommandLine::NPrivate
 			fg_CallFillFunction2<tf_bCharacter, EColorOperation::mc_None>(_fFill, _Properties);
 	}
 
-	template <typename tf_CFill>
-	inline_always void fg_CallFillFunction(tf_CFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
+	template <typename tf_FFill>
+	inline_always void fg_CallFillFunction(tf_FFill &&_fFill, CTerminalSurfaceFillProperties const &_Properties)
 	{
 		if (_Properties.m_Character)
 			fg_CallFillFunction1<true>(_fFill, _Properties);
