@@ -82,7 +82,7 @@ namespace NMib::NCommandLine
 
 	bool CCommandLineDefaults::fs_ColorEnabledDefault()
 	{
-		static bool bValue = []
+		static bool s_bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColor", ""))
 					return Value == "true";
@@ -104,12 +104,12 @@ namespace NMib::NCommandLine
 			}
 			()
 		;
-		return bValue;
+		return s_bValue;
 	}
 
 	bool CCommandLineDefaults::fs_Color24BitEnabledDefault()
 	{
-		static bool bValue = []
+		static bool s_bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColor24Bit", ""))
 					return Value == "true";
@@ -126,12 +126,12 @@ namespace NMib::NCommandLine
 			}
 			()
 		;
-		return bValue;
+		return s_bValue;
 	}
 
 	bool CCommandLineDefaults::fs_ColorSgrUsesSemiColonDefault()
 	{
-		static bool bValue = []
+		static bool s_bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColorSgrUsesSemiColon", ""))
 					return Value == "true";
@@ -151,12 +151,12 @@ namespace NMib::NCommandLine
 			}
 			()
 		;
-		return bValue;
+		return s_bValue;
 	}
 
 	bool CCommandLineDefaults::fs_BoxDrawingDefault()
 	{
-		static bool bValue = []
+		static bool s_bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibBoxDrawing", ""))
 					return Value == "true";
@@ -165,14 +165,14 @@ namespace NMib::NCommandLine
 			}
 			()
 		;
-		return bValue;
+		return s_bValue;
 	}
 
 	bool CCommandLineDefaults::fs_ColorLightBackgroundDefault()
 	{
 		using namespace NProcess;
 
-		static bool bValue = []
+		static bool s_bValue = []
 			{
 				if (auto Value = fg_GetSys()->f_GetEnvironmentVariable("MalterlibColorLight", ""); Value == "true")
 					return true;
@@ -227,7 +227,7 @@ namespace NMib::NCommandLine
 			}
 			()
 		;
-		return bValue;
+		return s_bValue;
 	}
 
 	NCommandLine::EAnsiEncodingFlag CCommandLineDefaults::fs_ParseAnsiEncodingParams(NEncoding::CEJsonSorted const &_Params)

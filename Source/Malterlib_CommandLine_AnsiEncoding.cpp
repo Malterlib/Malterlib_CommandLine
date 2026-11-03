@@ -52,14 +52,14 @@ namespace NMib::NCommandLine
 				{
 					uint8 BestColor = 0;
 					uint32 SmallestError = TCLimitsInt<uint32>::mc_Max;
-					for (umint i = 0; i < 6; ++i)
+					for (umint iCube = 0; iCube < 6; ++iCube)
 					{
-						uint32 Error = fg_Abs(int32(_Value) - int32(c_CubeColors[i]));
+						uint32 Error = fg_Abs(int32(_Value) - int32(c_CubeColors[iCube]));
 						Error = Error * Error;
 						if (Error < SmallestError)
 						{
 							SmallestError = Error;
-							BestColor = i;
+							BestColor = iCube;
 						}
 					}
 					return BestColor;
@@ -83,15 +83,15 @@ namespace NMib::NCommandLine
 				SmallestError = fError(g_CommandLine_AnsiEncodingColor256Array[BestColor]);
 			}
 
-			for (umint i = 232; i < 256; ++i)
+			for (umint iColor = 232; iColor < 256; ++iColor)
 			{
-				auto &Color = g_CommandLine_AnsiEncodingColor256Array[i];
+				auto &Color = g_CommandLine_AnsiEncodingColor256Array[iColor];
 
 				uint32 Error = fError(Color);
 				if (Error < SmallestError)
 				{
 					SmallestError = Error;
-					BestColor = i;
+					BestColor = iColor;
 				}
 			}
 
@@ -100,19 +100,19 @@ namespace NMib::NCommandLine
 
 		NGraphics::CColorR8G8B8 fg_InvertBrightness(uint8 _Red, uint8 _Green, uint8 _Blue)
 		{
-			fp32 R = fp32(1.0f / 255.0f) * _Red;
-			fp32 G = fp32(1.0f / 255.0f) * _Green;
-			fp32 B = fp32(1.0f / 255.0f) * _Blue;
+			fp32 Red = fp32(1.0f / 255.0f) * _Red;
+			fp32 Green = fp32(1.0f / 255.0f) * _Green;
+			fp32 Blue = fp32(1.0f / 255.0f) * _Blue;
 
-			fp32 Y = fp32(0.299f) * R + fp32(0.587f) * G + fp32(0.114f) * B;
-			fp32 Cb = fp32(-0.1687f) * R - fp32(0.3313f) * G + fp32(0.5f) * B;
-			fp32 Cr = fp32(0.5f) * R - fp32(0.4187f) * G - fp32(0.0813f) * B;
+			fp32 Luma = fp32(0.299f) * Red + fp32(0.587f) * Green + fp32(0.114f) * Blue;
+			fp32 Cb = fp32(-0.1687f) * Red - fp32(0.3313f) * Green + fp32(0.5f) * Blue;
+			fp32 Cr = fp32(0.5f) * Red - fp32(0.4187f) * Green - fp32(0.0813f) * Blue;
 
-			Y = (fp32(1.0f) - Y.f_Pow(1.0f / 1.5f));
+			Luma = (fp32(1.0f) - Luma.f_Pow(1.0f / 1.5f));
 
-			fp32 Rf = (Y + fp32(1.402f) * Cr);
-			fp32 Gf = (Y - fp32(0.34414f) * Cb - fp32(0.71414f) * Cr);
-			fp32 Bf = (Y + fp32(1.772f) * Cb);
+			fp32 Rf = (Luma + fp32(1.402f) * Cr);
+			fp32 Gf = (Luma - fp32(0.34414f) * Cb - fp32(0.71414f) * Cr);
+			fp32 Bf = (Luma + fp32(1.772f) * Cb);
 
 			Rf *= 255.0f;
 			Gf *= 255.0f;

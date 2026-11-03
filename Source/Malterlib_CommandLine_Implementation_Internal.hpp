@@ -103,41 +103,41 @@ namespace NMib::NCommandLine
 			return fs_ColorCode(_Color, _AnsiFlags);
 
 		NGraphics::CColorR8G8B8 Color{.m_Color = RGB};
-		fp32 R = fp32(1.0f / 255.0f) * Color.f_Red();
-		fp32 G = fp32(1.0f / 255.0f) * Color.f_Green();
-		fp32 B = fp32(1.0f / 255.0f) * Color.f_Blue();
+		fp32 Red = fp32(1.0f / 255.0f) * Color.f_Red();
+		fp32 Green = fp32(1.0f / 255.0f) * Color.f_Green();
+		fp32 Blue = fp32(1.0f / 255.0f) * Color.f_Blue();
 
 		// Convert RGB to HSV
-		fp32 CMax = fg_Max(R, fg_Max(G, B));
-		fp32 CMin = fg_Min(R, fg_Min(G, B));
+		fp32 CMax = fg_Max(Red, fg_Max(Green, Blue));
+		fp32 CMin = fg_Min(Red, fg_Min(Green, Blue));
 		fp32 Delta = CMax - CMin;
 
-		fp32 H = fp32(0.0f);
+		fp32 Hue = fp32(0.0f);
 		if (Delta > fp32(0.0f))
 		{
-			if (CMax == R)
-				H = fp32(60.0f) * ((G - B) / Delta).f_Mod(fp32(6.0f));
-			else if (CMax == G)
-				H = fp32(60.0f) * ((B - R) / Delta + fp32(2.0f));
+			if (CMax == Red)
+				Hue = fp32(60.0f) * ((Green - Blue) / Delta).f_Mod(fp32(6.0f));
+			else if (CMax == Green)
+				Hue = fp32(60.0f) * ((Blue - Red) / Delta + fp32(2.0f));
 			else
-				H = fp32(60.0f) * ((R - G) / Delta + fp32(4.0f));
-			if (H < fp32(0.0f))
-				H += fp32(360.0f);
+				Hue = fp32(60.0f) * ((Red - Green) / Delta + fp32(4.0f));
+			if (Hue < fp32(0.0f))
+				Hue += fp32(360.0f);
 		}
-		fp32 S = (CMax > fp32(0.0f)) ? (Delta / CMax) : fp32(0.0f);
-		fp32 V = CMax;
+		fp32 Saturation = (CMax > fp32(0.0f)) ? (Delta / CMax) : fp32(0.0f);
+		fp32 Value = CMax;
 
-		// Decrease saturation, then solve for V that preserves perceived brightness
-		fp32 Y_orig = (fp32(0.299f) * R + fp32(0.587f) * G + fp32(0.114f) * B) * fp32(0.7f);
-		S *= fp32(0.7f);
+		// Decrease saturation, then solve for Value that preserves perceived brightness
+		fp32 OriginalLuma = (fp32(0.299f) * Red + fp32(0.587f) * Green + fp32(0.114f) * Blue) * fp32(0.7f);
+		Saturation *= fp32(0.7f);
 
-		// Compute RGB at V=1 to find the luminance scaling factor
-		fp32 C1 = S;
-		fp32 X1 = C1 * (fp32(1.0f) - ((H / fp32(60.0f)).f_Mod(fp32(2.0f)) - fp32(1.0f)).f_Abs());
+		// Compute RGB at Value=1 to find the luminance scaling factor
+		fp32 C1 = Saturation;
+		fp32 X1 = C1 * (fp32(1.0f) - ((Hue / fp32(60.0f)).f_Mod(fp32(2.0f)) - fp32(1.0f)).f_Abs());
 		fp32 M1 = fp32(1.0f) - C1;
 
 		fp32 R1, G1, B1;
-		fp32 Hs = H / fp32(60.0f);
+		fp32 Hs = Hue / fp32(60.0f);
 		if (Hs < fp32(1.0f))
 		{
 			R1 = C1;
@@ -179,13 +179,13 @@ namespace NMib::NCommandLine
 		G1 += M1;
 		B1 += M1;
 
-		// All RGB components scale linearly with V, so solve V to match original luminance
+		// All RGB components scale linearly with Value, so solve Value to match original luminance
 		fp32 Y1 = fp32(0.299f) * R1 + fp32(0.587f) * G1 + fp32(0.114f) * B1;
-		V = ((Y1 > fp32(0.0f)) ? fg_Min(Y_orig / Y1, fp32(1.0f)) : fp32(0.0f));
+		Value = ((Y1 > fp32(0.0f)) ? fg_Min(OriginalLuma / Y1, fp32(1.0f)) : fp32(0.0f));
 
-		fp32 Rf = fg_Clamp(R1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
-		fp32 Gf = fg_Clamp(G1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
-		fp32 Bf = fg_Clamp(B1 * V * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+		fp32 Rf = fg_Clamp(R1 * Value * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+		fp32 Gf = fg_Clamp(G1 * Value * fp32(255.0f), fp32(0.0f), fp32(255.0f));
+		fp32 Bf = fg_Clamp(B1 * Value * fp32(255.0f), fp32(0.0f), fp32(255.0f));
 
 		CAnsiEncoding AnsiEncoding(_AnsiFlags);
 		return AnsiEncoding.f_ForegroundRGB(Rf.f_ToIntRound(), Gf.f_ToIntRound(), Bf.f_ToIntRound());
