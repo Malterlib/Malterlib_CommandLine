@@ -209,10 +209,10 @@ namespace NMib::NCommandLine
 	struct CTerminalSurface
 	{
 		CTerminalSurface(CAnsiEncoding const &_AnsiEncoding, CTerminalSize const &_Size, CTerminalSurfaceClearProperties const &_DefaultProperties = {});
-		CTerminalSurface(CTerminalSurface const &) = default;
-		CTerminalSurface(CTerminalSurface &&) = default;
-		CTerminalSurface &operator = (CTerminalSurface const &) = default;
-		CTerminalSurface &operator = (CTerminalSurface &&) = default;
+		CTerminalSurface(CTerminalSurface const &_Other) = default;
+		CTerminalSurface(CTerminalSurface &&_Other) = default;
+		CTerminalSurface &operator = (CTerminalSurface const &_Other) = default;
+		CTerminalSurface &operator = (CTerminalSurface &&_Other) = default;
 
 		void f_Clear(CTerminalSurfaceClearProperties const &_ClearProperties = {});
 		void f_Blit(CTerminalSurface const &_Source, CTerminalArea const &_SourceArea = {}, CTerminalPoint const &_Destination = {});

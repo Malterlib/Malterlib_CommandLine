@@ -47,7 +47,7 @@ namespace NMib::NCommandLine
 
 		// An unknown terminal width (0) uses 280 columns for table layout.
 		CTableRenderHelper(NFunction::TCFunction<void (NStr::CStr const &_Output)> const &_fOutput, EOption _Options, EAnsiEncodingFlag _AnsiFlags, uint32 _AvailableWidth);
-		CTableRenderHelper(CTableRenderHelper &&) = default;
+		CTableRenderHelper(CTableRenderHelper &&_Other) = default;
 
 		void f_AddDescription(NStr::CStr const &_Description);
 		template <typename ...tfp_CString>

@@ -74,7 +74,7 @@ namespace NMib::NCommandLine
 
 	struct CChixel
 	{
-		auto operator <=> (CChixel const &) const = default;
+		auto operator <=> (CChixel const &_Right) const = default;
 
 		template <typename tf_CStr>
 		void f_Format(tf_CStr &o_Str) const;

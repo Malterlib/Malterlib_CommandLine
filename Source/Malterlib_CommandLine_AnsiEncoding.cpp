@@ -920,8 +920,8 @@ namespace NMib::NCommandLine
 		// Second phase: the wrap state machine over the stripped UTF-8 bytes. Lines are reported
 		// front to back through _fOutputLine(pStart, nBytes, DisplayLen, bLeadingEllipsis), and
 		// _fAppendEllipsis(WidthDelta) appends a trailing "…" to the most recently output line.
-		template <typename t_FOutputLine, typename t_FAppendEllipsis>
-		void fg_LineBreakWalk(CStr const &_Stripped, umint _Length, CAnsiEncoding::EWordWrap _WordWrap, t_FOutputLine &&_fOutputLine, t_FAppendEllipsis &&_fAppendEllipsis)
+		template <typename tf_FOutputLine, typename tf_FAppendEllipsis>
+		void fg_LineBreakWalk(CStr const &_Stripped, umint _Length, CAnsiEncoding::EWordWrap _WordWrap, tf_FOutputLine &&_fOutputLine, tf_FAppendEllipsis &&_fAppendEllipsis)
 		{
 			ch8 const *pStrippedBase = _Stripped.f_GetStr();
 			uch8 const *pParse = (uch8 const *)pStrippedBase;

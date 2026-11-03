@@ -34,7 +34,7 @@ namespace NMib::NCommandLine
 		if (_Properties.m_Properties.m_UnderlineColor)
 			UnderlineColor = *_Properties.m_Properties.m_UnderlineColor;
 
-		auto fFill = [&]<bool t_bCharacter, NPrivate::EColorOperation t_Foreground, NPrivate::EColorOperation t_Background, NPrivate::EColorOperation t_Underline, bool t_bFlags>
+		auto fFill = [&]<bool tf_bCharacter, NPrivate::EColorOperation tf_Foreground, NPrivate::EColorOperation tf_Background, NPrivate::EColorOperation tf_Underline, bool tf_bFlags>
 			{
 				for (int32 CoordY = UpperLeft.m_CoordY; CoordY < LowerRight.m_CoordY; ++CoordY)
 				{
@@ -42,29 +42,29 @@ namespace NMib::NCommandLine
 					{
 						auto &Chixel = pBuffer[CoordY * SurfaceWidth + CoordX];
 
-						if constexpr (t_bCharacter && t_bFlags)
+						if constexpr (tf_bCharacter && tf_bFlags)
 							Chixel.f_SetAll(*_Properties.m_Character, *_Properties.m_Properties.m_ChixelFlags);
 						else
 						{
-							if constexpr (t_bCharacter)
+							if constexpr (tf_bCharacter)
 								Chixel.f_SetCharacterAndEndpointType(*_Properties.m_Character);
-							if constexpr (t_bFlags)
+							if constexpr (tf_bFlags)
 								Chixel.f_SetFlags(*_Properties.m_Properties.m_ChixelFlags);
 						}
 
-						if constexpr (t_Foreground == NPrivate::EColorOperation::mc_Overwrite)
+						if constexpr (tf_Foreground == NPrivate::EColorOperation::mc_Overwrite)
 							Chixel.m_ForegroundColor = ForegroundColor;
-						else if constexpr (t_Foreground == NPrivate::EColorOperation::mc_Blend)
+						else if constexpr (tf_Foreground == NPrivate::EColorOperation::mc_Blend)
 							Chixel.m_ForegroundColor = ForegroundColor.f_Blend(Chixel.m_ForegroundColor, *_Properties.m_Properties.m_ForegroundBlend);
 
-						if constexpr (t_Background == NPrivate::EColorOperation::mc_Overwrite)
+						if constexpr (tf_Background == NPrivate::EColorOperation::mc_Overwrite)
 							Chixel.m_BackgroundColor = BackgroundColor;
-						else if constexpr (t_Background == NPrivate::EColorOperation::mc_Blend)
+						else if constexpr (tf_Background == NPrivate::EColorOperation::mc_Blend)
 							Chixel.m_BackgroundColor = BackgroundColor.f_Blend(Chixel.m_BackgroundColor, *_Properties.m_Properties.m_BackgroundBlend);
 
-						if constexpr (t_Underline == NPrivate::EColorOperation::mc_Overwrite)
+						if constexpr (tf_Underline == NPrivate::EColorOperation::mc_Overwrite)
 							Chixel.m_UnderlineColor = UnderlineColor;
-						else if constexpr (t_Underline == NPrivate::EColorOperation::mc_Blend)
+						else if constexpr (tf_Underline == NPrivate::EColorOperation::mc_Blend)
 							Chixel.m_UnderlineColor = UnderlineColor.f_Blend(Chixel.m_UnderlineColor, *_Properties.m_Properties.m_UnderlineBlend);
 					}
 				}

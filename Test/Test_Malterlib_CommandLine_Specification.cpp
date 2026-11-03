@@ -177,7 +177,7 @@ namespace
 				{
 					auto fCallback = [](CEJsonSorted *_pRunParams)
 						{
-							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									*_pRunParams = _Params;
 									return 0;
@@ -270,7 +270,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -316,7 +316,7 @@ namespace
 				{
 					auto fCallback = [](CEJsonSorted *_pRunParams)
 						{
-							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									*_pRunParams = _Params;
 									return 0;
@@ -372,7 +372,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -419,7 +419,7 @@ namespace
 				{
 					auto fCallback = [](CEJsonSorted *_pRunParams)
 						{
-							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							return [_pRunParams](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									*_pRunParams = _Params;
 									return 0;
@@ -570,7 +570,7 @@ namespace
 						)
 					;
 
-					auto fCallback = [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+					auto fCallback = [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 						{
 							RunParams = _Params;
 							return 0;
@@ -643,7 +643,7 @@ namespace
 								"Names"_o= _o["--cmd"]
 								, "Description"_o= "Command"
 							}
-							, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 0;
@@ -716,7 +716,7 @@ namespace
 									}
 								}
 							}
-							, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 0;
@@ -833,7 +833,7 @@ namespace
 									}
 								}
 							}
-							, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 0;
@@ -897,7 +897,7 @@ namespace
 									}
 								}
 							}
-							, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+							, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								RunParams = _Params;
 								return 0;
@@ -950,7 +950,7 @@ namespace
 										"Names"_o= _o["--no-bad"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -976,7 +976,7 @@ namespace
 										"Names"_o= _o["+bad"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -998,7 +998,7 @@ namespace
 										"Names"_o= _o["--bad=name"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1028,7 +1028,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1050,7 +1050,7 @@ namespace
 										"Names"_o= _o[]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1070,7 +1070,7 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1084,7 +1084,7 @@ namespace
 										"Names"_o= _o["--cmd"]
 										, "Description"_o= "Test 2"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1127,7 +1127,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1170,7 +1170,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1190,7 +1190,7 @@ namespace
 									"Names"_o= _o["--existing-cmd"]
 									, "Description"_o= "Existing"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1213,7 +1213,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1247,7 +1247,7 @@ namespace
 										"Names"_o= _o["--taken"]
 										, "Description"_o= "Test"
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1333,7 +1333,7 @@ namespace
 									"Names"_o= _o["--existing"]
 									, "Description"_o= "Existing"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1382,7 +1382,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1411,7 +1411,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1454,7 +1454,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1511,7 +1511,7 @@ namespace
 											}
 										}
 									}
-									, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+									, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 									{
 										return 0;
 									}
@@ -1534,7 +1534,7 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1567,7 +1567,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1599,7 +1599,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1623,7 +1623,7 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1652,7 +1652,7 @@ namespace
 									"Names"_o= _o["--cmd"]
 									, "Description"_o= "Test"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1685,7 +1685,7 @@ namespace
 										}
 									}
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1709,7 +1709,7 @@ namespace
 									"Names"_o= _o["--cmd1"]
 									, "Description"_o= "Test 1"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1721,7 +1721,7 @@ namespace
 									"Names"_o= _o["--cmd2"]
 									, "Description"_o= "Test 2"
 								}
-								, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 0;
 								}
@@ -1758,7 +1758,7 @@ namespace
 										}
 									}
 								}
-								, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+								, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									RunParams = _Params;
 									return 0;
@@ -1789,7 +1789,7 @@ namespace
 										}
 									}
 								}
-								, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+								, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									RunParams = _Params;
 									return 42;
@@ -1813,7 +1813,7 @@ namespace
 									"Names"_o= _o["--default", "-d"]
 									, "Description"_o= "Default command"
 								}
-								, [](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+								, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									return 42;
 								}
@@ -1840,7 +1840,7 @@ namespace
 									"Names"_o= _o["--cmd", "-c", "cmd"]
 									, "Description"_o= "Multi-alias command"
 								}
-								, [&](CEJsonSorted const &_Params, CCommandLineClient &) -> uint32
+								, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 								{
 									RunParams = _Params;
 									return 0;
@@ -1896,7 +1896,7 @@ namespace
 									}
 								}
 							}
-							, [](CEJsonSorted const &, CCommandLineClient &) -> uint32
+							, [](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
 							{
 								return 0;
 							}

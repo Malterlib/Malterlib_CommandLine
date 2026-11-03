@@ -67,10 +67,10 @@ namespace NMib::NCommandLine
 		}
 
 		// Splits _Param into separator delimited views of the input bytes (empty pieces are kept,
-		// matching the previous split based parsing); at most t_MaxPieces are stored while the full
+		// matching the previous split based parsing); at most tf_MaxPieces are stored while the full
 		// count is returned
-		template <umint t_MaxPieces>
-		umint fg_SplitPieces(CStrPtr const &_Param, ch8 _Separator, CStrPtr (&o_Pieces)[t_MaxPieces])
+		template <umint tf_MaxPieces>
+		umint fg_SplitPieces(CStrPtr const &_Param, ch8 _Separator, CStrPtr (&o_Pieces)[tf_MaxPieces])
 		{
 			umint nPieces = 0;
 
@@ -82,7 +82,7 @@ namespace NMib::NCommandLine
 				while (pSeparator < pEnd && *pSeparator != _Separator)
 					++pSeparator;
 
-				if (nPieces < t_MaxPieces)
+				if (nPieces < tf_MaxPieces)
 					o_Pieces[nPieces] = CStrPtr(pPos, pSeparator - pPos);
 				++nPieces;
 
