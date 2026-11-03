@@ -42,21 +42,6 @@ namespace NMib::NCommandLine
 			CValue(NStr::CStr const &_Identifier, bool _bOptional);
 
 			void f_Parse(NEncoding::CEJsonOrdered &&_Option);
-			NEncoding::CEJsonSorted fp_ParseEJson(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
-			auto fp_ConvertValue
-				(
-					NEncoding::CEJsonSorted const &_Template
-					, NEncoding::CEJsonSorted const &_Value
-					, NStr::CStr const &_Identifier
-					, bool _bStrict
-					, NCommandLine::EAnsiEncodingFlag _AnsiFlags
-				)
-				const
-				-> NEncoding::CEJsonSorted
-			;
-			NStr::CStr fp_FormatValue(NEncoding::CEJsonSorted const &_Template, NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			NStr::CStr fp_FormatType(NEncoding::CEJsonSorted const &_Template, bool _bType, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
-			void fp_ValidateTemplate(NEncoding::CEJsonSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
 			NEncoding::CEJsonSorted f_ConvertValue(NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			NEncoding::CEJsonSorted f_ConvertValue(NEncoding::CEJsonSorted const &_Value, NStr::CStr const &_Identifier, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
 			void f_AppendConvertValue(NEncoding::CEJsonSorted &o_Value, NEncoding::CEJsonSorted const &_Value, EColor _Color, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
@@ -81,6 +66,23 @@ namespace NMib::NCommandLine
 
 			NStr::CStr m_ShortDescription;
 			NStr::CStr m_LongDescription;
+
+		private:
+			NEncoding::CEJsonSorted fp_ParseEJson(NStr::CStr const &_Value, NStr::CStr const &_Error) const;
+			auto fp_ConvertValue
+				(
+					NEncoding::CEJsonSorted const &_Template
+					, NEncoding::CEJsonSorted const &_Value
+					, NStr::CStr const &_Identifier
+					, bool _bStrict
+					, NCommandLine::EAnsiEncodingFlag _AnsiFlags
+				)
+				const
+				-> NEncoding::CEJsonSorted
+			;
+			NStr::CStr fp_FormatValue(NEncoding::CEJsonSorted const &_Template, NEncoding::CEJsonSorted const &_Value, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			NStr::CStr fp_FormatType(NEncoding::CEJsonSorted const &_Template, bool _bType, NCommandLine::EAnsiEncodingFlag _AnsiFlags) const;
+			void fp_ValidateTemplate(NEncoding::CEJsonSorted const &_Template, NStr::CStr const &_Identifier, bool _bPrevIsSetOf) const;
 		};
 
 		struct COptionSet
