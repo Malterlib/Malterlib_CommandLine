@@ -108,69 +108,69 @@ namespace NMib::NCommandLine
 		fp32 Blue = fp32(1.0f / 255.0f) * Color.f_Blue();
 
 		// Convert RGB to HSV
-		fp32 CMax = fg_Max(Red, fg_Max(Green, Blue));
-		fp32 CMin = fg_Min(Red, fg_Min(Green, Blue));
-		fp32 Delta = CMax - CMin;
+		fp32 MaxComponent = fg_Max(Red, fg_Max(Green, Blue));
+		fp32 MinComponent = fg_Min(Red, fg_Min(Green, Blue));
+		fp32 Delta = MaxComponent - MinComponent;
 
 		fp32 Hue = fp32(0.0f);
 		if (Delta > fp32(0.0f))
 		{
-			if (CMax == Red)
+			if (MaxComponent == Red)
 				Hue = fp32(60.0f) * ((Green - Blue) / Delta).f_Mod(fp32(6.0f));
-			else if (CMax == Green)
+			else if (MaxComponent == Green)
 				Hue = fp32(60.0f) * ((Blue - Red) / Delta + fp32(2.0f));
 			else
 				Hue = fp32(60.0f) * ((Red - Green) / Delta + fp32(4.0f));
 			if (Hue < fp32(0.0f))
 				Hue += fp32(360.0f);
 		}
-		fp32 Saturation = (CMax > fp32(0.0f)) ? (Delta / CMax) : fp32(0.0f);
-		fp32 Value = CMax;
+		fp32 Saturation = (MaxComponent > fp32(0.0f)) ? (Delta / MaxComponent) : fp32(0.0f);
+		fp32 Value = MaxComponent;
 
 		// Decrease saturation, then solve for Value that preserves perceived brightness
 		fp32 OriginalLuma = (fp32(0.299f) * Red + fp32(0.587f) * Green + fp32(0.114f) * Blue) * fp32(0.7f);
 		Saturation *= fp32(0.7f);
 
 		// Compute RGB at Value=1 to find the luminance scaling factor
-		fp32 C1 = Saturation;
-		fp32 X1 = C1 * (fp32(1.0f) - ((Hue / fp32(60.0f)).f_Mod(fp32(2.0f)) - fp32(1.0f)).f_Abs());
-		fp32 M1 = fp32(1.0f) - C1;
+		fp32 Chroma1 = Saturation;
+		fp32 X1 = Chroma1 * (fp32(1.0f) - ((Hue / fp32(60.0f)).f_Mod(fp32(2.0f)) - fp32(1.0f)).f_Abs());
+		fp32 M1 = fp32(1.0f) - Chroma1;
 
 		fp32 R1, G1, B1;
 		fp32 Hs = Hue / fp32(60.0f);
 		if (Hs < fp32(1.0f))
 		{
-			R1 = C1;
+			R1 = Chroma1;
 			G1 = X1;
 			B1 = fp32(0.0f);
 		}
 		else if (Hs < fp32(2.0f))
 		{
 			R1 = X1;
-			G1 = C1;
+			G1 = Chroma1;
 			B1 = fp32(0.0f);
 		}
 		else if (Hs < fp32(3.0f))
 		{
 			R1 = fp32(0.0f);
-			G1 = C1;
+			G1 = Chroma1;
 			B1 = X1;
 		}
 		else if (Hs < fp32(4.0f))
 		{
 			R1 = fp32(0.0f);
 			G1 = X1;
-			B1 = C1;
+			B1 = Chroma1;
 		}
 		else if (Hs < fp32(5.0f))
 		{
 			R1 = X1;
 			G1 = fp32(0.0f);
-			B1 = C1;
+			B1 = Chroma1;
 		}
 		else
 		{
-			R1 = C1;
+			R1 = Chroma1;
 			G1 = fp32(0.0f);
 			B1 = X1;
 		}
