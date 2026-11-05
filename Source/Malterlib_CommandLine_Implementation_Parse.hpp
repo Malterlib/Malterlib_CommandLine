@@ -446,14 +446,14 @@ namespace NMib::NCommandLine
 					{
 						struct CFuzzyEntry
 						{
-							CStr m_Name;
-							CStr m_ColoredName;
-							fp64 m_Score;
-
 							auto operator <=> (CFuzzyEntry const &_Right) const noexcept
 							{
 								return NStorage::fg_TupleReferences(m_Score, m_Name) <=> NStorage::fg_TupleReferences(_Right.m_Score, _Right.m_Name);
 							}
+
+							CStr m_Name;
+							CStr m_ColoredName;
+							fp64 m_Score;
 						};
 
 						TCVector<CFuzzyEntry> FuzzyEntries;

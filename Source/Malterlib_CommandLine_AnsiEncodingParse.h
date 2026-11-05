@@ -41,30 +41,30 @@ namespace NMib::NCommandLine
 
 		struct CWeight
 		{
-			CAnsiEncoding::EWeight m_Weight = CAnsiEncoding::EWeight::mc_Normal;
-
 			auto operator <=> (CWeight const &_Other) const noexcept = default;
+
+			CAnsiEncoding::EWeight m_Weight = CAnsiEncoding::EWeight::mc_Normal;
 		};
 
 		struct CUnderline
 		{
-			CAnsiEncoding::EUnderline m_Underline = CAnsiEncoding::EUnderline::mc_None;
-
 			auto operator <=> (CUnderline const &_Other) const noexcept = default;
+
+			CAnsiEncoding::EUnderline m_Underline = CAnsiEncoding::EUnderline::mc_None;
 		};
 
 		struct CItalic
 		{
-			bool m_bEnabled = false;
-
 			auto operator <=> (CItalic const &_Other) const noexcept = default;
+
+			bool m_bEnabled = false;
 		};
 
 		struct CStrikeout
 		{
-			bool m_bEnabled = false;
-
 			auto operator <=> (CStrikeout const &_Other) const noexcept = default;
+
+			bool m_bEnabled = false;
 		};
 
 		struct CReset

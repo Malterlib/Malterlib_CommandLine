@@ -94,7 +94,6 @@ namespace NMib::NCommandLine
 			uint32 f_BackgroundRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
 			uint32 f_UnderlineRGBDiff(uint32 _Previous, uint8 _Red, uint8 _Green, uint8 _Blue);
 
-			static constexpr uint32 mc_DefaultColor = 0xFFFFFFFE; // Terminal default channel color (SGR 39, 49, 59), distinct from RGB values.
 			uint32 f_ForegroundDefaultDiff(uint32 _Previous);
 			uint32 f_BackgroundDefaultDiff(uint32 _Previous);
 			uint32 f_UnderlineDefaultDiff(uint32 _Previous);
@@ -105,6 +104,8 @@ namespace NMib::NCommandLine
 			void f_NotItalic();
 			void f_Strikeout();
 			void f_NotStrikeout();
+
+			static constexpr uint32 mc_DefaultColor = 0xFFFFFFFE; // Terminal default channel color (SGR 39, 49, 59), distinct from RGB values.
 
 		private:
 			void fp_StartSequence();
