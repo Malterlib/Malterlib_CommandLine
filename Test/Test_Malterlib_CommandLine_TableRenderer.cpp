@@ -45,51 +45,53 @@ namespace NMib::NCommandLine
 
 	struct CTableRenderer_Tests : NMib::NTest::CTest
 	{
-		void f_DoTests()
-		{
-			DMibTestSuite("Width")
-			{
-				DMibTestCategory("UnknownWidth")
-				{
-					CStr Message;
-					Message.f_AddChars('X', 240);
-
-					auto Output = fg_RenderTable(0, Message);
-
-					DMibExpect(Output.f_Find(Message), >=, 0);
-					DMibExpect(Output, ==, fg_RenderTable(280, Message));
-					DMibExpect(fg_MaxLineWidth(Output), <=, 280);
-				};
-
-				DMibTestCategory("UnknownWidthStillWraps")
-				{
-					CStr Message;
-					Message.f_AddChars('X', 300);
-
-					auto Output = fg_RenderTable(0, Message);
-
-					DMibExpect(Output.f_Find(Message), ==, -1);
-					DMibExpect(Output, ==, fg_RenderTable(280, Message));
-					DMibExpect(fg_MaxLineWidth(Output), <=, 280);
-				};
-
-				DMibTestCategory("ExplicitWidths")
-				{
-					CStr Message;
-					Message.f_AddChars('X', 300);
-
-					auto Narrow = fg_RenderTable(80, Message);
-					auto Wide = fg_RenderTable(340, Message);
-
-					DMibExpect(Narrow.f_Find(Message), ==, -1);
-					DMibExpect(fg_MaxLineWidth(Narrow), <=, 80);
-					DMibExpect(Wide.f_Find(Message), >=, 0);
-					DMibExpect(fg_MaxLineWidth(Wide), >, 280);
-					DMibExpect(fg_MaxLineWidth(Wide), <=, 340);
-				};
-			};
-		}
+		void f_DoTests();
 	};
+
+	void CTableRenderer_Tests::f_DoTests()
+	{
+		DMibTestSuite("Width")
+		{
+			DMibTestCategory("UnknownWidth")
+			{
+				CStr Message;
+				Message.f_AddChars('X', 240);
+
+				auto Output = fg_RenderTable(0, Message);
+
+				DMibExpect(Output.f_Find(Message), >=, 0);
+				DMibExpect(Output, ==, fg_RenderTable(280, Message));
+				DMibExpect(fg_MaxLineWidth(Output), <=, 280);
+			};
+
+			DMibTestCategory("UnknownWidthStillWraps")
+			{
+				CStr Message;
+				Message.f_AddChars('X', 300);
+
+				auto Output = fg_RenderTable(0, Message);
+
+				DMibExpect(Output.f_Find(Message), ==, -1);
+				DMibExpect(Output, ==, fg_RenderTable(280, Message));
+				DMibExpect(fg_MaxLineWidth(Output), <=, 280);
+			};
+
+			DMibTestCategory("ExplicitWidths")
+			{
+				CStr Message;
+				Message.f_AddChars('X', 300);
+
+				auto Narrow = fg_RenderTable(80, Message);
+				auto Wide = fg_RenderTable(340, Message);
+
+				DMibExpect(Narrow.f_Find(Message), ==, -1);
+				DMibExpect(fg_MaxLineWidth(Narrow), <=, 80);
+				DMibExpect(Wide.f_Find(Message), >=, 0);
+				DMibExpect(fg_MaxLineWidth(Wide), >, 280);
+				DMibExpect(fg_MaxLineWidth(Wide), <=, 340);
+			};
+		};
+	}
 
 	DMibTestRegister(CTableRenderer_Tests, Malterlib::CommandLine);
 }
