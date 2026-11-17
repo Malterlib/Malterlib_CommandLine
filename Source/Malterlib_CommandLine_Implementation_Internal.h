@@ -151,6 +151,7 @@ namespace NMib::NCommandLine
 			bool m_bAlwaysVerbose = false;
 			bool m_bGreedyDefaultCommand = false;
 			bool m_bGreedyDefaultCommandParameters = false;
+			bool m_bRawParameters = false; // Parameters, -- included, pass to the command as they are, without parsing options
 			bool m_bShowOptionsInCommandEntry = false;
 			bool m_bShowParametersStart = true;
 		};

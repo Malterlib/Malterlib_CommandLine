@@ -182,6 +182,7 @@ namespace NMib::NCommandLine
 					, "ErrorOnCommandAsParameter"
 					, "GreedyDefaultCommand"
 					, "GreedyDefaultCommandParameters"
+					, "RawParameters"
 					, "ErrorOnOptionAsParameter"
 					, "ErrorOnOptionAsParameterWhenDefaultCommand"
 					, "AlwaysVerbose"
@@ -247,6 +248,8 @@ namespace NMib::NCommandLine
 			NewCommand.m_bGreedyDefaultCommand = pGreedyDefaultCommand->f_Boolean();
 		if (auto *pGreedyDefaultCommandParameters = CommandDescription.f_GetMember("GreedyDefaultCommandParameters"))
 			NewCommand.m_bGreedyDefaultCommandParameters = pGreedyDefaultCommandParameters->f_Boolean();
+		if (auto *pRawParameters = CommandDescription.f_GetMember("RawParameters"))
+			NewCommand.m_bRawParameters = pRawParameters->f_Boolean();
 		if (auto *pErrorOnOptionAsParameter = CommandDescription.f_GetMember("ErrorOnOptionAsParameter"))
 			NewCommand.m_bErrorOnOptionAsParameter = pErrorOnOptionAsParameter->f_Boolean();
 		if (auto *pErrorOnOptionAsParameterWhenDefaultCommand = CommandDescription.f_GetMember("ErrorOnOptionAsParameterWhenDefaultCommand"))
@@ -431,7 +434,13 @@ namespace NMib::NCommandLine
 	void TCCommandLineSpecification<t_CCustomization>::f_SetDefaultCommand(CCommand const &_Command)
 	{
 		auto &Internal = *mp_pInternal;
-		Internal.m_pDefaultCommand = fg_AutoStaticCast(_Command.mp_pCommand);
+		decltype(Internal.m_pDefaultCommand) pCommand = fg_AutoStaticCast(_Command.mp_pCommand);
+
+		// Raw parameters start where the command is known, which for a default command that is not greedy is only known by parsing
+		if (pCommand->m_bRawParameters && !pCommand->m_bGreedyDefaultCommand)
+			DMibError(NStr::fg_Format("A default command with RawParameters must have GreedyDefaultCommand: {}", pCommand->m_Names.f_GetFirst()));
+
+		Internal.m_pDefaultCommand = pCommand;
 	}
 
 	// Finds a command by any of its names. Empty when no command has the name

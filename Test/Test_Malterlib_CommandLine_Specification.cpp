@@ -315,6 +315,79 @@ namespace
 				};
 			};
 
+			DMibTestSuite("Raw Parameters")
+			{
+				auto fRun = [](bool _bRawParameters, TCVector<CStr> const &_CommandLine, bool _bGreedy = true) -> CEJsonSorted
+					{
+						CEJsonSorted RunParams;
+						TCSharedPointer<CCommandLineSpecification> pSpec = fg_Construct();
+						auto Section = pSpec->f_AddSection("Test", "Test");
+						auto Command = Section.f_RegisterDirectCommand
+							(
+								{
+									"Names"_o= _o["Embedded"]
+									, "Description"_o= "Test"
+									, "Parameters"_o=
+									{
+										"Params...?"_o=
+										{
+											"Type"_o= _o[""]
+											, "Description"_o= "Vector param"
+										}
+									}
+									, "ErrorOnCommandAsParameter"_o= false
+									, "ErrorOnOptionAsParameter"_o= false
+									, "GreedyDefaultCommand"_o= _bGreedy
+									, "GreedyDefaultCommandParameters"_o= true
+									, "RawParameters"_o= _bRawParameters
+								}
+								, [&](CEJsonSorted const &_Params, CCommandLineClient &_CommandLineClient) -> uint32
+								{
+									RunParams = _Params;
+									return 0;
+								}
+							)
+						;
+						pSpec->f_SetDefaultCommand(Command);
+
+						CCommandLineClient Client(pSpec);
+						Client.f_RunCommandLine(fg_TempCopy(_CommandLine));
+
+						return RunParams;
+					}
+				;
+
+				TCVector<CStr> CommandLine = fg_CreateVector<CStr>("App", "--launch", "--output", "a.txt", "--", "cmake", "-E", "--", "touch");
+
+				{
+					DMibTestPath("Parameters pass as they are");
+					auto RunParams = fRun(true, CommandLine);
+					DMibExpect(RunParams["Params"], ==, (_["--launch", "--output", "a.txt", "--", "cmake", "-E", "--", "touch"]));
+				};
+
+				{
+					DMibTestPath("Without raw parameters -- ends the options");
+					auto RunParams = fRun(false, CommandLine);
+					DMibExpect(RunParams["Params"], ==, (_["--launch", "--output", "a.txt", "cmake", "-E", "touch"]));
+				};
+
+				{
+					DMibTestPath("Default command with raw parameters must be greedy");
+					DMibExpectException
+						(
+							fRun(true, fg_CreateVector<CStr>("App", "first"), false)
+							, DMibErrorInstance("A default command with RawParameters must have GreedyDefaultCommand: Embedded")
+						)
+					;
+				};
+
+				{
+					DMibTestPath("Raw parameters can contain the command override");
+					auto RunParams = fRun(true, fg_CreateVector<CStr>("App", "--launch", "--", "--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89", "Other"));
+					DMibExpect(RunParams["Params"], ==, (_["--launch", "--", "--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89", "Other"]));
+				};
+			};
+
 			DMibTestSuite("Optional Options")
 			{
 				auto fCallback = [](CEJsonSorted *_pRunParams)

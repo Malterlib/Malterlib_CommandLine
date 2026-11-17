@@ -88,9 +88,14 @@ namespace NMib::NCommandLine
 
 		TCVector<CStr> Params;
 
+		// A greedy default command takes raw parameters from the start, so they can contain the override. A command with raw parameters
+		// that is named on the command line takes them after its name, which only parsing finds, so the override is still looked for
+		// in them.
+		bool bRawParameters = pCurrentCommand && pCurrentCommand->m_bRawParameters && pCurrentCommand->m_bGreedyDefaultCommand;
+
 		for (auto iParameter = _Params.f_GetIterator(); iParameter; ++iParameter)
 		{
-			if (*iParameter == "--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89")
+			if (!bRawParameters && *iParameter == "--malterlib-command-BA49ADC8-6CAA-4E8C-BA13-3A9273859D89")
 			{
 				++iParameter;
 				if (!iParameter)
@@ -138,7 +143,9 @@ namespace NMib::NCommandLine
 				continue;
 			}
 
-			if (Parameter == "--")
+			if (pFoundCommand && pFoundCommand->m_bRawParameters)
+				bParametersOnly = true;
+			else if (Parameter == "--")
 			{
 				bParametersOnly = true;
 				continue;
